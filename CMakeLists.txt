@@ -78,4 +78,10 @@ add_dependencies(lowpoly3d glfw_project)
 add_dependencies(lowpoly3d glbinding_project)
 add_dependencies(lowpoly3d subber_project)
 
-target_link_libraries(lowpoly3d glbinding glfw3 opengl32)
+if (WIN32)
+	target_link_libraries(lowpoly3d glbinding glfw3 opengl32)
+endif (WIN32)
+
+if (UNIX)
+    target_link_libraries(lowpoly3d glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
+endif (UNIX)

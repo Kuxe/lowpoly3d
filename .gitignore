@@ -30,3 +30,7 @@
 
 # Contribs
 contrib/
+
+# Build directories
+debug/
+release/

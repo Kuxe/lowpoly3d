@@ -28,8 +28,6 @@ private:
 	std::unordered_map<int, int> triangles;
 
 	void handleHeldKeys() const;
-
-	bool drawRenderData(const ShaderProgram& program, const RenderData& rd, const glm::mat4& vp) const;
 public:
 
 	//Initializes renderer (create window and get ready for rendering)

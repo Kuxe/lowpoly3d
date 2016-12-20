@@ -66,26 +66,7 @@ static void mouse_callback(GLFWwindow* window, double x, double y) {
 /** Private methods **/
 /*********************/
 
-bool Renderer::drawRenderData(const ShaderProgram& program, const RenderData& rd, const glm::mat4& vp) const {
-    program.use();
-    //Calculate the MVP-matrix
-    const glm::mat4 mvp = vp * rd.modelMatrix;
-
-    //Send MVP matrix (per renderData) to vertex shader
-    if(!program.setUniform("mvp", mvp)) {
-        printf("ERROR: Could not set mvp in shader\n");
-        return false;
-    }
-
-    glBindVertexArray(rd.vertexArray);
-    try {
-        glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
-    } catch(std::out_of_range oor) {
-        printf("ERROR: Could not lookup vertex array %i given by render data!\n", rd.vertexArray);
-        return false;
-    }
-    return true;
-}
+//Empty over here AS IT SHOuLD BE USE LAMBDAS
 
 /*********************/
 /** Public methods **/
@@ -183,7 +164,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         program.add(GL_FRAGMENT_SHADER, "../shaders/shader.frag") &&
         program.add(GL_GEOMETRY_SHADER, "../shaders/shader.geom") && 
         program.link())) {
-         return false;
+        return false;
     }
     ShaderProgram sunProgram("Sun shader");
     if(!(
@@ -192,6 +173,19 @@ bool Renderer::render(RenderQuerier& rq) const {
         sunProgram.link())) {
         return false;
      }
+
+     ShaderProgram skyboxProgram("Skybox shader");
+     if(!(
+        skyboxProgram.add(GL_VERTEX_SHADER, "../shaders/skybox.vert") &&
+        skyboxProgram.add(GL_FRAGMENT_SHADER, "../shaders/sun.frag") &&
+        skyboxProgram.link())) {
+        return false;
+     }
+
+     std::unordered_map<int, const ShaderProgram&> programs;
+     programs.insert({0, program});
+     programs.insert({1, sunProgram});
+     programs.insert({2, skyboxProgram});
 
     while(!glfwWindowShouldClose(window)) {
         /** Run simulation one tick and query for data which I (the renderer) wants **/
@@ -257,12 +251,37 @@ bool Renderer::render(RenderQuerier& rq) const {
             const glm::mat4 projectionMatrix = glm::perspective(glm::radians(50.0f), 16.0f/9.0f, 0.1f, 1000.0f);
             const glm::mat4 vp = projectionMatrix * camera.get();
             //TODO: Redesign such that instanced indexed drawing is used
+            //TODO: Set uniforms as a function of current shader (skybox shaders warrants for other uniforms)
+            const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {
+                try {
+                    programs.at(rd.shader).use();
+                } catch (std::out_of_range) {
+                    printf("ERROR: Could not draw RenderData, there is no shader %i (there are 0...%i shaders)\n", rd.shader, programs.size());
+                    return false;
+                }
+                //Calculate the MVP-matrix
+                const glm::mat4 mvp = vp * rd.modelMatrix;
+
+                //Send MVP matrix (per renderData) to vertex shader
+                if(!program.setUniform("mvp", mvp)) {
+                    printf("ERROR: Could not set mvp in shader\n");
+                    return false;
+                }
+                glBindVertexArray(rd.vertexArray);
+                try {
+                    glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
+                } catch(std::out_of_range oor) {
+                    printf("ERROR: Could not lookup vertex array %i given by render data!\n", rd.vertexArray);
+                    return false;
+                }
+                return true;
+            };
             for(const auto& rd : renderDatas) {
-                drawRenderData(program, rd, vp);
+                drawRenderData(rd, vp);
             }
 
             /** Praise the sun! **/
-            if(!drawRenderData(sunProgram, sunRd, vp)) {
+            if(!drawRenderData(sunRd, vp)) {
                 printf("ERROR: Could not draw the sun\n");
                 return false;
             }

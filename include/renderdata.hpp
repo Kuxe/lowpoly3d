@@ -39,6 +39,7 @@ class Gamedata;
 struct RenderData {
 	glm::mat4 modelMatrix;
 	int vertexArray;
+	int shader;
 	RenderData() {};
 	RenderData(const glm::mat4& modelMatrix, const int vertexArray);
 
@@ -46,7 +47,8 @@ struct RenderData {
 	void serialize(Archive& archive) {
 		archive(
 			CEREAL_NVP(modelMatrix),
-			CEREAL_NVP(vertexArray)
+			CEREAL_NVP(vertexArray),
+			CEREAL_NVP(shader)
 		); 
 	}
 };

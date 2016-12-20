@@ -63,7 +63,8 @@
                 "m[3][2]": 0.0,
                 "m[3][3]": 1.0
             },
-            "vertexArray": 1
+            "vertexArray": 1,
+            "shader": 0
         },
         "renderDatas": [
             {
@@ -85,7 +86,8 @@
                     "m[3][2]": -100.0,
                     "m[3][3]": 1.0
                 },
-                "vertexArray": 2
+                "vertexArray": 2,
+                "shader": 0
             },
             {
                 "modelMatrix": {
@@ -106,7 +108,8 @@
                     "m[3][2]": 50.0,
                     "m[3][3]": 1.0
                 },
-                "vertexArray": 3
+                "vertexArray": 3,
+                "shader": 0
             },
             {
                 "modelMatrix": {
@@ -127,7 +130,8 @@
                     "m[3][2]": 0.0,
                     "m[3][3]": 1.0
                 },
-                "vertexArray": 4
+                "vertexArray": 4,
+                "shader": 0
             }
         ]
     }

@@ -158,6 +158,11 @@ std::vector<int> Renderer::loadModels(const std::vector<Model>& models) {
 bool Renderer::render(RenderQuerier& rq) const {
     using namespace std::chrono;
 
+    /** Ideally a ShaderProgram defines what uniforms it needs.
+        It would be nice during initialization of a shader to simply
+        pass a list of datatypes which the shaders sets as uniforms.
+        No. This is not nice. I want uniforms to be defined in shader
+        NO not nice either, dont wanna subclass. **/
     ShaderProgram program("Default shader");
     if(!(
         program.add(GL_VERTEX_SHADER, "../shaders/shader.vert") &&
@@ -166,6 +171,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         program.link())) {
         return false;
     }
+
     ShaderProgram sunProgram("Sun shader");
     if(!(
         sunProgram.add(GL_VERTEX_SHADER, "../shaders/sun.vert") &&
@@ -177,7 +183,7 @@ bool Renderer::render(RenderQuerier& rq) const {
      ShaderProgram skyboxProgram("Skybox shader");
      if(!(
         skyboxProgram.add(GL_VERTEX_SHADER, "../shaders/skybox.vert") &&
-        skyboxProgram.add(GL_FRAGMENT_SHADER, "../shaders/sun.frag") &&
+        skyboxProgram.add(GL_FRAGMENT_SHADER, "../shaders/skybox.frag") &&
         skyboxProgram.link())) {
         return false;
      }
@@ -218,38 +224,39 @@ bool Renderer::render(RenderQuerier& rq) const {
             const glm::vec3 sunsetColor(250, 214, 165);
             const glm::vec3 sunriseColor(49,47,102);
             const glm::vec3 cloudyColor(189,190,192);
-            const glm::vec3 noonColor(64, 156, 255);
+            const glm::vec3 noonColor(50, 189, 255);
             const glm::vec3 midnightColor(5,0,27);
-            const auto sin01 = [](float t) { return 0.5f*sinf(t)+0.5f; };
-            const auto fastsiglerp = [](const glm::vec3& a, const glm::vec3& b, float t) -> glm::vec3 {
-                return a*(t/(1.0f+fabsf(t))) + b*((1.0f-t)/(1.0f+fabsf(t)));
-            };
-            glm::vec3 timeOfDayColor = fastsiglerp(midnightColor, noonColor, sin01(rq.getSunOmega())) / 255.0f;
-            const glm::vec3 extraSunDay = glm::max(glm::vec3(0.0f, 0.0f, 0.0f), glm::sqrt(sunriseColor*2.0f));
-            const glm::vec3 clearColor = timeOfDayColor + extraSunDay/255.0f;
-            glClearColor(clearColor.x, clearColor.y, clearColor.z, 255.0f/255.0f);
-            //Send position of sun to fragment shader
-            if(!program.setUniform("timeOfDayColor", timeOfDayColor)) {
-                return false;
-            }
+
+            //Linear interpolation
+            const auto lerp = [](const auto& a, const auto& b, float t) { return a*(1.0f-t) + b*t; };
+
+            //Function that clamps values in range [lower, upper]
+            const auto clamp = [](float n, float lower, float upper) { return std::max(lower, std::min(n, upper)); };
+
+            //Clamps cosine in range [0.0f, 1.0f], steepness determines how steep the slope is
+            const auto clippedcos = [&](float t, float steepness) { return clamp(steepness*cosf(t), 0.0f, 1.0f); };
+            const float t = clippedcos(rq.getSunOmega(), 5.0f);
+            const glm::vec3 timeOfDayColor = lerp(midnightColor, noonColor, t) / 255.0f;
+            glClearColor(timeOfDayColor.x, timeOfDayColor.y, timeOfDayColor.z, 1.0f);
 
             const glm::mat4 view = camera.get();
             const glm::mat4 projection = glm::perspective(glm::radians(50.0f), 16.0f/9.0f, 0.1f, 1000.0f);
+
+            program.use();
             if(!program.setUniform("view", view)) return false;
             if(!program.setUniform("projection", projection)) return false;
+            if(!program.setUniform("sunPos", sunPos)) return false;
+            if(!program.setUniform("windowResolution", {width, height})) return false;
+            if(!program.setUniform("timeOfDayColor", timeOfDayColor)) return false; 
 
-            //Send position of sun to fragment shader
-            if(!program.setUniform("sunPos", sunPos)) {
-                return false;
-            }
+            skyboxProgram.use();
+            if(!skyboxProgram.setUniform("skyColor", timeOfDayColor)) return false;
+            if(!skyboxProgram.setUniform("sunPos", sunPos)) return false;
+            if(!skyboxProgram.setUniform("view", view)) return false;
+            if(!skyboxProgram.setUniform("projection", projection)) return false;
+            if(!skyboxProgram.setUniform("windowResolution", glm::vec2(width, height))) return false;
 
-            //Send window resolution to fragment shader
-            if(!program.setUniform("windowResolution", {width, height})) {
-                return false;
-            }
-
-            const glm::mat4 projectionMatrix = glm::perspective(glm::radians(50.0f), 16.0f/9.0f, 0.1f, 1000.0f);
-            const glm::mat4 vp = projectionMatrix * camera.get();
+            const glm::mat4 vp = projection * camera.get();
             //TODO: Redesign such that instanced indexed drawing is used
             //TODO: Set uniforms as a function of current shader (skybox shaders warrants for other uniforms)
             const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {

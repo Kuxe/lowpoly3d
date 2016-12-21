@@ -20,10 +20,17 @@ vec2 world2screen(vec3 p) {
 	return screenp * windowResolution;
 }
 
-vec3 suneffects() {
-	return 100.0/distance(world2screen(sunPos), gl_FragCoord.xy) * vec3(1.0, 0.2, 0.0);
+vec3 suneffects(float sunIntensity) {
+	float fragsunDistance = distance(world2screen(sunPos), gl_FragCoord.xy);
+	vec3 sunFlareColor = vec3(1.0, 0.2, 0.0);
+	//lookatLevel can be though of as "how much am I lookin at sun", ranging from 0.0 to 1.0, non-linear function.
+	//it also helps eliminate a "night sun" which appear due to reasons I wont bother explaining because I dont
+	//fully understand them atm.. I did grasp it recently but details are forgotten..
+	float lookatLevel = max(0.0, dot(vec3(0.0, 0.0, -1.0), normalize(vec3(view*vec4(sunPos, 1.0)))));
+	return sunIntensity/fragsunDistance * sunFlareColor * lookatLevel;
+
 }
 
 void main(void) {
-	color = fragColor + suneffects();
+	color = fragColor + suneffects(30.0);
 }

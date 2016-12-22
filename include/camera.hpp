@@ -13,7 +13,7 @@
 	Relies on the DeltaTime class.
 **/
 
-class Camera : Subber<wPress>, Subber<aPress>, Subber<sPress>, Subber<dPress>, Subber<qPress>, Subber<ePress>, Subber<MouseEvent>, Subber<CursorEnterWindow>, Subber<CursorExitWindow> {
+class Camera : Subber<wPress, aPress, sPress, dPress, qPress, ePress, MouseEvent, CursorEnterWindow, CursorExitWindow> {
 private:
 	glm::vec4 side, up, forward, eye;
 	float yaw, pitch;

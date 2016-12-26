@@ -104,9 +104,18 @@ int main(int argc, char** argv) {
 
 		//Only proceed if all models were succesfully loaded
 		if(std::find(std::begin(vas), std::end(vas), -1) == std::end(vas)) {
+
+			//Run simulation in a thread
+			std::thread dsthread(&DummySimulation::run, &ds);
+
+			//Main-thread will remain in here until program terminates
 			if(!renderer.render(ds)) {
 				printf("ERROR: Something went wrong in renderer\n");
 			}
+
+			//Renderer has quit, so terminate simulation and join simulation thread with main thread
+			ds.terminate();
+			dsthread.join();
 		} else {
 			printf("ERROR: Will not render because one or more models failed to load\n");
 		}

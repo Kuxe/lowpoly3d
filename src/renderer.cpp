@@ -186,40 +186,103 @@ bool Renderer::render(RenderQuerier& rq) const {
         skyboxProgram.add(GL_FRAGMENT_SHADER, "../shaders/skybox.frag") &&
         skyboxProgram.link())) {
         return false;
-     }
+    }
 
-     std::unordered_map<int, const ShaderProgram&> programs;
-     programs.insert({0, program});
-     programs.insert({1, sunProgram});
-     programs.insert({2, skyboxProgram});
+    std::unordered_map<int, const ShaderProgram&> programs;
+    programs.insert({0, program});
+    programs.insert({1, sunProgram});
+    programs.insert({2, skyboxProgram});
+
+    rq.rendererActive = true;
 
     while(!glfwWindowShouldClose(window)) {
-        /** Run simulation one tick and query for data which I (the renderer) wants **/
-        rq.update();
-        const std::vector<RenderData>& renderDatas = rq.getRenderDatas();
-        const RenderData& sunRd = rq.getSunRenderData();
-        const Camera& camera = rq.getCamera();
+
+        /** Explanation of threading in renderer (why and how):
+            First of all, the simulation part of game (logic, physics, AI etc)
+            should be decoupled from the rendering engine. This is because
+            the code would get messy otherwise. In the best of worlds, only a
+            minimal set of data flows from the "game" into the renderer.
+            This minimal set of data is, for most part, called "RenderData".
+            Other information that the renderer need from the game is position of sun,
+            position of camera and some other things. So an interface which the game implements
+            should provide these data if the game should be compatible with the renderer.
+            Thus, the only thing the game needs to do is simply realize the interface.
+            The game need not know anything about the renderer. This is nice.
+
+            So we know what the game must do (again, simply realize the RenderQuerier interface).
+            What must the renderer do? The renderer must have access to the RenderQuerier,
+            so pass a RenderQuerier into the render-method
+                Renderer::render(const RenderQuerier& rq)
+            This is precisely what is done right now. Now the renderer can access
+            whatever it needs to render a nice world. Very good.
+            But who passes RenderQuerier into the render-method?
+            This can be done in main, like so:
+
+                DummySimulation sim;
+                Renderer renderer;
+                renderer.initialize();
+                renderer.render(sim); //Main-thread locked in here!
+                renderer.terminate();
+
+            Not very difficult. But notice that renderer.render(sim) will not return
+            until the renderer is close (crossing out the window, alt+f4 or whatever).
+            Question: When should the simulation update?
+            Try1: Let the renderer update the simulation
+
+                DummySimulation sim;
+                Renderer renderer;
+                renderer.initialize();
+                renderer.render(sim); ... {
+                    sim.update();
+                    //do whatever the renderer does
+                }
+                renderer.terminate();
+
+            Since the renderer knows the RenderQuerier, the RenderQuerier can provide
+            a "update"-method which the renderer calls. Thus the renderer is in
+            control of updating the simulation. This is not nice, because then
+            the renderer is highly coupled with the simulation
+            (the renderer is a puppet-master and the simulation is the puppet).
+
+            Try2: Update the simulation in another thread, like so:
+
+                DummySimulation sim;
+                Renderer renderer;
+                renderer.initialize();
+                updateInThread(sim);
+                renderer.render(sim);
+                renderer.terminate();
+
+            Very nice. But problem arises. Since the renderer may access sim at anytime, even when
+            sim is doing computation, a race condition is introduced. So we must make sure that
+            the renderer does not use anything from simulation when simulation is running.
+            So whenever the simulation wants to render anything, signal the renderer that it
+            should render. When the renderer is done, wake the simulation. That is all.
+        **/
 
         DeltaTime::start();
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //Lambda function for rendering the scene
         //Useful to encapsulate rendering calls and required calls in lambda, because it just so happens
         //that it is handy to render the scene several times per frame (MSAA)
         const auto renderScene = [&]() {
+            const std::vector<RenderData>& renderDatas = rq.getRenderDatas();
+            const RenderData& sunRd = rq.getSunRenderData();
+            const Camera& camera = rq.getCamera();
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             if(!program.use()) {
                 printf("ERROR: Could not use shader program\n");
                 return false;
             }
 
-            /** Compute clear color as function of time to match the sunset and sunrise **/
-            glm::vec3 sunPos = {
-                sunRd.modelMatrix[3]
-            };
-
+                /** Compute clear color as function of time to match the sunset and sunrise **/
+            glm::vec3 sunPos = { sunRd.modelMatrix[3] };
+            
             //Add blue tone at night
             const glm::vec3 sunsetColor(250, 214, 165);
             const glm::vec3 sunriseColor(49,47,102);
@@ -256,7 +319,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             if(!skyboxProgram.setUniform("projection", projection)) return false;
             if(!skyboxProgram.setUniform("windowResolution", glm::vec2(width, height))) return false;
 
-            const glm::mat4 vp = projection * camera.get();
+            const glm::mat4 vp = projection * view;
             //TODO: Redesign such that instanced indexed drawing is used
             //TODO: Set uniforms as a function of current shader (skybox shaders warrants for other uniforms)
             const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {
@@ -283,6 +346,7 @@ bool Renderer::render(RenderQuerier& rq) const {
                 }
                 return true;
             };
+
             for(const auto& rd : renderDatas) {
                 drawRenderData(rd, vp);
             }
@@ -294,19 +358,27 @@ bool Renderer::render(RenderQuerier& rq) const {
             }
 
             return true;
-        };
+        }; //End of renderScene()
 
-        if(!renderScene()) {
-            printf("ERROR: Could not render scene\n");
-            return false;
+        /** Critical section **/
+        if(rq.shouldRender) {
+            if(!renderScene()) {
+                rq.signalSimulation();
+                return false;
+            }
+            rq.signalSimulation();
         }
+        /** End of critical section **/
 
-        glfwSwapBuffers(window);
         glfwPollEvents();
         handleHeldKeys();
+        glfwSwapBuffers(window);
         std::this_thread::sleep_until(DeltaTime::deltaTimeStart + std::chrono::microseconds(1666));
         DeltaTime::stop();
     }
+    rq.rendererActive = false; //This one take care of all possible waits happening _later_ in time
+    rq.cv.notify_one(); //This one take care of all possible waits that happened _befor_ in time
+    //So any wait is dealt with here!
     return true;
 }
 

@@ -4,7 +4,7 @@
 #include "gamedata.hpp"
 
 DummySimulation::DummySimulation(const Gamedata& gd) : 
-	renderDatas(gd.renderDatas), sunRd(gd.sunRd), suncb(gd.suncb), forceDaytime(gd.forceDaytime), gametimeSpeedFactor(gd.gametimeSpeedFactor)
+	renderDatas(gd.renderDatas), sunRd(gd.sunRd), suncb(gd.suncb), forceDaytime(gd.forceDaytime), gametimeSpeedFactor(gd.gametimeSpeedFactor), running(true)
  {
 
 }
@@ -30,6 +30,14 @@ const float DummySimulation::getSunOmega() const {
 	return !forceDaytime * getGametime();
 }
 
-void DummySimulation::update() {
-	sunRd.modelMatrix[3] = glm::vec4(suncb.getPos(getSunOmega()), 1.0);
+void DummySimulation::run() {
+	while(running) {
+		sunRd.modelMatrix[3] = glm::vec4(suncb.getPos(getSunOmega()), 1.0);
+		signalRenderer();
+	}
+};
+
+void DummySimulation::terminate() {
+	running = false;
 }
+

@@ -2,7 +2,8 @@
 #include "model.hpp"
 #include <math.h>
 
-PlaneGenerator::PlaneGenerator(const Vertex& normal, const Color& color) : normal(normal), color(color) { }
+PlaneGenerator::PlaneGenerator(const Vertex& normal, const Color& color, const uint8_t subdivides) :
+	normal(normal), color(color), subdivides(subdivides) { }
 
 Model PlaneGenerator::generate() {
 
@@ -13,5 +14,7 @@ Model PlaneGenerator::generate() {
 	std::vector<Vertex> vertices = {axis1, axis2, -axis1, -axis2};
 	std::vector<Color> colors(vertices.size(), color);
 	std::vector<Triangle> triangles = {{0,1,2},{0,2,3}};
-	return {vertices, colors, triangles};
+	Model m = {vertices, colors, triangles};
+	m.subdivide(subdivides);
+	return m;
 }

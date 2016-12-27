@@ -192,7 +192,6 @@ bool Renderer::render(RenderQuerier& rq) const {
     if(!(
         waterProgram.add(GL_VERTEX_SHADER, "../shaders/water.vert") &&
         waterProgram.add(GL_FRAGMENT_SHADER, "../shaders/water.frag") &&
-        waterProgram.add(GL_GEOMETRY_SHADER, "../shaders/water.geom") &&
         waterProgram.link())) {
         return false;
     }

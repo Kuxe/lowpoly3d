@@ -32,6 +32,7 @@ struct Gamedata {
 	bool forceDaytime;
 	glm::vec3 planeNormal;
 	Color planeColor = {255, 0, 255};
+	uint8_t waterSubdivides = 0;
 
 	/** "Constant" renderdatas and "linear" renderdatas wrp programming complexity :) **/
 	RenderData sunRd;
@@ -48,6 +49,7 @@ struct Gamedata {
 			CEREAL_NVP(forceDaytime),
 			CEREAL_NVP(planeNormal),
 			CEREAL_NVP(planeColor),
+			CEREAL_NVP(waterSubdivides),
 			CEREAL_NVP(sunRd),
 			CEREAL_NVP(renderDatas)
 		); 

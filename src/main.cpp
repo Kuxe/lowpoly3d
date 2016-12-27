@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 		SphereGenerator sg(gamedata.sunColor, gamedata.sunSubdivides);
 		SphereGenerator hemisphereGenerator({125.0f, 125.0f, 125.0f}, 3);
 		TerrainGenerator tg;
-		PlaneGenerator pg(gamedata.planeNormal, gamedata.planeColor);
+		PlaneGenerator pg(gamedata.planeNormal, gamedata.planeColor, gamedata.waterSubdivides);
 		Model sun = sg.generate();
 		Model terrainModel = tg.generate();
 		Model waterModel = pg.generate();

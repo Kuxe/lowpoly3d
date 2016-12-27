@@ -1,8 +1,7 @@
 #version 450
 
 
-in vec3 geomOutColor;
-in vec3 geomOutNormal;
+in vec3 outColor;
 out vec3 color;
 
 //TODO: Implement reflections
@@ -10,5 +9,5 @@ out vec3 color;
 //TODO: Implement small wave effects
 //TODO: Implement transparency
 void main(void) {
-	color = geomOutColor;
+	color = outColor;
 }

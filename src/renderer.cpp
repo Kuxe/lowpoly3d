@@ -363,6 +363,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         /** Critical section **/
         if(rq.shouldRender) {
             if(!renderScene()) {
+                rq.rendererActive = false;
                 rq.signalSimulation();
                 return false;
             }

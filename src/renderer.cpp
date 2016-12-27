@@ -188,10 +188,20 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
+    ShaderProgram waterProgram("Water shader");
+    if(!(
+        waterProgram.add(GL_VERTEX_SHADER, "../shaders/water.vert") &&
+        waterProgram.add(GL_FRAGMENT_SHADER, "../shaders/water.frag") &&
+        waterProgram.add(GL_GEOMETRY_SHADER, "../shaders/water.geom") &&
+        waterProgram.link())) {
+        return false;
+    }
+
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
     programs.insert({1, sunProgram});
     programs.insert({2, skyboxProgram});
+    programs.insert({3, waterProgram});
 
     rq.rendererActive = true;
 
@@ -268,10 +278,9 @@ bool Renderer::render(RenderQuerier& rq) const {
         //Lambda function for rendering the scene
         //Useful to encapsulate rendering calls and required calls in lambda, because it just so happens
         //that it is handy to render the scene several times per frame (MSAA)
-        const auto renderScene = [&]() {
+        const auto renderScene = [&](const Camera& camera) {
             const std::vector<RenderData>& renderDatas = rq.getRenderDatas();
             const RenderData& sunRd = rq.getSunRenderData();
-            const Camera& camera = rq.getCamera();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -362,7 +371,7 @@ bool Renderer::render(RenderQuerier& rq) const {
 
         /** Critical section **/
         if(rq.shouldRender) {
-            if(!renderScene()) {
+            if(!renderScene(rq.getCamera())) {
                 rq.rendererActive = false;
                 rq.signalSimulation();
                 return false;

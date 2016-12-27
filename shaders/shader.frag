@@ -21,11 +21,7 @@ float sigmoid(float x, float k) {
 }
 
 void main(void) {
-
-	float d = distance(vec2(gl_FragCoord), windowResolution/2.0) / max(windowResolution.x, windowResolution.y);
-	float filterStrength = 1 - (0.5 / (1 + exp(-d)));
 	vec3 ambient = vec3(0.15, 0.15, 0.15);
 	float diffuse = max(dot(geomOutNormal, normalize(sunPos - vec3(screen2world()))), 0.1) * sigmoid(sunPos.y, 1);
 	color = (diffuse * geomOutColor + geomOutColor * ambient) + 0.00001* normalize(timeOfDayColor);
-	//Modulate color as a function of time of day (orange during sunrise / sunset and dark at night!)
 }

@@ -14,7 +14,7 @@ Model TerrainGenerator::generate() {
 
 	std::random_device rd;
     std::knuth_b e2(rd());
-    std::normal_distribution<> dist(0, 0.05);
+    std::normal_distribution<> dist(0, 0.15);
 
 	//1. Generate vertices
 	for(int y = 0; y < numVerticesPerSide; y++) {

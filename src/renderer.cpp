@@ -6,18 +6,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/ext.hpp>
-#include <iostream>
 #include <thread>
 #include <algorithm>
 #include <cmath>
 #include "renderer.hpp"
-#include "scene.hpp"
 #include "model.hpp"
 #include "renderdata.hpp"
 #include "deltatime.hpp"
 #include "camera.hpp"
 #include "events.hpp"
 #include "shaderprogram.hpp"
+#include "framebuffer.hpp"
 
 using namespace gl;
 
@@ -196,6 +195,10 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    Framebuffer defaultFBO(width, height);
+
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
     programs.insert({1, sunProgram});
@@ -270,7 +273,6 @@ bool Renderer::render(RenderQuerier& rq) const {
         **/
 
         DeltaTime::start();
-        int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
@@ -280,6 +282,14 @@ bool Renderer::render(RenderQuerier& rq) const {
         const auto renderScene = [&](const Camera& camera) {
             const std::vector<RenderData>& renderDatas = rq.getRenderDatas();
             const RenderData& sunRd = rq.getSunRenderData();
+
+            //TODO: Figure out how to use "custom" FBO as displayed FBO
+            //currently these lines bellow causes only clear color to be shown
+            /*if(!defaultFBO.use()) {
+                printf("ERROR: Could not use default FBO\n");
+                return false;
+            }*/
+
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -382,7 +392,12 @@ bool Renderer::render(RenderQuerier& rq) const {
         glfwPollEvents();
         handleHeldKeys();
         glfwSwapBuffers(window);
-        std::this_thread::sleep_until(DeltaTime::deltaTimeStart + std::chrono::microseconds(1666));
+
+        if(glGetError() != GL_NO_ERROR) {
+            printf("ERROR: Unknown error in renderer!\n");
+            return false;
+        }
+
         DeltaTime::stop();
     }
     rq.rendererActive = false; //This one take care of all possible waits happening _later_ in time

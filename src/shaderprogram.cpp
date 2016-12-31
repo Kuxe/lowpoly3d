@@ -160,6 +160,32 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLfloat
 	return true;
 }
 
+bool ShaderProgram::setTexture(const std::string& uniformName, const GLuint& id, const GLenum& target) const {
+	if(!glIsTexture(id)) {
+		printf("ERROR: ShaderProgram could not set texture with id %i because %i is not a texture\n", id);
+		return false;
+	}
+
+	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
+	if(uniformLocation == -1) {
+		printf("ERROR: No texture uniform named %s\n", uniformName.c_str());
+		return false;
+	}
+
+	glBindTexture(target, id);
+	glUniform1i(uniformLocation, 0);
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Could not set texture uniform %s\n", uniformName.c_str());
+		return false;
+	}
+	return true;
+}
+
+bool ShaderProgram::setTextureMultisample(const std::string& uniformName, const GLuint& id) const {
+	return setTexture(uniformName, id, GL_TEXTURE_2D_MULTISAMPLE);
+}
+
+
 void ShaderProgram::notify(const rPress& event) {
 	for(const auto& pair : shaderHandles) {
 		const auto& key = pair.first;

@@ -12,9 +12,9 @@
 
 class ShaderProgram : public Subber<rPress> {
 private:
+	const std::string shaderName;
 	const gl::GLuint programHandle;
 	std::unordered_map<gl::GLenum, gl::GLuint> shaderHandles;
-	std::string shaderName;
 public:
 	ShaderProgram(const std::string& shaderName);
 	~ShaderProgram();
@@ -42,6 +42,8 @@ public:
 	bool setUniform(const std::string& uniformName, const glm::vec3& v) const;
 	bool setUniform(const std::string& uniformName, const glm::vec2& v) const;
 	bool setUniform(const std::string& uniformName, const gl::GLfloat& f) const;
+	bool setTexture(const std::string& uniformName, const gl::GLuint& id, const gl::GLenum& target = gl::GL_TEXTURE_2D) const;
+	bool setTextureMultisample(const std::string& uniformName, const gl::GLuint& id) const;
 
 	//If r is pressed to a live-reload of the shaderprogram
 	void notify(const rPress& event);

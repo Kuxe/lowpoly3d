@@ -157,6 +157,30 @@ std::vector<int> Renderer::loadModels(const std::vector<Model>& models) {
 bool Renderer::render(RenderQuerier& rq) const {
     using namespace std::chrono;
 
+    /** Create quad vertices for use in post-processing **/
+    gl::GLuint quadVA, quadVBO;
+    glGenVertexArrays(1, &quadVA);
+    glBindVertexArray(quadVA);
+    static const GLfloat quadVertices[] {
+        -1.0f, -1.0f, 0.0f,
+        +1.0f, -1.0f, 0.0f,
+        -1.0f, +1.0f, 0.0f,
+        -1.0f, +1.0f, 0.0f,
+        +1.0f, -1.0f, 0.0f,
+        +1.0f, +1.0f, 0.0f};
+    glGenBuffers(1, &quadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    const auto error = glGetError();
+    if(error != GL_NO_ERROR) {
+        printf("ERROR: Could not load quad for postprocessing\n");
+        return false;
+    }
+
     /** Ideally a ShaderProgram defines what uniforms it needs.
         It would be nice during initialization of a shader to simply
         pass a list of datatypes which the shaders sets as uniforms.
@@ -195,9 +219,19 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
+    ShaderProgram postprocessProgram("Post-process shader");
+    if(!(
+        postprocessProgram.add(GL_VERTEX_SHADER, "../shaders/passthrough.vert") &&
+        postprocessProgram.add(GL_FRAGMENT_SHADER, "../shaders/postprocess.frag") &&
+        postprocessProgram.link())) {
+        return false;
+    }
+
+
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    Framebuffer defaultFBO(width, height);
+    constexpr GLsizei numMultisamples = 4;
+    Framebuffer postprocessFBO(width, height, numMultisamples);
 
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
@@ -282,15 +316,6 @@ bool Renderer::render(RenderQuerier& rq) const {
         const auto renderScene = [&](const Camera& camera) {
             const std::vector<RenderData>& renderDatas = rq.getRenderDatas();
             const RenderData& sunRd = rq.getSunRenderData();
-
-            //TODO: Figure out how to use "custom" FBO as displayed FBO
-            //currently these lines bellow causes only clear color to be shown
-            /*if(!defaultFBO.use()) {
-                printf("ERROR: Could not use default FBO\n");
-                return false;
-            }*/
-
-
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if(!program.use()) {
@@ -378,13 +403,60 @@ bool Renderer::render(RenderQuerier& rq) const {
             return true;
         }; //End of renderScene()
 
+        //Render to default framebuffer using postprocessing effects
+        auto renderPostprocess = [&] {
+            //Render quad filling the screen using postprocessing shader,
+            //where postprocessing shader got a texture from postprocessFBO
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glViewport(0, 0, width, height);
+            postprocessProgram.use();
+            if(!postprocessProgram.setUniform("resolution", glm::vec2(width, height))) return false; 
+            if(!postprocessProgram.setTexture("renderedTexture", postprocessFBO.getTexture())) return false;
+            glBindVertexArray(quadVA);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindVertexArray(0);
+            return true;
+        };
+
+        /** SHADOW-MAPPING
+            I need to
+                1. Render scene (only depth-buffer) from sun-pov => we have a greyscale image
+                2. When rendering final scene with shadows, transform fragments from camera-space to sun-space
+                    and compare their z-values (if smaller than the grayscale color in grayscale image, then
+                    this pixel must be in shadow!)
+            And thats shadowmapping. In summary:
+
+            Render depth-buffer from suns point of view, then render scene again from camera point of view
+            BUT transform fragments into sun-space and compare z-values.
+        **/
+
         /** Critical section **/
         if(rq.shouldRender) {
+
+            postprocessFBO.use(); //Draw to postprocessFBO
             if(!renderScene(rq.getCamera())) {
                 rq.rendererActive = false;
                 rq.signalSimulation();
                 return false;
             }
+
+            //Draw content of postprocessFBO to screen
+            if(!renderPostprocess()) {
+                rq.rendererActive = false;
+                rq.signalSimulation();
+                return false;
+            };
+
+            /*glBindFramebuffer(GL_FRAMEBUFFER, 0); //Finally render scene to default framebuffer
+            if(!renderScene(rq.getCamera())) {
+                rq.rendererActive = false;
+                rq.signalSimulation();
+                return false;
+            }*/
+
+
+
             rq.signalSimulation();
         }
         /** End of critical section **/

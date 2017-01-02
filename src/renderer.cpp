@@ -156,6 +156,7 @@ std::vector<int> Renderer::loadModels(const std::vector<Model>& models) {
 
 bool Renderer::render(RenderQuerier& rq) const {
     using namespace std::chrono;
+    using RenderDatas = std::vector<RenderData>;
 
     /** Create quad vertices for use in post-processing **/
     gl::GLuint quadVA, quadVBO;
@@ -227,11 +228,24 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
+    ShaderProgram shadowmapProgram("Shadow-map shader");
+    if(!(
+        shadowmapProgram.add(GL_VERTEX_SHADER, "../shaders/shadowmap.vert") &&
+        shadowmapProgram.add(GL_FRAGMENT_SHADER, "../shaders/shadowmap.frag") &&
+        shadowmapProgram.link())) {
+        return false;
+    }
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     constexpr GLsizei numMultisamples = 4;
+
     Framebuffer postprocessFBO(width, height, numMultisamples);
+
+    //TODO: Implement a proper shadowFBO that only renders to one channel instead of three
+    //(currently shadowFBO is identical to that of postprocessingFBO but another shader
+    //which only renders z-component is used when rendering to shadowFBO
+    Framebuffer shadowmapFBO(width, height, numMultisamples);
 
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
@@ -309,21 +323,47 @@ bool Renderer::render(RenderQuerier& rq) const {
         DeltaTime::start();
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
+        const glm::mat4 projection = glm::perspective(glm::radians(50.0f), 16.0f/9.0f, 0.1f, 1000.0f);
 
-        //Lambda function for rendering the scene
-        //Useful to encapsulate rendering calls and required calls in lambda, because it just so happens
-        //that it is handy to render the scene several times per frame (MSAA)
-        const auto renderScene = [&](const Camera& camera) {
-            const std::vector<RenderData>& renderDatas = rq.getRenderDatas();
-            const RenderData& sunRd = rq.getSunRenderData();
+        /** Draws a set of renderdatas for any view-projection matrix.
+            This lambda does NOT bind anything but the vertex array of each render data,
+            so you need to specify what fbo or what shaders to use beforehand **/
+        //TODO: Redesign such that instanced indexed drawing is used
+        const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {
+            //Calculate the MVP-matrix and send it to vertex shader
+            const glm::mat4 mvp = vp * rd.modelMatrix;
+            if(!program.setUniform("mvp", mvp)) {
+                printf("ERROR: Could not set mvp in shader\n");
+                return false;
+            }
+            glBindVertexArray(rd.vertexArray); 
+            try {
+                glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
+            } catch(std::out_of_range oor) {
+                printf("ERROR: Could not lookup vertex array %i given by render data!\n", rd.vertexArray);
+                return false;
+            }
+            return true;
+        };
+
+        /** Draws a set of renderdatas, the sun from POV of camera to an framebuffer object
+            This is the place where the whole scene, with per-model shaders, is drawn **/
+        //TODO: Set uniforms as a function of current shader (skybox shaders warrants for other uniforms)
+        const auto render2fbo = [&](
+            const RenderDatas& rds,
+            const RenderData& sunRd,
+            const glm::mat4& sunvp,
+            const glm::mat4& view,
+            const glm::mat4& projection,
+            const Framebuffer& fbo) {
+            fbo.use();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
             if(!program.use()) {
                 printf("ERROR: Could not use shader program\n");
                 return false;
             }
 
-                /** Compute clear color as function of time to match the sunset and sunrise **/
+            /** Compute clear color as function of time to match the sunset and sunrise **/
             glm::vec3 sunPos = { sunRd.modelMatrix[3] };
             
             //Add blue tone at night
@@ -345,15 +385,13 @@ bool Renderer::render(RenderQuerier& rq) const {
             const glm::vec3 timeOfDayColor = lerp(midnightColor, noonColor, t) / 255.0f;
             glClearColor(timeOfDayColor.x, timeOfDayColor.y, timeOfDayColor.z, 1.0f);
 
-            const glm::mat4 view = camera.get();
-            const glm::mat4 projection = glm::perspective(glm::radians(50.0f), 16.0f/9.0f, 0.1f, 1000.0f);
-
             program.use();
             if(!program.setUniform("view", view)) return false;
             if(!program.setUniform("projection", projection)) return false;
             if(!program.setUniform("sunPos", sunPos)) return false;
             if(!program.setUniform("windowResolution", {width, height})) return false;
             if(!program.setUniform("timeOfDayColor", timeOfDayColor)) return false; 
+            if(!program.setUniform("sunvp", sunvp)) return false;
 
             skyboxProgram.use();
             if(!skyboxProgram.setUniform("skyColor", timeOfDayColor)) return false;
@@ -362,36 +400,20 @@ bool Renderer::render(RenderQuerier& rq) const {
             if(!skyboxProgram.setUniform("projection", projection)) return false;
             if(!skyboxProgram.setUniform("windowResolution", glm::vec2(width, height))) return false;
 
+            /** vp is the view-projection matrix. Model matrix is provided per renderdata,
+                so later on vp will be multiplied with model matrix once per renderdata **/
             const glm::mat4 vp = projection * view;
-            //TODO: Redesign such that instanced indexed drawing is used
-            //TODO: Set uniforms as a function of current shader (skybox shaders warrants for other uniforms)
-            const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {
+            for(const auto& rd : rds) {
                 try {
                     programs.at(rd.shader).use();
                 } catch (std::out_of_range) {
                     printf("ERROR: Could not draw RenderData, there is no shader %i (there are 0...%i shaders)\n", rd.shader, programs.size());
                     return false;
                 }
-                //Calculate the MVP-matrix
-                const glm::mat4 mvp = vp * rd.modelMatrix;
-
-                //Send MVP matrix (per renderData) to vertex shader
-                if(!program.setUniform("mvp", mvp)) {
-                    printf("ERROR: Could not set mvp in shader\n");
+                if(!drawRenderData(rd, vp)) {
+                    printf("ERROR: Could not draw a renderdata\n");
                     return false;
-                }
-                glBindVertexArray(rd.vertexArray);
-                try {
-                    glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
-                } catch(std::out_of_range oor) {
-                    printf("ERROR: Could not lookup vertex array %i given by render data!\n", rd.vertexArray);
-                    return false;
-                }
-                return true;
-            };
-
-            for(const auto& rd : renderDatas) {
-                drawRenderData(rd, vp);
+                };
             }
 
             /** Praise the sun! **/
@@ -401,10 +423,10 @@ bool Renderer::render(RenderQuerier& rq) const {
             }
 
             return true;
-        }; //End of renderScene()
+        }; //End of render2fbo
 
-        //Render to default framebuffer using postprocessing effects
-        auto renderPostprocess = [&] {
+        /** Renders content of postprocessFBO to screen **/
+        auto render2screen = [&] {
             //Render quad filling the screen using postprocessing shader,
             //where postprocessing shader got a texture from postprocessFBO
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -419,45 +441,52 @@ bool Renderer::render(RenderQuerier& rq) const {
             return true;
         };
 
-        /** SHADOW-MAPPING
-            I need to
-                1. Render scene (only depth-buffer) from sun-pov => we have a greyscale image
-                2. When rendering final scene with shadows, transform fragments from camera-space to sun-space
-                    and compare their z-values (if smaller than the grayscale color in grayscale image, then
-                    this pixel must be in shadow!)
-            And thats shadowmapping. In summary:
-
-            Render depth-buffer from suns point of view, then render scene again from camera point of view
-            BUT transform fragments into sun-space and compare z-values.
-        **/
+        /** Renders renderDatas to shadowmapFBO such that render2screen can provide the shadowmap uniform **/
+        auto render2shadowmap = [&](const RenderDatas& rds, const glm::mat4& view, const glm::mat4& projection) {
+            //1. Render each renderdata (except sun?) to shadowfbo using shadowmap shaders
+            shadowmapFBO.use();
+            shadowmapProgram.use();
+            glViewport(0, 0, width, height);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            const glm::mat4 vp = projection * view;
+            for(const auto& rd : rds) {
+                if(!drawRenderData(rd, vp)) {
+                    printf("ERROR: Could not draw a renderdata for shadowmapping\n");
+                    return false;
+                };
+            }
+            return true;
+        };
 
         /** Critical section **/
         if(rq.shouldRender) {
+            bool ok = true;
+            const RenderDatas& rds = rq.getRenderDatas(); //Shared data
+            const RenderData& sunRd = rq.getSunRenderData(); //Shared data
+            const Camera& camera = rq.getCamera(); //Shared data
+            const glm::mat4& view = camera.get();
 
-            postprocessFBO.use(); //Draw to postprocessFBO
-            if(!renderScene(rq.getCamera())) {
-                rq.rendererActive = false;
-                rq.signalSimulation();
-                return false;
-            }
-
-            //Draw content of postprocessFBO to screen
-            if(!renderPostprocess()) {
-                rq.rendererActive = false;
-                rq.signalSimulation();
-                return false;
-            };
-
-            /*glBindFramebuffer(GL_FRAMEBUFFER, 0); //Finally render scene to default framebuffer
-            if(!renderScene(rq.getCamera())) {
-                rq.rendererActive = false;
-                rq.signalSimulation();
-                return false;
-            }*/
-
-
+            /** In order to do shadow-mapping, I need to render to FBO. In order to render to FBO
+                I need to provide a view matrix for the sun. For now the sun will look at 0.0
+                This will only give shadows in the 0.0 region. Later on this can probably be improved
+                by letting the sun look at the point which is the foci of the camera, or something along
+                those lines (this corresponds to computing shadowmap only where player is looking).
+                The lookat point will probably depend on the camera (which is a shared resource)
+                and I dont want to introduce any race conditions by mistake later on, so keep this
+                code here **/
+            const glm::vec3 sunPos = glm::column(sunRd.modelMatrix, 3);
+            const glm::mat4 sunView = glm::lookAt(sunPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+            const glm::mat4 sunvp = sunView * projection;
+            ok =
+                render2shadowmap(rds, sunView, projection) &&
+                render2fbo(rds, sunRd, sunvp, view, projection, postprocessFBO) &&
+                render2screen();
 
             rq.signalSimulation();
+            if(!ok) {
+                rq.rendererActive = false;
+                return false;
+            }
         }
         /** End of critical section **/
 
@@ -473,7 +502,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         DeltaTime::stop();
     }
     rq.rendererActive = false; //This one take care of all possible waits happening _later_ in time
-    rq.cv.notify_one(); //This one take care of all possible waits that happened _befor_ in time
+    rq.cv.notify_one(); //This one take care of all possible waits that happened _before_ in time
     //So any wait is dealt with here!
     return true;
 }

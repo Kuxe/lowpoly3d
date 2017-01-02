@@ -80,7 +80,7 @@ bool ShaderProgram::link() const {
 		glGetProgramiv(programHandle, GL_INFO_LOG_LENGTH, &length);
 		std::vector<GLchar> log(length);
 		glGetProgramInfoLog(programHandle, length, &length, &log[0]);
-		printf("ERROR: Could not link shader program (%s)\n", &log[0]);
+		printf("ERROR: Could not link the shader program \"%s\" (%s)\n", shaderName.c_str(), &log[0]);
 		return false;
 	}
 	return true;

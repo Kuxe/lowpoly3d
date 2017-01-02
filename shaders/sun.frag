@@ -5,5 +5,5 @@ in vec3 fragColor;
 
 //TODO: Implement some procedural solar flares (simplex noise perhaps?)
 void main(void) {
-	color = fragColor;
+	color = fragColor + vec3(1.0);
 }

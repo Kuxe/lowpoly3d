@@ -83,6 +83,18 @@ bool Framebuffer::use() const {
 	return true;
 }
 
+void Framebuffer::notify(const OnResize& evt) {
+	const GLenum textureTarget = GL_TEXTURE_2D;
+	const GLsizei width = evt.width, height = evt.height;
+	glBindTexture(textureTarget, texture);
+	glTexImage2D(textureTarget, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0); //TODO: Dont forget to replace this one (when multisampling error goes away with 0 => GL_TRUE but then screen is black)
+	glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height); //TODO: This should be multisample too
+	if(glGetError() != GL_NO_ERROR) {
+		printf("WARNING: Could not resize framebuffer!\n");
+	}
+}
+
 GLuint Framebuffer::getTexture() const {
 	return texture;
 }

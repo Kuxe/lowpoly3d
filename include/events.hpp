@@ -14,5 +14,6 @@ struct MouseEvent { const double x, y; };
 struct DrawGridToggle { };
 struct CursorEnterWindow { const double x, y; };
 struct CursorExitWindow { const double x, y; };
+struct OnResize { const int width, height; };
 
 #endif //EVENTS_HPP

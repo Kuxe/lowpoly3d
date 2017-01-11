@@ -244,7 +244,7 @@ bool Renderer::render(RenderQuerier& rq) const {
 
     Framebuffer postprocessFBO(width, height, numMultisamples);
 
-    const uint16_t SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    const uint16_t SHADOW_WIDTH = 8192, SHADOW_HEIGHT = 8192;
     DepthFramebuffer shadowmapFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
 
     std::unordered_map<int, const ShaderProgram&> programs;

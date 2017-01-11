@@ -13,14 +13,13 @@ DepthFramebuffer::DepthFramebuffer(const gl::GLsizei width, const gl::GLsizei he
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &texture);
 	glBindTexture(textureTarget, texture);
-	glTexImage2D(textureTarget, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexImage2D(textureTarget, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	float outOfTextureColor[] = {1.0f, 0.0f, 1.0f, 1.0f};
 	glTexParameterfv(textureTarget, GL_TEXTURE_BORDER_COLOR, outOfTextureColor);
-
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureTarget, texture, 0); //Bind texture to binded fbo
 	glDrawBuffer(GL_NONE);
@@ -71,16 +70,6 @@ bool DepthFramebuffer::use() const {
 		return false;
 	}
 	return true;
-}
-
-void DepthFramebuffer::notify(const OnResize& evt) {
-	const GLenum textureTarget = GL_TEXTURE_2D;
-	const GLsizei width = evt.width, height = evt.height;
-	glBindTexture(textureTarget, texture);
-	glTexImage2D(textureTarget, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	if(glGetError() != GL_NO_ERROR) {
-		printf("WARNING: Could not resize depth framebuffer!\n");
-	}
 }
 
 GLuint DepthFramebuffer::getTexture() const {

@@ -30,7 +30,7 @@ float readShadowmap(vec4 fragSunspace) {
 
 //Returns a floating point in range [0.0, 1.0] representing "how much" this fragment is shadowed
 float shadowed(vec4 fragSunspace) {
-	return readShadowmap(fragSunspace) < fragSunspace.z  ? 0.5 : 1.0;  
+	return readShadowmap(fragSunspace) < (fragSunspace.z - 0.005) || sunPos.y < 0.0  ? 0.5 : 1.0;  
 }
 
 //             Modelmatrix                Viewmatrix               Projectionmatrix         Homogenous division   Multiply by windows resolution (NDC in [-1, 1] cube but screenspace in 0 - range so need to +1.0 then / 2.0)

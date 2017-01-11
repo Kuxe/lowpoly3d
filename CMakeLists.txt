@@ -72,6 +72,7 @@ add_executable(lowpoly3d
 	src/planegenerator.cpp
 	src/circlegenerator.cpp
 	src/framebuffer.cpp
+	src/depthframebuffer.cpp
 )
 
 add_dependencies(lowpoly3d glm_project)

@@ -35,6 +35,6 @@ vec3 avgNeighborus(int n) {
 
 //TODO: Toy around with post-processing effects
 void main(void) {
-	vec3 thisColor = texture2D(renderedTexture, gl_FragCoord.xy/resolution).xyz; 
+	vec3 thisColor = texture(renderedTexture, gl_FragCoord.xy/resolution).xyz; 
 	color = thisColor;
 }

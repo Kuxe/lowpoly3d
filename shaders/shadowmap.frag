@@ -1,6 +1,6 @@
 #version 450
 
-out vec3 depth;
+out float depth;
 void main(void) {
-	depth = vec3(gl_FragCoord.z);
+	depth = gl_FragCoord.z;
 }

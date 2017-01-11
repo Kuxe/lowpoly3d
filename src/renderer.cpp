@@ -17,6 +17,7 @@
 #include "events.hpp"
 #include "shaderprogram.hpp"
 #include "framebuffer.hpp"
+#include "depthframebuffer.hpp"
 
 using namespace gl;
 
@@ -243,10 +244,8 @@ bool Renderer::render(RenderQuerier& rq) const {
 
     Framebuffer postprocessFBO(width, height, numMultisamples);
 
-    //TODO: Implement a proper shadowFBO that only renders to one channel instead of three
-    //(currently shadowFBO is identical to that of postprocessingFBO but another shader
-    //which only renders z-component is used when rendering to shadowFBO
-    Framebuffer shadowmapFBO(width, height, numMultisamples);
+    const uint16_t SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    DepthFramebuffer shadowmapFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
 
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
@@ -332,11 +331,13 @@ bool Renderer::render(RenderQuerier& rq) const {
         //TODO: Redesign such that instanced indexed drawing is used
         const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {
             //Calculate the MVP-matrix and send it to vertex shader
-            const glm::mat4 mvp = vp * rd.modelMatrix;
-            if(!program.setUniform("mvp", mvp)) {
+            /** FIXME: THIS IS UGLY BECAUSE IT ASSUMES THAT ALL SHADERS HAVE "mvp" UNIFORM! NOT NECCESARILY TRUE **/
+            /** IDEALLY SHADERS SHOULD KNOW THEIR UNIFORMS SUCH THAT I THEY AUTOMATICALLY SET THEM ON .use() **/
+            if(!program.setUniform("mvp", vp * rd.modelMatrix)) {
                 printf("ERROR: Could not set mvp in shader\n");
                 return false;
             }
+
             glBindVertexArray(rd.vertexArray); 
             try {
                 glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
@@ -358,6 +359,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             const glm::mat4& projection,
             const Framebuffer& fbo) {
             fbo.use();
+            glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             if(!program.use()) {
                 printf("ERROR: Could not use shader program\n");
@@ -391,8 +393,8 @@ bool Renderer::render(RenderQuerier& rq) const {
             if(!program.setUniform("projection", projection)) return false;
             if(!program.setUniform("sunPos", sunPos)) return false;
             if(!program.setUniform("windowResolution", {width, height})) return false;
-            if(!program.setUniform("timeOfDayColor", timeOfDayColor)) return false; 
-            if(!program.setUniform("sunvp", sunvp)) return false;
+            if(!program.setUniform("timeOfDayColor", timeOfDayColor)) return false;
+            if(!program.setTexture("shadowmap", shadowmapFBO.getTexture())) return false;
 
             skyboxProgram.use();
             if(!skyboxProgram.setUniform("skyColor", timeOfDayColor)) return false;
@@ -405,12 +407,19 @@ bool Renderer::render(RenderQuerier& rq) const {
                 so later on vp will be multiplied with model matrix once per renderdata **/
             const glm::mat4 vp = projection * view;
             for(const auto& rd : rds) {
+
+                //FIXME: This is dirty solution. I only need to send sunmvp to shader matrix if programs.at(rd.shader) return a shader where sunmvp is needed
+                program.use();
+                if(!program.setUniform("sunmvp", sunvp * rd.modelMatrix)) return false;
+                //End of fixme
+
                 try {
                     programs.at(rd.shader).use();
                 } catch (std::out_of_range) {
-                    printf("ERROR: Could not draw RenderData, there is no shader %i (there are 0...%i shaders)\n", rd.shader, programs.size());
+                    printf("ERROR: Could not draw RenderData, there is no shader %i (there are 0...%llu shaders)\n", rd.shader, programs.size());
                     return false;
                 }
+
                 if(!drawRenderData(rd, vp)) {
                     printf("ERROR: Could not draw a renderdata\n");
                     return false;
@@ -443,15 +452,14 @@ bool Renderer::render(RenderQuerier& rq) const {
         };
 
         /** Renders renderDatas to shadowmapFBO such that render2screen can provide the shadowmap uniform **/
-        auto render2shadowmap = [&](const RenderDatas& rds, const glm::mat4& view, const glm::mat4& projection) {
+        auto render2shadowmap = [&](const RenderDatas& rds, const glm::mat4& viewproj) {
             //1. Render each renderdata (except sun?) to shadowfbo using shadowmap shaders
             shadowmapFBO.use();
             shadowmapProgram.use();
-            glViewport(0, 0, width, height);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            const glm::mat4 vp = projection * view;
+            glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+            glClear(GL_DEPTH_BUFFER_BIT);
             for(const auto& rd : rds) {
-                if(!drawRenderData(rd, vp)) {
+                if(!drawRenderData(rd, viewproj)) {
                     printf("ERROR: Could not draw a renderdata for shadowmapping\n");
                     return false;
                 };
@@ -477,9 +485,10 @@ bool Renderer::render(RenderQuerier& rq) const {
                 code here **/
             const glm::vec3 sunPos = glm::column(sunRd.modelMatrix, 3);
             const glm::mat4 sunView = glm::lookAt(sunPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-            const glm::mat4 sunvp = sunView * projection;
+            const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
+            const glm::mat4 sunvp = sunPerspective * sunView;
             ok =
-                render2shadowmap(rds, sunView, projection) &&
+                render2shadowmap(rds, sunvp) &&
                 render2fbo(rds, sunRd, sunvp, view, projection, postprocessFBO) &&
                 render2screen();
 

@@ -1,5 +1,5 @@
-#ifndef FRAMEBUFFER_HPP
-#define FRAMEBUFFER_HPP
+#ifndef DEPTHFRAMEBUFFER_HPP
+#define DEPTHFRAMEBUFFER_HPP
 
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
@@ -10,19 +10,19 @@
 #include "events.hpp"
 
 /** Class representing a framebuffer. In essence, call
-	Framebuffer::use() before drawing anything to the screen,
+	DepthFramebuffer::use() before drawing anything to the screen,
 	and you can use getTexture() which returns a handle to
-	a texture with scene rendered onto it. Useful for
-	post-processing **/
-class Framebuffer final : Subber<OnResize> {
-	gl::GLuint fbo, renderbuffer, texture;
+	a texture with depth of scene rendered onto it. Useful for
+	shadow-mapping **/
+class DepthFramebuffer final : Subber<OnResize> {
+	gl::GLuint fbo, texture;
 public:
-	Framebuffer(const gl::GLsizei width, const gl::GLsizei height, const gl::GLsizei samples = 0);
-	~Framebuffer();
+	DepthFramebuffer(const gl::GLsizei width, const gl::GLsizei height);
+	~DepthFramebuffer();
 	bool use() const;
 	gl::GLuint getTexture() const;
 	void notify(const OnResize& evt);
 };
 
 
-#endif //FRAMEBUFFER_HPP
+#endif //DEPTHFRAMEBUFFER_HPP

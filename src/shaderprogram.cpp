@@ -99,7 +99,7 @@ bool ShaderProgram::use() const {
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::mat4& m) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s\n", uniformName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
 		return false;
 	}
 
@@ -115,7 +115,7 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::mat4& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec3& v) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s\n", uniformName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
 		return false;
 	}
 
@@ -131,7 +131,7 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec3& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec2& v) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s\n", uniformName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
 		return false;
 	}
 
@@ -147,7 +147,7 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec2& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLfloat& f) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s\n", uniformName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
 		return false;
 	}
 
@@ -168,7 +168,7 @@ bool ShaderProgram::setTexture(const std::string& uniformName, const GLuint& id,
 
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No texture uniform named %s\n", uniformName.c_str());
+		printf("ERROR: No texture uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
 		return false;
 	}
 

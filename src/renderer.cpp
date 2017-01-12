@@ -353,6 +353,23 @@ bool Renderer::render(RenderQuerier& rq) const {
             return true;
         };
 
+        //Linear interpolation
+        const auto lerp = [](const auto& a, const auto& b, float t) { return a*(1.0f-t) + b*t; };
+
+        //Function that clamps values in range [lower, upper]
+        const auto clamp = [](float n, float lower, float upper) { return std::max(lower, std::min(n, upper)); };
+
+        //Clamps cosine in range [0.0f, 1.0f], steepness determines how steep the slope is
+        const auto clippedcos = [&](float t, float steepness) { return clamp(steepness*cosf(t), 0.0f, 1.0f); };
+
+        //Compute clear color as function of time to match the sunset and sunrise
+        const auto timeOfDayColorLambda = [&](const float t) {
+            const glm::vec3 noonColor(80, 219, 255);
+            const glm::vec3 midnightColor(5,0,27);
+            const float t = clippedcos(rq.getSunOmega(), 5.0f);
+            return lerp(midnightColor, noonColor, t) / 255.0f;
+        }
+
         /** Draws a set of renderdatas, the sun from POV of camera to an framebuffer object
             This is the place where the whole scene, with per-model shaders, is drawn **/
         //TODO: Set uniforms as a function of current shader (skybox shaders warrants for other uniforms)
@@ -372,22 +389,8 @@ bool Renderer::render(RenderQuerier& rq) const {
             }
 
             /** Compute clear color as function of time to match the sunset and sunrise **/
-            glm::vec3 sunPos = { sunRd.modelMatrix[3] };
-            
-            //Add blue tone at night
-            const glm::vec3 noonColor(80, 219, 255);
-            const glm::vec3 midnightColor(5,0,27);
-
-            //Linear interpolation
-            const auto lerp = [](const auto& a, const auto& b, float t) { return a*(1.0f-t) + b*t; };
-
-            //Function that clamps values in range [lower, upper]
-            const auto clamp = [](float n, float lower, float upper) { return std::max(lower, std::min(n, upper)); };
-
-            //Clamps cosine in range [0.0f, 1.0f], steepness determines how steep the slope is
-            const auto clippedcos = [&](float t, float steepness) { return clamp(steepness*cosf(t), 0.0f, 1.0f); };
-            const float t = clippedcos(rq.getSunOmega(), 5.0f);
-            const glm::vec3 timeOfDayColor = lerp(midnightColor, noonColor, t) / 255.0f;
+            const glm::vec3 sunPos = { sunRd.modelMatrix[3] };
+            const glm::vec3 timeOfDayColor = timeOfDayColorLambda(t);
             glClearColor(timeOfDayColor.x, timeOfDayColor.y, timeOfDayColor.z, 1.0f);
 
             program.use();

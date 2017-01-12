@@ -19,22 +19,40 @@ vec3 sobel() {
 	;
 }
 
+float edge() {
+	return dot(sobel(), vec3(1.0)) / 3.0;
+}
+
 vec3 sumNeighbours(int n) {
 	vec3 sum = vec3(0.0);
 	for(int x = 0; x < n; x++) {
 		for(int y = 0; y < n; y++) {
-			sum += texture2D(renderedTexture, (gl_FragCoord.xy + vec2(x, y))/resolution).xyz;
+			sum += texture(renderedTexture, (gl_FragCoord.xy + vec2(x, y))/resolution).xyz;
 		}
 	}
 	return sum;
 }
 
 vec3 avgNeighborus(int n) {
-	return sumNeighbours(n) / pow(n, 2);
+	return sumNeighbours(n) / pow(n, 2.0);
+}
+
+vec3 screenspaceAA() {
+	return (
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(1, 0))/resolution).xyz +
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 0))/resolution).xyz +
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, 1))/resolution).xyz +
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, -1))/resolution).xyz +
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(1, 1))/resolution).xyz +
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
+		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, -1))/resolution).xyz +
+		1.0/2.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, 0))/resolution).xyz)
+	;
 }
 
 //TODO: Toy around with post-processing effects
 void main(void) {
-	vec3 thisColor = texture(renderedTexture, gl_FragCoord.xy/resolution).xyz; 
-	color = thisColor;
+	color = texture(renderedTexture, gl_FragCoord.xy/resolution).xyz;
+	color = 0.6*avgNeighborus(5) * color + 0.6*pow(color, vec3(2.0));
 }

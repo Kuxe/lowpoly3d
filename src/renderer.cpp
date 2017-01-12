@@ -230,22 +230,27 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
-    ShaderProgram shadowmapProgram("Shadow-map shader");
+    ShaderProgram depthProgram("Depth shader");
     if(!(
-        shadowmapProgram.add(GL_VERTEX_SHADER, "../shaders/shadowmap.vert") &&
-        shadowmapProgram.add(GL_FRAGMENT_SHADER, "../shaders/shadowmap.frag") &&
-        shadowmapProgram.link())) {
+        depthProgram.add(GL_VERTEX_SHADER, "../shaders/depth.vert") &&
+        depthProgram.add(GL_FRAGMENT_SHADER, "../shaders/depth.frag") &&
+        depthProgram.link())) {
         return false;
     }
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
+
+    /** mainFBO is the fbo where the actual full-scene is rendered.
+        The FBO pipeline is as follows:
+                          draw mainFBO w MSAA          Render mainFBO to postProcessFBO w postfx shaders (no MSAA)           Blit postfxFBO to defaultFBO
+            depthFBO --------------------> mainFBO ----------------------------------------------------------> postfxFBO ----------------------------> defaultFBO
+    **/
     constexpr GLsizei numMultisamples = 4;
-
-    Framebuffer postprocessFBO(width, height, numMultisamples);
-
-    const uint16_t SHADOW_WIDTH = 8192, SHADOW_HEIGHT = 8192;
-    DepthFramebuffer shadowmapFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
+    constexpr uint16_t SHADOW_WIDTH = 8192, SHADOW_HEIGHT = 8192;
+    Framebuffer mainFBO("Main FBO", width, height, numMultisamples);
+    Framebuffer postfxFBO("PostFX FBO", width, height);
+    DepthFramebuffer depthFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
 
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
@@ -391,7 +396,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             if(!program.setUniform("sunPos", sunPos)) return false;
             if(!program.setUniform("windowResolution", {width, height})) return false;
             if(!program.setUniform("timeOfDayColor", timeOfDayColor)) return false;
-            if(!program.setTexture("shadowmap", shadowmapFBO.getTexture())) return false;
+            if(!program.setTexture("shadowmap", depthFBO.getTexture())) return false;
 
             skyboxProgram.use();
             if(!skyboxProgram.setUniform("skyColor", timeOfDayColor)) return false;
@@ -432,32 +437,44 @@ bool Renderer::render(RenderQuerier& rq) const {
             return true;
         }; //End of render2fbo
 
-        /** Renders content of postprocessFBO to screen **/
+        /** Blit content of mainFBO to postfxFBO and finally draw postfxFBO to default FBO **/
         auto render2screen = [&] {
-            //Render quad filling the screen using postprocessing shader,
-            //where postprocessing shader got a texture from postprocessFBO
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            /** Blit mainFBO onto postfxFBO **/
+            mainFBO.use(GL_READ_FRAMEBUFFER);
+            postfxFBO.use(GL_DRAW_FRAMEBUFFER);
             glViewport(0, 0, width, height);
+            glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+            if(glGetError() != GL_NO_ERROR) {
+                printf("ERROR: Could not blit mainFBO to postfxFBO\n");
+                return false;
+            }
+
+            /** Render quad filling the screen using postfx shaders, where postfx shader got multisampled texture from mainFBO **/
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             postprocessProgram.use();
             if(!postprocessProgram.setUniform("resolution", glm::vec2(width, height))) return false; 
-            if(!postprocessProgram.setTexture("renderedTexture", postprocessFBO.getTexture())) return false;
+            if(!postprocessProgram.setTexture("renderedTexture", postfxFBO.getTexture())) return false;
             glBindVertexArray(quadVA);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
+            if(glGetError() != GL_NO_ERROR) {
+                printf("ERROR: Could not draw postfxFBO to defaultFBO\n");
+                return false;
+            }
             return true;
         };
 
-        /** Renders renderDatas to shadowmapFBO such that render2screen can provide the shadowmap uniform **/
-        auto render2shadowmap = [&](const RenderDatas& rds, const glm::mat4& viewproj) {
-            //1. Render each renderdata (except sun?) to shadowfbo using shadowmap shaders
-            shadowmapFBO.use();
-            shadowmapProgram.use();
+        /** Renders renderDatas to depthFBO such that render2screen can provide the shadowmap uniform **/
+        auto render2depth = [&](const RenderDatas& rds, const glm::mat4& viewproj) {
+            //Render each renderdata (except sun?) to depthfbo using depth shaders
+            depthFBO.use();
+            depthProgram.use();
             glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             glClear(GL_DEPTH_BUFFER_BIT);
             for(const auto& rd : rds) {
                 if(!drawRenderData(rd, viewproj)) {
-                    printf("ERROR: Could not draw a renderdata for shadowmapping\n");
+                    printf("ERROR: Could not draw a renderdata to depthFBO\n");
                     return false;
                 };
             }
@@ -485,8 +502,8 @@ bool Renderer::render(RenderQuerier& rq) const {
             const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
             const glm::mat4 sunvp = sunPerspective * sunView;
             ok =
-                render2shadowmap(rds, sunvp) &&
-                render2fbo(rds, sunRd, sunvp, view, projection, postprocessFBO) &&
+                render2depth(rds, sunvp) &&
+                render2fbo(rds, sunRd, sunvp, view, projection, mainFBO) &&
                 render2screen();
 
             rq.signalSimulation();

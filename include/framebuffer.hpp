@@ -15,11 +15,14 @@
 	a texture with scene rendered onto it. Useful for
 	post-processing **/
 class Framebuffer final : Subber<OnResize> {
+	const std::string framebufferName;
 	gl::GLuint fbo, renderbuffer, texture;
+	const gl::GLsizei samples;
+	const bool multisampled;
 public:
-	Framebuffer(const gl::GLsizei width, const gl::GLsizei height, const gl::GLsizei samples = 0);
+	Framebuffer(const std::string& framebufferName, const gl::GLsizei width, const gl::GLsizei height, const gl::GLsizei samples = 0);
 	~Framebuffer();
-	bool use() const;
+	bool use(const gl::GLenum target = gl::GL_FRAMEBUFFER) const;
 	gl::GLuint getTexture() const;
 	void notify(const OnResize& evt);
 };

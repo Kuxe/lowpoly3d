@@ -21,6 +21,23 @@
 
 using namespace gl;
 
+/** TODO LIST
+    
+    TODO:   use glUniformBuffers such that I first update uniform buffers and then let shaders loose,
+            without worrying what shader need what uniform. Currently I set uniform "mvp" in drawRenderData, 
+            assuming that all shaders used during drawRenderdata have an "mvp" uniform, which isn't neccesarily
+            true. If I ever render an RenderData whose shader does not have an "mvp" uniform,
+            a call to setUniform("mvp", mvp) will fail. BUT! if uniformBuffers are used,
+            I can set uniforms regardless of what shader is currently in use.
+            The shaders will opt-in for whatever uniforms they need. This seems convenient.
+
+    TODO:   Field of depth would be nice
+    TODO:   Instanced indexed drawing could increase performance
+    TODO:   Text
+
+
+**/
+
 /*************/
 /** Statics **/
 /*************/
@@ -333,7 +350,6 @@ bool Renderer::render(RenderQuerier& rq) const {
         /** Draws a set of renderdatas for any view-projection matrix.
             This lambda does NOT bind anything but the vertex array of each render data,
             so you need to specify what fbo or what shaders to use beforehand **/
-        //TODO: Redesign such that instanced indexed drawing is used
         const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {
             //Calculate the MVP-matrix and send it to vertex shader
             /** FIXME: THIS IS UGLY BECAUSE IT ASSUMES THAT ALL SHADERS HAVE "mvp" UNIFORM! NOT NECCESARILY TRUE **/
@@ -372,7 +388,6 @@ bool Renderer::render(RenderQuerier& rq) const {
 
         /** Draws a set of renderdatas, the sun from POV of camera to an framebuffer object
             This is the place where the whole scene, with per-model shaders, is drawn **/
-        //TODO: Set uniforms as a function of current shader (skybox shaders warrants for other uniforms)
         const auto render2fbo = [&](
             const RenderDatas& rds,
             const RenderData& sunRd,

@@ -15,6 +15,10 @@ uniform mat4 sunvp;
 
 uniform sampler2D shadowmap;
 
+//             Modelmatrix                Viewmatrix               Projectionmatrix         Homogenous division   Multiply by windows resolution (NDC in [-1, 1] cube but screenspace in 0 - range so need to +1.0 then / 2.0)
+//Modelspace --------------> Worldspace --------------> Cameraspace --------------> Clipspace --------------> NDCspace --------------> Screenspace 
+//gl_FragCoord in screenspace
+
 vec4 screen2world() {
 	vec2 eyeCoords = mat2(inverse(projection)) * 2.0 *(vec2(gl_FragCoord.x / windowResolution.x, gl_FragCoord.y / windowResolution.y) - vec2(0.5));
 	return inverse(view) * vec4(eyeCoords.x, eyeCoords.y, -gl_FragCoord.z, gl_FragCoord.w) / gl_FragCoord.w;
@@ -30,13 +34,13 @@ float readShadowmap(vec4 fragSunspace) {
 
 //Returns a floating point in range [0.0, 1.0] representing "how much" this fragment is shadowed
 float shadowed(vec4 fragSunspace) {
-	return readShadowmap(fragSunspace) < (fragSunspace.z - 0.005) || sunPos.y < 0.0  ? 0.5 : 1.0;  
+	return readShadowmap(fragSunspace) < (fragSunspace.z - 0.005) || sunPos.y < 0.0  ? 0.7 : 1.0;  
 }
 
-//             Modelmatrix                Viewmatrix               Projectionmatrix         Homogenous division   Multiply by windows resolution (NDC in [-1, 1] cube but screenspace in 0 - range so need to +1.0 then / 2.0)
-//Modelspace --------------> Worldspace --------------> Cameraspace --------------> Clipspace --------------> NDCspace --------------> Screenspace 
-//gl_FragCoord in screenspace
-
+vec3 fog(vec3 color) {
+	const vec3 fogcolor = vec3(mix(vec3(0.5), timeOfDayColor, 0.8));
+	return mix(color, fogcolor, clamp(sqrt(0.02*gl_FragCoord.z / gl_FragCoord.w) - 1.0, 0.0, 1.0));
+}
 
 void main(void) {
 
@@ -47,4 +51,5 @@ void main(void) {
 	vec3 ambient = vec3(0.15, 0.15, 0.15);
 	float diffuse = max(dot(geomOutNormal, normalize(sunPos - vec3(fragworld))), 0.1) * sigmoid(sunPos.y, 1);
 	color = mix((diffuse * geomOutColor + geomOutColor * ambient), timeOfDayColor, 0.05) * shadowed(shadowcoord);
+	color = fog(color);
 }

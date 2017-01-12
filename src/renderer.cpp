@@ -370,10 +370,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             glm::vec3 sunPos = { sunRd.modelMatrix[3] };
             
             //Add blue tone at night
-            const glm::vec3 sunsetColor(250, 214, 165);
-            const glm::vec3 sunriseColor(49,47,102);
-            const glm::vec3 cloudyColor(189,190,192);
-            const glm::vec3 noonColor(50, 189, 255);
+            const glm::vec3 noonColor(80, 219, 255);
             const glm::vec3 midnightColor(5,0,27);
 
             //Linear interpolation

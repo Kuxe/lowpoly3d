@@ -28,7 +28,6 @@ vec3 suneffects(float sunIntensity) {
 	//fully understand them atm.. I did grasp it recently but details are forgotten..
 	float lookatLevel = max(0.0, dot(vec3(0.0, 0.0, -1.0), normalize(vec3(view*vec4(sunPos, 1.0)))));
 	return sunIntensity/fragsunDistance * sunFlareColor * lookatLevel;
-
 }
 
 void main(void) {

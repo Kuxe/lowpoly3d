@@ -9,12 +9,12 @@ Model TerrainGenerator::generate() {
 	std::vector<Color> colors;
 	std::vector<Triangle> triangles;
 
-	const uint16_t numVerticesPerSide = 100;
-	const float tileWidth = 1.0f;
+	const uint16_t numVerticesPerSide = 200;
+	const float tileWidth = 0.5f;
 
 	std::random_device rd;
     std::knuth_b e2(rd());
-    std::normal_distribution<> dist(0, 0.15);
+    std::normal_distribution<> dist(0, 0.05);
 
 	//1. Generate vertices
 	for(int y = 0; y < numVerticesPerSide; y++) {

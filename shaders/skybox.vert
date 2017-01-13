@@ -7,7 +7,7 @@ out vec3 fragColor;
 
 layout (std140) uniform WorldUniformData { 
 	mat4 view, projection;
-	vec3 sunPos, timeOfDayColor;
+	vec4 sunPos, timeOfDayColor;
 	vec2 windowResolution;
 };
 
@@ -17,5 +17,5 @@ layout (std140) uniform ModelUniformData {
 
 void main(void) {
 	gl_Position = mvp * vec4(position, 1.0);
-	fragColor = timeOfDayColor;
+	fragColor = vec3(timeOfDayColor);
 }

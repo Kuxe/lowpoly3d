@@ -15,7 +15,7 @@ out vec4 geomOutFragSunSpace;
 
 layout (std140) uniform WorldUniformData { 
 	mat4 view, projection;
-	vec3 sunPos, timeOfDayColor;
+	vec4 sunPos, timeOfDayColor;
 	vec2 windowResolution;
 };
 

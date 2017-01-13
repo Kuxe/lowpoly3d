@@ -33,7 +33,7 @@ using namespace gl;
             timeOfDayColor seem to be correct on CPU. It is the clear color, and clear color is fine. Also looked good when printed.
             Ah. Its vec3. See topic: http://stackoverflow.com/questions/38172696/should-i-ever-use-a-vec3-inside-of-a-uniform-buffer-or-shader-storage-buffer-o
             I should not use glm::vec3 in uniform buffers
-            
+**/
 
 /** TODO LIST
 
@@ -285,6 +285,7 @@ bool Renderer::render(RenderQuerier& rq) const {
     if(!program.setUBO("ModelUniformData", modelUBO)) return false;
     if(!skyboxProgram.setUBO("WorldUniformData", worldUBO)) return false;
     if(!skyboxProgram.setUBO("ModelUniformData", modelUBO)) return false;
+    if(!depthProgram.setUBO("ModelUniformData", modelUBO)) return false;
 
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
@@ -422,9 +423,8 @@ bool Renderer::render(RenderQuerier& rq) const {
                 return false;
             }
 
-            glClearColor(timeOfDayColor.x, timeOfDayColor.y, timeOfDayColor.z, 1.0f);
 
-            worldUBO.use<WorldUniformData>({view, projection, glm::vec3(glm::column(sunRd.modelMatrix, 3)), timeOfDayColor, windowResolution});
+            worldUBO.use<WorldUniformData>({view, projection, glm::column(sunRd.modelMatrix, 3), glm::vec4(timeOfDayColor, 0.0), windowResolution});
 
             program.use();
             if(!program.setTexture("shadowmap", depthFBO.getTexture())) return false;
@@ -493,7 +493,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             glClear(GL_DEPTH_BUFFER_BIT);
             for(const auto& rd : rds) {
-                modelUBO.use(ModelUniformData{rd.modelMatrix, viewproj * rd.modelMatrix, viewproj * rd.modelMatrix});
+                modelUBO.use<ModelUniformData>({rd.modelMatrix, viewproj * rd.modelMatrix, viewproj * rd.modelMatrix});
                 if(!drawRenderData(rd)) {
                     printf("ERROR: Could not draw a renderdata to depthFBO\n");
                     return false;

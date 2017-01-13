@@ -4,7 +4,7 @@
 
 struct WorldUniformData {
 	const glm::mat4 view, projection;
-	const glm::vec3 sunPos, timeOfDayColor;
+	const glm::vec4 sunPos, timeOfDayColor;
 	const glm::vec2 windowResolution;
 };
 

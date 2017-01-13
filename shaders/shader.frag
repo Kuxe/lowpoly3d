@@ -7,7 +7,7 @@ out vec3 color;
 
 layout (std140) uniform WorldUniformData { 
 	mat4 view, projection;
-	vec3 sunPos, timeOfDayColor;
+	vec4 sunPos, timeOfDayColor;
 	vec2 windowResolution;
 };
 
@@ -36,7 +36,7 @@ float shadowed(vec4 fragSunspace) {
 }
 
 vec3 fog(vec3 color) {
-	const vec3 fogcolor = vec3(mix(vec3(0.5), timeOfDayColor, 0.8));
+	const vec3 fogcolor = vec3(mix(vec3(0.5), vec3(timeOfDayColor), 0.8));
 	return mix(color, fogcolor, clamp(sqrt(0.02*gl_FragCoord.z / gl_FragCoord.w) - 1.0, 0.0, 1.0));
 }
 
@@ -47,7 +47,7 @@ void main(void) {
 
 	vec4 fragworld = screen2world();
 	vec3 ambient = vec3(0.15, 0.15, 0.15);
-	float diffuse = max(dot(geomOutNormal, normalize(sunPos - vec3(fragworld))), 0.1) * sigmoid(sunPos.y, 1);
-	color = mix((diffuse * geomOutColor + geomOutColor * ambient), timeOfDayColor, 0.05) * shadowed(shadowcoord);
+	float diffuse = max(dot(geomOutNormal, normalize(vec3(sunPos) - vec3(fragworld))), 0.1) * sigmoid(sunPos.y, 1);
+	color = mix((diffuse * geomOutColor + geomOutColor * ambient), vec3(timeOfDayColor), 0.05) * shadowed(shadowcoord);
 	color = fog(color);
 }

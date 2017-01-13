@@ -5,7 +5,7 @@ in vec3 fragColor;
 
 layout (std140) uniform WorldUniformData {
 	mat4 view, projection;
-	vec3 sunPos, timeOfDayColor;
+	vec4 sunPos, timeOfDayColor;
 	vec2 windowResolution;
 };
 
@@ -22,15 +22,15 @@ vec2 world2screen(vec3 p) {
 }
 
 vec3 suneffects(float sunIntensity) {
-	float fragsunDistance = distance(world2screen(sunPos), gl_FragCoord.xy);
+	float fragsunDistance = distance(world2screen(vec3(sunPos)), gl_FragCoord.xy);
 	vec3 sunFlareColor = vec3(1.0, 0.2, 0.0);
 	//lookatLevel can be though of as "how much am I lookin at sun", ranging from 0.0 to 1.0, non-linear function.
 	//it also helps eliminate a "night sun" which appear due to reasons I wont bother explaining because I dont
 	//fully understand them atm.. I did grasp it recently but details are forgotten..
-	float lookatLevel = max(0.0, dot(vec3(0.0, 0.0, -1.0), normalize(vec3(view*vec4(sunPos, 1.0)))));
+	float lookatLevel = max(0.0, dot(vec3(0.0, 0.0, -1.0), normalize(vec3(view*sunPos))));
 	return sunIntensity/fragsunDistance * sunFlareColor * lookatLevel;
 }
 
 void main(void) {
-	color = fragColor + 0.000000000000000000000000000001*suneffects(30.0);
+	color = fragColor + suneffects(30.0);
 }

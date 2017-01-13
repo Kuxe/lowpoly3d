@@ -48,6 +48,7 @@ public:
 	static std::unordered_set<int> keysHeld;
 
 	void setPrintFrameTime(bool printFrameTime);
+	void setMultisamples(int msaa);
 
 	void notify(const DrawGridToggle& event);
 };

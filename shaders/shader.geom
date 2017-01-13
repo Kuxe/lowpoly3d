@@ -13,8 +13,11 @@ out vec3 geomOutColor;
 out vec3 geomOutNormal;
 out vec4 geomOutFragSunSpace;
 
-uniform mat4 view;
-uniform mat4 projection;
+layout (std140) uniform WorldUniformData { 
+	mat4 view, projection;
+	vec3 sunPos, timeOfDayColor;
+	vec2 windowResolution;
+};
 
 void main() {
 	mat4 vpi = inverse(projection*view);

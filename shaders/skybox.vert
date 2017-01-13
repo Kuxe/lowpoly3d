@@ -5,10 +5,17 @@ layout(location = 1) in vec3 color;
 
 out vec3 fragColor;
 
-uniform mat4 mvp;
-uniform vec3 skyColor;
+layout (std140) uniform WorldUniformData { 
+	mat4 view, projection;
+	vec3 sunPos, timeOfDayColor;
+	vec2 windowResolution;
+};
+
+layout (std140) uniform ModelUniformData { 
+	mat4 model, mvp, sunmvp;
+};
 
 void main(void) {
 	gl_Position = mvp * vec4(position, 1.0);
-	fragColor = skyColor;
+	fragColor = timeOfDayColor;
 }

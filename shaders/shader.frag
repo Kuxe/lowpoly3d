@@ -5,13 +5,11 @@ in vec3 geomOutNormal;
 in vec4 geomOutFragSunSpace;
 out vec3 color;
 
-uniform vec3 sunPos;
-uniform vec3 timeOfDayColor;
-uniform vec2 windowResolution;
-
-uniform mat4 view;
-uniform mat4 projection;
-uniform mat4 sunvp;
+layout (std140) uniform WorldUniformData { 
+	mat4 view, projection;
+	vec3 sunPos, timeOfDayColor;
+	vec2 windowResolution;
+};
 
 uniform sampler2D shadowmap;
 

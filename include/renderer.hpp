@@ -21,7 +21,7 @@ class ShaderProgram;
 /** Takes renderdatas and renderes them in 3D window **/
 class Renderer : Subber<DrawGridToggle> {
 private:
-	bool drawGrid = false;
+	bool drawGrid = false, printFrameTime = false;
 	GLFWwindow* window;
 
 	//Keep track of triangles count per VA
@@ -46,6 +46,8 @@ public:
 
 	//Keep tracks of what keys are held down
 	static std::unordered_set<int> keysHeld;
+
+	void setPrintFrameTime(bool printFrameTime);
 
 	void notify(const DrawGridToggle& event);
 };

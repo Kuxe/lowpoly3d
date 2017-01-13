@@ -48,6 +48,7 @@ int main(int argc, char** argv) {
 	args::Flag printVasFlag(parser, "printvas", "Print integer handle to vertex arrays loaded by renderer", {"printvas"});
 	args::ValueFlag<float> gametimeSpeedFactor(parser, "gametime", "Increases gametime speed by a factor", {"gt", "gametimespeedfactor"});
 	args::Flag forceDaytime(parser, "forcedaytime", "Disable day/night cycle", {"forcedaytime"});
+	args::Flag printFrameTimeFlag(parser, "printframetime", "Prints frame time", {"printframetime"});
     try {
     	parser.ParseCLI(argc, argv);
     } catch (args::Help) {
@@ -65,6 +66,11 @@ int main(int argc, char** argv) {
     }
 
 	Renderer renderer;
+
+	if(printFrameTimeFlag) {
+		renderer.setPrintFrameTime(true);
+	}
+
 	if(renderer.initialize()) {
 
 

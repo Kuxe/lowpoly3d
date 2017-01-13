@@ -18,18 +18,24 @@
 #include "shaderprogram.hpp"
 #include "framebuffer.hpp"
 #include "depthframebuffer.hpp"
+#include "uniformbuffer.hpp"
+#include "worlduniformdata.hpp"
+#include "modeluniformdata.hpp"
 
 using namespace gl;
 
+/** FIXME LIST
+
+    FIXME:  Colors are not right since UniformBuffer were implemented and used. Why?
+            Colors are broke in both default shader and skybox shader. Its not shader specific.
+            Camera work as intended. So model (ModelUniformData), view and projection (WorldUniformData) seem to work.
+            I've pinend it down to timeOfDayColor. It's values are way higher than they should be.
+            timeOfDayColor seem to be correct on CPU. It is the clear color, and clear color is fine. Also looked good when printed.
+            Ah. Its vec3. See topic: http://stackoverflow.com/questions/38172696/should-i-ever-use-a-vec3-inside-of-a-uniform-buffer-or-shader-storage-buffer-o
+            I should not use glm::vec3 in uniform buffers
+            
+
 /** TODO LIST
-    
-    TODO:   use glUniformBuffers such that I first update uniform buffers and then let shaders loose,
-            without worrying what shader need what uniform. Currently I set uniform "mvp" in drawRenderData, 
-            assuming that all shaders used during drawRenderdata have an "mvp" uniform, which isn't neccesarily
-            true. If I ever render an RenderData whose shader does not have an "mvp" uniform,
-            a call to setUniform("mvp", mvp) will fail. BUT! if uniformBuffers are used,
-            I can set uniforms regardless of what shader is currently in use.
-            The shaders will opt-in for whatever uniforms they need. This seems convenient.
 
     TODO:   Field of depth would be nice
     TODO:   Instanced indexed drawing could increase performance
@@ -84,7 +90,7 @@ static void mouse_callback(GLFWwindow* window, double x, double y) {
 /** Private methods **/
 /*********************/
 
-//Empty over here AS IT SHOuLD BE USE LAMBDAS
+//Empty over here AS IT SHOULD BE USE LAMBDAS
 
 /*********************/
 /** Public methods **/
@@ -269,6 +275,17 @@ bool Renderer::render(RenderQuerier& rq) const {
     Framebuffer postfxFBO("PostFX FBO", width, height);
     DepthFramebuffer depthFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
 
+    /** Create two UBOs. World UBO is an Uniform Buffer Object which contains data that is constant
+        over any RenderData (such as position of sun, viewprojection matrix, time). All shaders have access
+        to World UBO. World UBO is updated once per frame. Model UBO is an Uniform Buffer Object which
+        is updated once per RenderData. It contains data provided by RenderData such as the model matrix **/
+    UniformBuffer worldUBO("World UBO", 1);
+    UniformBuffer modelUBO("Model UBO", 2);
+    if(!program.setUBO("WorldUniformData", worldUBO)) return false;
+    if(!program.setUBO("ModelUniformData", modelUBO)) return false;
+    if(!skyboxProgram.setUBO("WorldUniformData", worldUBO)) return false;
+    if(!skyboxProgram.setUBO("ModelUniformData", modelUBO)) return false;
+
     std::unordered_map<int, const ShaderProgram&> programs;
     programs.insert({0, program});
     programs.insert({1, sunProgram});
@@ -345,29 +362,8 @@ bool Renderer::render(RenderQuerier& rq) const {
         DeltaTime::start();
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
+        const glm::vec2 windowResolution(width, height);
         const glm::mat4 projection = glm::perspective(glm::radians(50.0f), 16.0f/9.0f, 0.1f, 1000.0f);
-
-        /** Draws a set of renderdatas for any view-projection matrix.
-            This lambda does NOT bind anything but the vertex array of each render data,
-            so you need to specify what fbo or what shaders to use beforehand **/
-        const auto drawRenderData = [&](const RenderData& rd, const glm::mat4& vp) {
-            //Calculate the MVP-matrix and send it to vertex shader
-            /** FIXME: THIS IS UGLY BECAUSE IT ASSUMES THAT ALL SHADERS HAVE "mvp" UNIFORM! NOT NECCESARILY TRUE **/
-            /** IDEALLY SHADERS SHOULD KNOW THEIR UNIFORMS SUCH THAT I THEY AUTOMATICALLY SET THEM ON .use() **/
-            if(!program.setUniform("mvp", vp * rd.modelMatrix)) {
-                printf("ERROR: Could not set mvp in shader\n");
-                return false;
-            }
-
-            glBindVertexArray(rd.vertexArray); 
-            try {
-                glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
-            } catch(std::out_of_range oor) {
-                printf("ERROR: Could not lookup vertex array %i given by render data!\n", rd.vertexArray);
-                return false;
-            }
-            return true;
-        };
 
         //Linear interpolation
         const auto lerp = [](const auto& a, const auto& b, float t) { return a*(1.0f-t) + b*t; };
@@ -382,9 +378,32 @@ bool Renderer::render(RenderQuerier& rq) const {
         const auto timeOfDayColorLambda = [&](const float t) {
             const glm::vec3 noonColor(80, 219, 255);
             const glm::vec3 midnightColor(5,0,27);
-            const float t = clippedcos(rq.getSunOmega(), 5.0f);
             return lerp(midnightColor, noonColor, t) / 255.0f;
-        }
+        };
+
+        /** Compute clear color as function of time to match the sunset and sunrise **/
+        const float t = clippedcos(rq.getSunOmega(), 5.0f);
+        const glm::vec3 timeOfDayColor = timeOfDayColorLambda(t);
+
+        /** Draws a set of renderdatas.
+            This lambda does NOT bind anything but the vertex array of each render data,
+            so you need to specify what fbo or what shaders to use beforehand **/
+        const auto drawRenderData = [&](const RenderData& rd) {
+            glBindVertexArray(rd.vertexArray); 
+            try {
+                glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
+            } catch(std::out_of_range oor) {
+                printf("ERROR: Could not lookup vertex array %i given by render data!\n", rd.vertexArray);
+                return false;
+            }
+
+            if(glGetError() != GL_NO_ERROR) {
+                printf("ERROR: Failed to draw RenderData with VAO=%i\n", rd.vertexArray);
+                return false;
+            }
+
+            return true;
+        };
 
         /** Draws a set of renderdatas, the sun from POV of camera to an framebuffer object
             This is the place where the whole scene, with per-model shaders, is drawn **/
@@ -403,36 +422,17 @@ bool Renderer::render(RenderQuerier& rq) const {
                 return false;
             }
 
-            /** Compute clear color as function of time to match the sunset and sunrise **/
-            const glm::vec3 sunPos = { sunRd.modelMatrix[3] };
-            const glm::vec3 timeOfDayColor = timeOfDayColorLambda(t);
             glClearColor(timeOfDayColor.x, timeOfDayColor.y, timeOfDayColor.z, 1.0f);
 
-            program.use();
-            if(!program.setUniform("view", view)) return false;
-            if(!program.setUniform("projection", projection)) return false;
-            if(!program.setUniform("sunPos", sunPos)) return false;
-            if(!program.setUniform("windowResolution", {width, height})) return false;
-            if(!program.setUniform("timeOfDayColor", timeOfDayColor)) return false;
-            if(!program.setTexture("shadowmap", depthFBO.getTexture())) return false;
+            worldUBO.use<WorldUniformData>({view, projection, glm::vec3(glm::column(sunRd.modelMatrix, 3)), timeOfDayColor, windowResolution});
 
-            skyboxProgram.use();
-            if(!skyboxProgram.setUniform("skyColor", timeOfDayColor)) return false;
-            if(!skyboxProgram.setUniform("sunPos", sunPos)) return false;
-            if(!skyboxProgram.setUniform("view", view)) return false;
-            if(!skyboxProgram.setUniform("projection", projection)) return false;
-            if(!skyboxProgram.setUniform("windowResolution", glm::vec2(width, height))) return false;
+            program.use();
+            if(!program.setTexture("shadowmap", depthFBO.getTexture())) return false;
 
             /** vp is the view-projection matrix. Model matrix is provided per renderdata,
                 so later on vp will be multiplied with model matrix once per renderdata **/
             const glm::mat4 vp = projection * view;
             for(const auto& rd : rds) {
-
-                //FIXME: This is dirty solution. I only need to send sunmvp to shader matrix if programs.at(rd.shader) return a shader where sunmvp is needed
-                program.use();
-                if(!program.setUniform("sunmvp", sunvp * rd.modelMatrix)) return false;
-                //End of fixme
-
                 try {
                     programs.at(rd.shader).use();
                 } catch (std::out_of_range) {
@@ -440,14 +440,16 @@ bool Renderer::render(RenderQuerier& rq) const {
                     return false;
                 }
 
-                if(!drawRenderData(rd, vp)) {
+                modelUBO.use<ModelUniformData>({rd.modelMatrix, vp * rd.modelMatrix, sunvp * rd.modelMatrix});
+                if(!drawRenderData(rd)) {
                     printf("ERROR: Could not draw a renderdata\n");
                     return false;
                 };
             }
 
             /** Praise the sun! **/
-            if(!drawRenderData(sunRd, vp)) {
+            modelUBO.use<ModelUniformData>({sunRd.modelMatrix, vp * sunRd.modelMatrix, sunvp * sunRd.modelMatrix});
+            if(!drawRenderData(sunRd)) {
                 printf("ERROR: Could not draw the sun\n");
                 return false;
             }
@@ -470,7 +472,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             /** Render quad filling the screen using postfx shaders, where postfx shader got multisampled texture from mainFBO **/
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             postprocessProgram.use();
-            if(!postprocessProgram.setUniform("resolution", glm::vec2(width, height))) return false; 
+            if(!postprocessProgram.setUniform("resolution", windowResolution)) return false; 
             if(!postprocessProgram.setTexture("renderedTexture", postfxFBO.getTexture())) return false;
             glBindVertexArray(quadVA);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -491,7 +493,8 @@ bool Renderer::render(RenderQuerier& rq) const {
             glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             glClear(GL_DEPTH_BUFFER_BIT);
             for(const auto& rd : rds) {
-                if(!drawRenderData(rd, viewproj)) {
+                modelUBO.use(ModelUniformData{rd.modelMatrix, viewproj * rd.modelMatrix, viewproj * rd.modelMatrix});
+                if(!drawRenderData(rd)) {
                     printf("ERROR: Could not draw a renderdata to depthFBO\n");
                     return false;
                 };
@@ -542,6 +545,13 @@ bool Renderer::render(RenderQuerier& rq) const {
         }
 
         DeltaTime::stop();
+
+        //Print time to console every sec
+        if(printFrameTime) {
+            static float accumfps = 0, numframes = 0;
+            printf("avgfps: %f\n",  (accumfps += DeltaTime::dt)/(numframes+=1.0f));
+        }
+
     }
     rq.rendererActive = false; //This one take care of all possible waits happening _later_ in time
     rq.cv.notify_one(); //This one take care of all possible waits that happened _before_ in time
@@ -584,6 +594,10 @@ void Renderer::handleHeldKeys() const {
             } break;
         }
     }
+}
+
+void Renderer::setPrintFrameTime(bool printFrameTime) {
+    this->printFrameTime = printFrameTime;
 }
 
 void Renderer::notify(const DrawGridToggle& event) {

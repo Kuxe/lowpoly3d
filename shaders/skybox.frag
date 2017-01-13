@@ -3,10 +3,11 @@
 out vec3 color;
 in vec3 fragColor;
 
-uniform vec3 sunPos;
-uniform mat4 view;
-uniform mat4 projection;
-uniform vec2 windowResolution;
+layout (std140) uniform WorldUniformData {
+	mat4 view, projection;
+	vec3 sunPos, timeOfDayColor;
+	vec2 windowResolution;
+};
 
 vec2 world2screen(vec3 p) {
 	//Transform point to clipspace (projection * view * p transforms from
@@ -31,5 +32,5 @@ vec3 suneffects(float sunIntensity) {
 }
 
 void main(void) {
-	color = fragColor + suneffects(30.0);
+	color = fragColor + 0.000000000000000000000000000001*suneffects(30.0);
 }

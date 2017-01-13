@@ -10,6 +10,7 @@
 #include "events.hpp"
 #include <string>
 
+class UniformBuffer;
 class ShaderProgram : public Subber<rPress> {
 private:
 	const std::string shaderName;
@@ -44,6 +45,8 @@ public:
 	bool setUniform(const std::string& uniformName, const gl::GLfloat& f) const;
 	bool setTexture(const std::string& uniformName, const gl::GLuint& id, const gl::GLenum& target = gl::GL_TEXTURE_2D) const;
 	bool setTextureMultisample(const std::string& uniformName, const gl::GLuint& id) const;
+
+	bool setUBO(const std::string& blockName, const UniformBuffer& ubo);
 
 	//If r is pressed to a live-reload of the shaderprogram
 	void notify(const rPress& event);

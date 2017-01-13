@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
+#include "uniformbuffer.hpp"
 
 using namespace gl;
 
@@ -183,6 +184,21 @@ bool ShaderProgram::setTexture(const std::string& uniformName, const GLuint& id,
 
 bool ShaderProgram::setTextureMultisample(const std::string& uniformName, const GLuint& id) const {
 	return setTexture(uniformName, id, GL_TEXTURE_2D_MULTISAMPLE);
+}
+
+bool ShaderProgram::setUBO(const std::string& blockName, const UniformBuffer& ubo) {
+	GLuint blockIndex =  glGetUniformBlockIndex(programHandle, blockName.c_str());
+	if(blockIndex == GL_INVALID_INDEX) {
+		printf("ERROR: No uniform block index named \"%s\" in %s\n", blockName.c_str(), shaderName.c_str());
+		return false;
+	}
+	glBindBufferBase(GL_UNIFORM_BUFFER, ubo.bindingPoint, ubo.ubo);
+	glUniformBlockBinding(programHandle, blockIndex, ubo.bindingPoint);
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Could not set uniform buffer object in %s\n", shaderName.c_str());
+		return false;
+	}
+	return true;
 }
 
 

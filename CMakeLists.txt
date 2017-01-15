@@ -57,7 +57,7 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/contrib/src/subber_project
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14")
-add_executable(lowpoly3d 
+add_executable(lowpoly3d_example 
 	src/main.cpp
 	src/renderer.cpp
 	src/renderdata.cpp
@@ -76,15 +76,15 @@ add_executable(lowpoly3d
 	src/uniformbuffer.cpp
 )
 
-add_dependencies(lowpoly3d glm_project)
-add_dependencies(lowpoly3d glfw_project)
-add_dependencies(lowpoly3d glbinding_project)
-add_dependencies(lowpoly3d subber_project)
+add_dependencies(lowpoly3d_example glm_project)
+add_dependencies(lowpoly3d_example glfw_project)
+add_dependencies(lowpoly3d_example glbinding_project)
+add_dependencies(lowpoly3d_example subber_project)
 
 if (WIN32)
-	target_link_libraries(lowpoly3d glbinding glfw3 opengl32)
+	target_link_libraries(lowpoly3d_example glbinding glfw3 opengl32)
 endif (WIN32)
 
 if (UNIX)
-    target_link_libraries(lowpoly3d glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
+    target_link_libraries(lowpoly3d_example glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
 endif (UNIX)

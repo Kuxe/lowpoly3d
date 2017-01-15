@@ -21,22 +21,17 @@
 #include "uniformbuffer.hpp"
 #include "worlduniformdata.hpp"
 #include "modeluniformdata.hpp"
+#include "ilowpolyinput.hpp"
 
 using namespace gl;
 
 /** FIXME LIST
-
-    FIXME:  Colors are not right since UniformBuffer were implemented and used. Why?
-            Colors are broke in both default shader and skybox shader. Its not shader specific.
-            Camera work as intended. So model (ModelUniformData), view and projection (WorldUniformData) seem to work.
-            I've pinend it down to timeOfDayColor. It's values are way higher than they should be.
-            timeOfDayColor seem to be correct on CPU. It is the clear color, and clear color is fine. Also looked good when printed.
-            Ah. Its vec3. See topic: http://stackoverflow.com/questions/38172696/should-i-ever-use-a-vec3-inside-of-a-uniform-buffer-or-shader-storage-buffer-o
-            I should not use glm::vec3 in uniform buffers
+    //Empty
 **/
 
 /** TODO LIST
 
+    TODO:   Renderer should not handle input. Forward it to a "LowpolyInput"-interface, which someone else can implement.
     TODO:   Field of depth would be nice
     TODO:   Instanced indexed drawing could increase performance
     TODO:   Text
@@ -62,10 +57,6 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if(action == GLFW_PRESS) {
         Renderer::keysHeld.insert(key);
-
-        if(key == GLFW_KEY_F3) {
-            publish(DrawGridToggle());
-        }
 
     } else if(action == GLFW_RELEASE) {
         Renderer::keysHeld.erase(key);
@@ -96,7 +87,7 @@ static void mouse_callback(GLFWwindow* window, double x, double y) {
 /** Public methods **/
 /*********************/
 
-bool Renderer::initialize() {
+bool Renderer::initialize(ILowpolyInput* const li) {
     glfwSetErrorCallback(error_callback);
     if(!glfwInit()) {
         fprintf(stderr, "Could not load glfw (call to glfwInit returned 0)\n");
@@ -598,8 +589,4 @@ void Renderer::handleHeldKeys() const {
 
 void Renderer::setPrintFrameTime(bool printFrameTime) {
     this->printFrameTime = printFrameTime;
-}
-
-void Renderer::notify(const DrawGridToggle& event) {
-    drawGrid = !drawGrid;
 }

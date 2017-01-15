@@ -13,6 +13,7 @@
 #include "gamedata.hpp"
 #include "args.hxx"
 #include <glm/gtc/matrix_transform.hpp>
+#include "ilowpolyinput.hpp"
 
 int generateJSON(const std::string& gamedataPath) {
     Gamedata gamedata;
@@ -71,7 +72,10 @@ int main(int argc, char** argv) {
 		renderer.setPrintFrameTime(true);
 	}
 
-	if(renderer.initialize()) {
+	//Dummy LowpolyInput which does absolutely nothing
+	DummyLowpolyInput dli;
+
+	if(renderer.initialize(&dli)) {
 
 
 		/** gamedata.json -> gamedata -> when initializing stuff just lookup in gamedata class **/

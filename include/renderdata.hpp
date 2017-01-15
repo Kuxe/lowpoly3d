@@ -35,7 +35,6 @@ namespace glm {
 //The renderer receives an array of RenderDatas,
 //looping through each RenderData and renders the
 //model given by modelId and modelMatrix
-class Gamedata;
 struct RenderData {
 	glm::mat4 modelMatrix;
 	int vertexArray;

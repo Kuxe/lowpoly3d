@@ -15,18 +15,16 @@ class ILowpolyInput;
 	handles. These integer handles correspond to the vertexArray-member of the RenderData struct.**/
 class Renderer {
 private:
-	bool printFrameTime = false;
+	bool initialized = false, printFrameTime = false;
 	GLFWwindow* window;
 
-	//Keep track of triangles count per VA
-	std::unordered_map<int, int> triangles;
-
-	void handleHeldKeys() const;
+	//Keep track of triangles count per model and what vertex array is associated with what name
+	std::unordered_map<std::string, int> triangles, models;
 public:
 
 	//Initializes renderer (create window and get ready for rendering)
 	//returns an error code if fail
-	bool initialize(ILowpolyInput* const li);
+	bool initialize(ILowpolyInput* li);
 
 	//Terminates renderer (destroy window, no longer ready for rendering)
 	void terminate();
@@ -35,8 +33,7 @@ public:
 	bool render(RenderQuerier& rq) const;
 
 	//Load a 3D-model to GPU memory, returns a handle to the model
-	int loadModel(const Model& model);
-	std::vector<int> loadModels(const std::vector<Model>& models);
+	bool loadModel(const std::string& name, const Model& model);
 
 	//Keep tracks of what keys are held down
 	static std::unordered_set<int> keysHeld;

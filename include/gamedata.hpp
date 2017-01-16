@@ -6,7 +6,6 @@
 #include "modeldefs.hpp"
 #include "cereal/archives/json.hpp"
 #include "cereal/types/vector.hpp"
-#include "celestialbody.hpp"
 #include <glm/glm.hpp>
 
 /** Gamedata contains whatever (non-pointer) data is required to get the simulation going,
@@ -27,15 +26,12 @@ struct Gamedata {
 	/** Parameters used by generators **/
 	Color sunColor = {255, 0, 255};
 	uint8_t sunSubdivides = 0;
-	CelestialBody suncb = {{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, 3.14f * 0.5f};
-	CelestialBody mooncb = {{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, 3.14f * 1.5f};
 	bool forceDaytime;
 	glm::vec3 planeNormal;
 	Color planeColor = {255, 0, 255};
 	uint8_t waterSubdivides = 0;
 
 	/** "Constant" renderdatas and "linear" renderdatas wrp programming complexity :) **/
-	RenderData sunRd;
 	std::vector<RenderData> renderDatas;
 
 	template<class Archive>
@@ -44,13 +40,10 @@ struct Gamedata {
 			CEREAL_NVP(gametimeSpeedFactor),
 			CEREAL_NVP(sunColor),
 			CEREAL_NVP(sunSubdivides),
-			CEREAL_NVP(suncb),
-			CEREAL_NVP(mooncb),
 			CEREAL_NVP(forceDaytime),
 			CEREAL_NVP(planeNormal),
 			CEREAL_NVP(planeColor),
 			CEREAL_NVP(waterSubdivides),
-			CEREAL_NVP(sunRd),
 			CEREAL_NVP(renderDatas)
 		); 
 	}

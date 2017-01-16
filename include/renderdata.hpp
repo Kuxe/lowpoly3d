@@ -37,18 +37,13 @@ namespace glm {
 //model given by modelId and modelMatrix
 struct RenderData {
 	glm::mat4 modelMatrix;
-	int vertexArray;
-	int shader;
+	std::string model, shader;
 	RenderData() {};
-	RenderData(const glm::mat4& modelMatrix, const int vertexArray);
+	RenderData(const glm::mat4& modelMatrix, const std::string& model, const std::string& shader = "Default");
 
 	template<class Archive>
 	void serialize(Archive& archive) {
-		archive(
-			CEREAL_NVP(modelMatrix),
-			CEREAL_NVP(vertexArray),
-			CEREAL_NVP(shader)
-		); 
+		archive(CEREAL_NVP(modelMatrix), CEREAL_NVP(model), CEREAL_NVP(shader)); 
 	}
 };
 

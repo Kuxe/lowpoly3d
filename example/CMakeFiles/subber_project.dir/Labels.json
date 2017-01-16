@@ -1,0 +1,51 @@
+
+{
+	"sources" : 
+	[
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/subber_project"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/subber_project.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/subber_project-complete.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-install.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-mkdir.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-download.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-patch.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-configure.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-build.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-skip-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : [ "subber_project" ],
+		"name" : "subber_project"
+	}
+}

@@ -4,7 +4,7 @@
 #include "gamedata.hpp"
 
 DummySimulation::DummySimulation(const Gamedata& gd) : 
-	renderDatas(gd.renderDatas), sunRd(gd.sunRd), suncb(gd.suncb), forceDaytime(gd.forceDaytime), gametimeSpeedFactor(gd.gametimeSpeedFactor), running(true)
+	renderDatas(gd.renderDatas), forceDaytime(gd.forceDaytime), gametimeSpeedFactor(gd.gametimeSpeedFactor), running(true)
  {
 
 }
@@ -13,12 +13,8 @@ const std::vector<RenderData>& DummySimulation::getRenderDatas() const {
 	return renderDatas;
 }
 
-const RenderData& DummySimulation::getSunRenderData() const {
-	return sunRd;
-}
-
-const Camera& DummySimulation::getCamera() const {
-	return camera;
+const glm::mat4 DummySimulation::getView() const {
+	return camera.get();
 }
 
 const float DummySimulation::getGametime() const {
@@ -26,13 +22,35 @@ const float DummySimulation::getGametime() const {
 	return gametimeSpeedFactor*duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count()/36000.0f;
 }
 
-const float DummySimulation::getSunOmega() const {
+const float DummySimulation::getSunRadians() const {
 	return !forceDaytime * getGametime();
+}
+
+
+void DummySimulation::onError() {
+
+}
+void DummySimulation::onFramebufferResize() {
+
+}
+void DummySimulation::onKeyPress() {
+
+}
+void DummySimulation::onKeyRelease() {
+
+}
+void DummySimulation::onMouseEnter() {
+
+}
+void DummySimulation::onMouseExit() {
+
+}
+void DummySimulation::onMouse() {
+
 }
 
 void DummySimulation::run() {
 	while(running) {
-		sunRd.modelMatrix[3] = glm::vec4(suncb.getPos(getSunOmega()), 1.0);
 		signalRenderer();
 	}
 };

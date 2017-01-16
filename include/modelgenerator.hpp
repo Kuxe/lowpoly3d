@@ -3,8 +3,9 @@
 
 #include "model.hpp"
 
-struct ModelGenerator {
-	virtual Model generate() = 0;
-};
+/** Model generators generate vertices, colors and indices
+	used for indexed drawing. It is within the model generators
+	that procedural generation takes place.  **/
+struct ModelGenerator { virtual Model generate() = 0; };
 
 #endif //MODELGENERATOR

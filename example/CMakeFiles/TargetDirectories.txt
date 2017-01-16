@@ -1,0 +1,8 @@
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/lowpoly3d-example.dir
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/subber_project.dir
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/example.dir
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/lowpoly3d-playground.dir
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glfw_project.dir
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glbinding_project.dir
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glm_project.dir
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/playground.dir

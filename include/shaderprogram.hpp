@@ -13,10 +13,11 @@
 class UniformBuffer;
 class ShaderProgram : public Subber<rPress> {
 private:
-	const std::string shaderName;
 	const gl::GLuint programHandle;
 	std::unordered_map<gl::GLenum, gl::GLuint> shaderHandles;
 public:
+	const std::string name;
+
 	ShaderProgram(const std::string& shaderName);
 	~ShaderProgram();
 

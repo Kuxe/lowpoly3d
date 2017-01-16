@@ -4,6 +4,8 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 /** Renderer will through this class query the simulation for
 	whatever data the renderer needs in order to render.
@@ -26,10 +28,14 @@ private:
 	friend Renderer;
 public:
 	virtual const std::vector<RenderData>& getRenderDatas() const = 0;
-	virtual const RenderData& getSunRenderData() const = 0;
-	virtual const Camera& getCamera() const = 0;
+	virtual const glm::mat4 getView() const = 0;
 	virtual const float getGametime() const = 0;
-	virtual const float getSunOmega() const = 0;
+	virtual const float getSunRadians() const = 0;
+
+	/**	signalRenderer tells the lowpoly3d renderer to a new frame.
+		signalRenderer() blocks the current thread until
+		the renderer is done rendering, since the renderer
+		is using shared data provided by the RenderQuerier interface **/
 	void signalRenderer() {
 		shouldRender = true;
 		std::unique_lock<std::mutex> lk(s);

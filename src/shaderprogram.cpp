@@ -7,7 +7,7 @@
 
 using namespace gl;
 
-ShaderProgram::ShaderProgram(const std::string& shaderName) : shaderName(shaderName), programHandle(glCreateProgram()) { }
+ShaderProgram::ShaderProgram(const std::string& name) : name(name), programHandle(glCreateProgram()) { }
 ShaderProgram::~ShaderProgram() {
 	glDeleteProgram(programHandle);
 }
@@ -81,7 +81,7 @@ bool ShaderProgram::link() const {
 		glGetProgramiv(programHandle, GL_INFO_LOG_LENGTH, &length);
 		std::vector<GLchar> log(length);
 		glGetProgramInfoLog(programHandle, length, &length, &log[0]);
-		printf("ERROR: Could not link the shader program \"%s\" (%s)\n", shaderName.c_str(), &log[0]);
+		printf("ERROR: Could not link the shader program \"%s\" (%s)\n", name.c_str(), &log[0]);
 		return false;
 	}
 	return true;
@@ -100,7 +100,7 @@ bool ShaderProgram::use() const {
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::mat4& m) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
@@ -116,7 +116,7 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::mat4& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec3& v) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
@@ -132,7 +132,7 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec3& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec2& v) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
@@ -148,7 +148,7 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec2& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLfloat& f) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
@@ -169,7 +169,7 @@ bool ShaderProgram::setTexture(const std::string& uniformName, const GLuint& id,
 
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No texture uniform named %s in %s\n", uniformName.c_str(), shaderName.c_str());
+		printf("ERROR: No texture uniform named %s in %s\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
@@ -189,13 +189,13 @@ bool ShaderProgram::setTextureMultisample(const std::string& uniformName, const 
 bool ShaderProgram::setUBO(const std::string& blockName, const UniformBuffer& ubo) {
 	GLuint blockIndex =  glGetUniformBlockIndex(programHandle, blockName.c_str());
 	if(blockIndex == GL_INVALID_INDEX) {
-		printf("ERROR: No uniform block index named \"%s\" in %s\n", blockName.c_str(), shaderName.c_str());
+		printf("ERROR: No uniform block index named \"%s\" in %s\n", blockName.c_str(), name.c_str());
 		return false;
 	}
 	glBindBufferBase(GL_UNIFORM_BUFFER, ubo.bindingPoint, ubo.ubo);
 	glUniformBlockBinding(programHandle, blockIndex, ubo.bindingPoint);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set uniform buffer object in %s\n", shaderName.c_str());
+		printf("ERROR: Could not set uniform buffer object in %s\n", name.c_str());
 		return false;
 	}
 	return true;

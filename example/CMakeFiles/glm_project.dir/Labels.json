@@ -1,0 +1,51 @@
+
+{
+	"sources" : 
+	[
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glm_project"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glm_project.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glm_project-complete.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-install.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-mkdir.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-download.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-patch.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-configure.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-build.rule"
+		},
+		
+		{
+			"file" : "C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-skip-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : [ "glm_project" ],
+		"name" : "glm_project"
+	}
+}

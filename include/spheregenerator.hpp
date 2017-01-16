@@ -7,6 +7,7 @@ struct SphereGenerator : public ModelGenerator {
 	const Color color;
 	const uint8_t subdivides;
 	SphereGenerator(const Color& color = {255, 0, 255}, uint8_t subdivides = 0);
+	std::string name() const;
 	Model generate() override;
 };
 

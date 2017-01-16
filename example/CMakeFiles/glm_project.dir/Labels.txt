@@ -1,0 +1,13 @@
+# Target labels
+ glm_project
+# Source files and their labels
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glm_project
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glm_project.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glm_project-complete.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-install.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-mkdir.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-download.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-patch.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-configure.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-build.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glm_project/glm_project-skip-update.rule

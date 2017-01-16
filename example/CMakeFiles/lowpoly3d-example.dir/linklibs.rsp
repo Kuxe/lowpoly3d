@@ -1,0 +1,1 @@
+ -LC:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Source/glfw_project/src  -LC:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Source/glbinding_project  -lglbinding -lglfw3 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

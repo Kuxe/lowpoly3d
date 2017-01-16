@@ -8,23 +8,21 @@
 struct ILowpolyInput {
 	virtual ~ILowpolyInput() { }
 	virtual void onError() = 0;
-	virtual void onFramebufferResize() = 0;
-	virtual void onKeyPress() = 0;
-	virtual void onKeyRelease() = 0;
-	virtual void onMouseEnter() = 0;
-	virtual void onMouseExit() = 0;
-	virtual void onMouse() = 0; 
+	virtual void onFramebufferResize(int width, int height) = 0;
+	virtual void onKey(int key, int scancode, int action, int mods) = 0;
+	virtual void onMouseEnter(double xpos, double ypos) = 0;
+	virtual void onMouseExit(double xpos, double ypos) = 0;
+	virtual void onMouse(double xpos, double ypos) = 0; 
 };
 
 struct DummyLowpolyInput : ILowpolyInput {
 	~DummyLowpolyInput() { }
 	void onError() { }
-	void onFramebufferResize() { }
-	void onKeyPress() { }
-	void onKeyRelease() { }
-	void onMouseEnter() { }
-	void onMouseExit() { }
-	void onMouse() { }
+	void onFramebufferResize(int width, int height) { }
+	void onKey(int key, int scancode, int action, int mods) { }
+	void onMouseEnter(double xpos, double ypos) { }
+	void onMouseExit(double xpos, double ypos) { }
+	void onMouse(double xpos, double ypos) { }
 };
 
 

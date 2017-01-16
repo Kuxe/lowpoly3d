@@ -22,6 +22,7 @@
 #include "worlduniformdata.hpp"
 #include "modeluniformdata.hpp"
 #include "ilowpolyinput.hpp"
+#include "celestialbody.hpp"
 
 using namespace gl;
 
@@ -43,38 +44,34 @@ using namespace gl;
 /** Statics **/
 /*************/
 
-std::unordered_set<int> Renderer::keysHeld;
+ILowpolyInput* lowpolyInput;
 
 static void error_callback(int error, const char* description) {
-    printf("Error: %s\n (%i)", description, error);
+    lowpolyInput->onError();
 }
 
-static void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    publish(OnResize{width, height});
+static void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
+    glViewport(0, 0, w, h);
+    lowpolyInput->onFramebufferResize(w, h);
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if(action == GLFW_PRESS) {
-        Renderer::keysHeld.insert(key);
-
-    } else if(action == GLFW_RELEASE) {
-        Renderer::keysHeld.erase(key);
-    }
+    if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
+    lowpolyInput->onKey(key, scancode, action, mods);
 }
 
 static void cursor_enter_callback(GLFWwindow* window, int focused) {
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
     if(focused) {
-        publish(CursorEnterWindow{xpos, ypos});
+        lowpolyInput->onMouseEnter(x, y);
     } else {
-        publish(CursorExitWindow{xpos, ypos});
+        lowpolyInput->onMouseExit(x, y);
     }
 }
 
 static void mouse_callback(GLFWwindow* window, double x, double y) {
-    publish(MouseEvent{x, y});
+    lowpolyInput->onMouse(x, y);
 }
 
 /*********************/
@@ -87,7 +84,8 @@ static void mouse_callback(GLFWwindow* window, double x, double y) {
 /** Public methods **/
 /*********************/
 
-bool Renderer::initialize(ILowpolyInput* const li) {
+bool Renderer::initialize(ILowpolyInput* li) {
+    lowpolyInput = li;
     glfwSetErrorCallback(error_callback);
     if(!glfwInit()) {
         fprintf(stderr, "Could not load glfw (call to glfwInit returned 0)\n");
@@ -114,15 +112,21 @@ bool Renderer::initialize(ILowpolyInput* const li) {
     glEnable(GL_CULL_FACE);
     glClearColor(23.0f/255.0f, 126.0f/255.0f, 137.0f/255.0f, 255.0f/255.0f);
     glEnable(GL_MULTISAMPLE);
+    initialized = true;
     return true;
 }
 
 void Renderer::terminate() {
     glfwDestroyWindow(window);
     glfwTerminate();
+    initialized = false;
 }
 
-int Renderer::loadModel(const Model& model) {
+bool Renderer::loadModel(const std::string& name, const Model& model) {
+    if(!initialized) {
+        printf("ERROR: Could not load model, renderer is not initialized (did you forget to call the initialize()-method?\n");
+        return false;
+    }
     //Send model to GPU memory and return handle
     //to the model stored in GPU memory such that
     //we later on easily can tell the GPU
@@ -155,22 +159,22 @@ int Renderer::loadModel(const Model& model) {
     const auto error = glGetError();
     if(error != GL_NO_ERROR) {
         printf("ERROR: Could not load model\n");
-        return -1;
+        return false;
     }
 
-    triangles[vertexArray] = model.triangles.size();
+    triangles[name] = model.triangles.size();
+    models[name] = vertexArray;
 
     glBindVertexArray(0); //Dont let subsequent calls work on vertexArray
-    return vertexArray;
-}
-
-std::vector<int> Renderer::loadModels(const std::vector<Model>& models) {
-    std::vector<int> vertexArrays(models.size());
-    std::transform(models.begin(), models.end(), vertexArrays.begin(), [this](const Model& m) { return this->loadModel(m); });
-    return vertexArrays;
+    return true;
 }
 
 bool Renderer::render(RenderQuerier& rq) const {
+    if(!initialized) {
+        printf("ERROR: Renderer is not initialized (did you forget to call the initialize()-method?\n");
+        return false;
+    }
+
     using namespace std::chrono;
     using RenderDatas = std::vector<RenderData>;
 
@@ -203,7 +207,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         pass a list of datatypes which the shaders sets as uniforms.
         No. This is not nice. I want uniforms to be defined in shader
         NO not nice either, dont wanna subclass. **/
-    ShaderProgram program("Default shader");
+    ShaderProgram program("default");
     if(!(
         program.add(GL_VERTEX_SHADER, "../shaders/shader.vert") &&
         program.add(GL_FRAGMENT_SHADER, "../shaders/shader.frag") &&
@@ -212,7 +216,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
-    ShaderProgram sunProgram("Sun shader");
+    ShaderProgram sunProgram("sun");
     if(!(
         sunProgram.add(GL_VERTEX_SHADER, "../shaders/sun.vert") &&
         sunProgram.add(GL_FRAGMENT_SHADER, "../shaders/sun.frag") &&
@@ -220,7 +224,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
      }
 
-     ShaderProgram skyboxProgram("Skybox shader");
+     ShaderProgram skyboxProgram("skybox");
      if(!(
         skyboxProgram.add(GL_VERTEX_SHADER, "../shaders/skybox.vert") &&
         skyboxProgram.add(GL_FRAGMENT_SHADER, "../shaders/skybox.frag") &&
@@ -228,7 +232,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
-    ShaderProgram waterProgram("Water shader");
+    ShaderProgram waterProgram("water");
     if(!(
         waterProgram.add(GL_VERTEX_SHADER, "../shaders/water.vert") &&
         waterProgram.add(GL_FRAGMENT_SHADER, "../shaders/water.frag") &&
@@ -236,7 +240,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
-    ShaderProgram postprocessProgram("Post-process shader");
+    ShaderProgram postprocessProgram("post-process");
     if(!(
         postprocessProgram.add(GL_VERTEX_SHADER, "../shaders/passthrough.vert") &&
         postprocessProgram.add(GL_FRAGMENT_SHADER, "../shaders/postprocess.frag") &&
@@ -244,7 +248,7 @@ bool Renderer::render(RenderQuerier& rq) const {
         return false;
     }
 
-    ShaderProgram depthProgram("Depth shader");
+    ShaderProgram depthProgram("depth");
     if(!(
         depthProgram.add(GL_VERTEX_SHADER, "../shaders/depth.vert") &&
         depthProgram.add(GL_FRAGMENT_SHADER, "../shaders/depth.frag") &&
@@ -278,13 +282,20 @@ bool Renderer::render(RenderQuerier& rq) const {
     if(!skyboxProgram.setUBO("ModelUniformData", modelUBO)) return false;
     if(!depthProgram.setUBO("ModelUniformData", modelUBO)) return false;
 
-    std::unordered_map<int, const ShaderProgram&> programs;
-    programs.insert({0, program});
-    programs.insert({1, sunProgram});
-    programs.insert({2, skyboxProgram});
-    programs.insert({3, waterProgram});
+    std::unordered_map<std::string, const ShaderProgram&> programs;
+    auto addProgram = [&](const ShaderProgram& p) { programs.insert({p.name, p}); };
+    addProgram(program);
+    addProgram(sunProgram);
+    addProgram(skyboxProgram);
+    addProgram(waterProgram);
+    addProgram(postprocessProgram);
+    addProgram(depthProgram);
+
 
     rq.rendererActive = true;
+
+    //Sun should rotate around the x-axis through origo
+    CelestialBody suncb({0.0, 0.0, 0.0}, {95.0, 0.0, 0.0}, 1.57079632679);
 
     while(!glfwWindowShouldClose(window)) {
 
@@ -295,7 +306,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             minimal set of data flows from the "game" into the renderer.
             This minimal set of data is, for most part, called "RenderData".
             Other information that the renderer need from the game is position of sun,
-            position of camera and some other things. So an interface which the game implements
+            view-matrix and some other things. So an interface which the game implements
             should provide these data if the game should be compatible with the renderer.
             Thus, the only thing the game needs to do is simply realize the interface.
             The game need not know anything about the renderer. This is nice.
@@ -373,35 +384,31 @@ bool Renderer::render(RenderQuerier& rq) const {
             return lerp(midnightColor, noonColor, t) / 255.0f;
         };
 
-        /** Compute clear color as function of time to match the sunset and sunrise **/
-        const float t = clippedcos(rq.getSunOmega(), 5.0f);
-        const glm::vec3 timeOfDayColor = timeOfDayColorLambda(t);
-
         /** Draws a set of renderdatas.
             This lambda does NOT bind anything but the vertex array of each render data,
             so you need to specify what fbo or what shaders to use beforehand **/
         const auto drawRenderData = [&](const RenderData& rd) {
-            glBindVertexArray(rd.vertexArray); 
             try {
-                glDrawElements(GL_TRIANGLES, triangles.at(rd.vertexArray)*3, GL_UNSIGNED_SHORT, nullptr);
+                glBindVertexArray(models.at(rd.model)); 
+                glDrawElements(GL_TRIANGLES, triangles.at(rd.model)*3, GL_UNSIGNED_SHORT, nullptr);
             } catch(std::out_of_range oor) {
-                printf("ERROR: Could not lookup vertex array %i given by render data!\n", rd.vertexArray);
+                printf("ERROR: Could not lookup vertex array given by render data \"%s\"!\n", rd.model.c_str());
                 return false;
             }
 
             if(glGetError() != GL_NO_ERROR) {
-                printf("ERROR: Failed to draw RenderData with VAO=%i\n", rd.vertexArray);
+                printf("ERROR: Failed to draw RenderData with model \"%s\"\n", rd.model.c_str());
                 return false;
             }
 
             return true;
         };
 
-        /** Draws a set of renderdatas, the sun from POV of camera to an framebuffer object
+        /** Draws a set of renderdatas, the sun from POV of view-matrix to an framebuffer object
             This is the place where the whole scene, with per-model shaders, is drawn **/
         const auto render2fbo = [&](
             const RenderDatas& rds,
-            const RenderData& sunRd,
+            const float sunRadians,
             const glm::mat4& sunvp,
             const glm::mat4& view,
             const glm::mat4& projection,
@@ -409,16 +416,21 @@ bool Renderer::render(RenderQuerier& rq) const {
             fbo.use();
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            /** Compute clear color as function of time to match the sunset and sunrise **/
+            const float t = clippedcos(sunRadians, 5.0f);
+            const glm::vec3 timeOfDayColor = timeOfDayColorLambda(t);
+
+            worldUBO.use<WorldUniformData>({view, projection, glm::vec4(suncb.getPos(sunRadians), 1.0), glm::vec4(timeOfDayColor, 0.0), windowResolution});
+
             if(!program.use()) {
                 printf("ERROR: Could not use shader program\n");
                 return false;
             }
-
-
-            worldUBO.use<WorldUniformData>({view, projection, glm::column(sunRd.modelMatrix, 3), glm::vec4(timeOfDayColor, 0.0), windowResolution});
-
-            program.use();
-            if(!program.setTexture("shadowmap", depthFBO.getTexture())) return false;
+            if(!program.setTexture("shadowmap", depthFBO.getTexture())) {
+                printf("ERROR: Could not set shadowmap\n");
+                return false;
+            }
 
             /** vp is the view-projection matrix. Model matrix is provided per renderdata,
                 so later on vp will be multiplied with model matrix once per renderdata **/
@@ -427,7 +439,7 @@ bool Renderer::render(RenderQuerier& rq) const {
                 try {
                     programs.at(rd.shader).use();
                 } catch (std::out_of_range) {
-                    printf("ERROR: Could not draw RenderData, there is no shader %i (there are 0...%llu shaders)\n", rd.shader, programs.size());
+                    printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%llu shaders)\n", rd.shader.c_str(), programs.size());
                     return false;
                 }
 
@@ -436,13 +448,6 @@ bool Renderer::render(RenderQuerier& rq) const {
                     printf("ERROR: Could not draw a renderdata\n");
                     return false;
                 };
-            }
-
-            /** Praise the sun! **/
-            modelUBO.use<ModelUniformData>({sunRd.modelMatrix, vp * sunRd.modelMatrix, sunvp * sunRd.modelMatrix});
-            if(!drawRenderData(sunRd)) {
-                printf("ERROR: Could not draw the sun\n");
-                return false;
             }
 
             return true;
@@ -495,11 +500,9 @@ bool Renderer::render(RenderQuerier& rq) const {
 
         /** Critical section **/
         if(rq.shouldRender) {
-            bool ok = true;
             const RenderDatas& rds = rq.getRenderDatas(); //Shared data
-            const RenderData& sunRd = rq.getSunRenderData(); //Shared data
-            const Camera& camera = rq.getCamera(); //Shared data
-            const glm::mat4& view = camera.get();
+            const float sunRads = rq.getSunRadians();
+            const glm::mat4 view = rq.getView();
 
             /** In order to do shadow-mapping, I need to render to FBO. In order to render to FBO
                 I need to provide a view matrix for the sun. For now the sun will look at 0.0
@@ -509,13 +512,12 @@ bool Renderer::render(RenderQuerier& rq) const {
                 The lookat point will probably depend on the camera (which is a shared resource)
                 and I dont want to introduce any race conditions by mistake later on, so keep this
                 code here **/
-            const glm::vec3 sunPos = glm::column(sunRd.modelMatrix, 3);
-            const glm::mat4 sunView = glm::lookAt(sunPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+            const glm::mat4 sunView = glm::lookAt(suncb.getPos(sunRads), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
             const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
             const glm::mat4 sunvp = sunPerspective * sunView;
-            ok =
+            bool ok =
                 render2depth(rds, sunvp) &&
-                render2fbo(rds, sunRd, sunvp, view, projection, mainFBO) &&
+                render2fbo(rds, sunRads, sunvp, view, projection, mainFBO) &&
                 render2screen();
 
             rq.signalSimulation();
@@ -527,7 +529,6 @@ bool Renderer::render(RenderQuerier& rq) const {
         /** End of critical section **/
 
         glfwPollEvents();
-        handleHeldKeys();
         glfwSwapBuffers(window);
 
         if(glGetError() != GL_NO_ERROR) {
@@ -548,43 +549,6 @@ bool Renderer::render(RenderQuerier& rq) const {
     rq.cv.notify_one(); //This one take care of all possible waits that happened _before_ in time
     //So any wait is dealt with here!
     return true;
-}
-
-void Renderer::handleHeldKeys() const {
-    for(int key : keysHeld) {
-        switch(key) {
-            case GLFW_KEY_ESCAPE: {
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-            } break;
-            case GLFW_KEY_W: {
-                publish(wPress());
-            } break;
-            case GLFW_KEY_A: {
-                publish(aPress());
-            } break;
-            case GLFW_KEY_S: {
-                publish(sPress());
-            } break;
-            case GLFW_KEY_D: {
-                publish(dPress());
-            } break;
-            case GLFW_KEY_R: {
-                publish(rPress());
-            } break;
-            case GLFW_KEY_E: {
-                publish(ePress());
-            } break;
-            case GLFW_KEY_Q: {
-                publish(qPress());
-            } break;
-            case GLFW_KEY_P: {
-                publish(pPress());
-            } break;
-            case GLFW_KEY_T: {
-                publish(tPress());
-            } break;
-        }
-    }
 }
 
 void Renderer::setPrintFrameTime(bool printFrameTime) {

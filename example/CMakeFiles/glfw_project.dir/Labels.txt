@@ -1,0 +1,13 @@
+# Target labels
+ glfw_project
+# Source files and their labels
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glfw_project
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glfw_project.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/glfw_project-complete.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glfw_project/glfw_project-install.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glfw_project/glfw_project-mkdir.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glfw_project/glfw_project-download.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glfw_project/glfw_project-patch.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glfw_project/glfw_project-configure.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glfw_project/glfw_project-build.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/glfw_project/glfw_project-skip-update.rule

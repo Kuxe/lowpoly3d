@@ -1,0 +1,13 @@
+# Target labels
+ subber_project
+# Source files and their labels
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/subber_project
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/subber_project.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/example/CMakeFiles/subber_project-complete.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-install.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-mkdir.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-download.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-patch.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-configure.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-build.rule
+C:/Users/Kuxe/programming/gitrepos/lowpoly3d/contrib/Stamp/subber_project/subber_project-skip-update.rule

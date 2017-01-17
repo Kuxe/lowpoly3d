@@ -1,8 +1,6 @@
 ![alt tag](lowpoly3d.png)
 A 3D engine tailored towards procedurally generated low poly graphics. It is a hobby project :).
 
-![alt tag](lowpoly3d.png)
-
 ## Self-contained example
 ```c++
 #include "lowpoly3d.hpp"

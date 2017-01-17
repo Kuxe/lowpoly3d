@@ -47,6 +47,13 @@ ExternalProject_Add(subber_project
 
 add_dependencies(glbinding_project glfw_project)
 
+#Run "make setup" to download dependencies
+#This must be done atleast once before running "make example" or "make playground"
+ADD_CUSTOM_TARGET(setup
+    DEPENDS glm_project glfw_project glbinding_project subber_project
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+)
+
 link_directories(${CONTRIB_DIR}/Source/glfw_project/src)
 link_directories(${CONTRIB_DIR}/Source/glbinding_project)
 

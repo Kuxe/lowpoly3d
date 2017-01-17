@@ -7,7 +7,7 @@
 
 using namespace gl;
 
-ShaderProgram::ShaderProgram(const std::string& name) : name(name), programHandle(glCreateProgram()) { }
+ShaderProgram::ShaderProgram(const std::string& name) : programHandle(glCreateProgram()), name(name) { }
 ShaderProgram::~ShaderProgram() {
 	glDeleteProgram(programHandle);
 }
@@ -163,7 +163,7 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLfloat
 
 bool ShaderProgram::setTexture(const std::string& uniformName, const GLuint& id, const GLenum& target) const {
 	if(!glIsTexture(id)) {
-		printf("ERROR: ShaderProgram could not set texture with id %i because %i is not a texture\n", id);
+		printf("ERROR: ShaderProgram could not set texture with id %u because %u is not a texture\n", id, id);
 		return false;
 	}
 
@@ -206,7 +206,7 @@ void ShaderProgram::notify(const rPress& event) {
 	for(const auto& pair : shaderHandles) {
 		const auto& key = pair.first;
 		if(!remove(key)) {
-			printf("ERROR: Could not remove shader %i during live-reload\n", key);
+			printf("ERROR: Could not remove shader \"%s\" during live-reload\n", name.c_str());
 			return;
 		}
 	}

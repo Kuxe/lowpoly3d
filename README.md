@@ -84,10 +84,10 @@ int main(int argc, char** argv) {
 ```
 
 ## Building (Linux)
-Run `cmake .. && make example` from within the example directory.
+Run `cmake .. && make setup example` from within the example directory.
 
 ## Building (Windows)
-Run `cmake -G "MinGW Makefile" ..; make example` from within the example directory.
+Run `cmake -G "MinGW Makefile" ..; make setup example` from within the example directory.
 
 # How do I use lowpoly3d?
 ## Two important interfaces

@@ -7,12 +7,12 @@
 	(=lowpoly3d only forwards events by glfw to whatever application which uses lowpoly3d). **/
 struct ILowpolyInput {
 	virtual ~ILowpolyInput() { }
-	virtual void onError() = 0;
-	virtual void onFramebufferResize(int width, int height) = 0;
-	virtual void onKey(int key, int scancode, int action, int mods) = 0;
-	virtual void onMouseEnter(double xpos, double ypos) = 0;
-	virtual void onMouseExit(double xpos, double ypos) = 0;
-	virtual void onMouse(double xpos, double ypos) = 0; 
+	virtual void onError() { }
+	virtual void onFramebufferResize(int width, int height) { }
+	virtual void onKey(int key, int scancode, int action, int mods) { }
+	virtual void onMouseEnter(double xpos, double ypos) { }
+	virtual void onMouseExit(double xpos, double ypos) { }
+	virtual void onMouse(double xpos, double ypos) { }
 };
 
 struct DummyLowpolyInput : ILowpolyInput {

@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
 	/** Use members of gamedata, such as vectors, to initialize different objects in game engine **/
 	DummySimulation ds(gamedata);
 
-	if(renderer.initialize(ds)) {
+	if(renderer.initialize(&ds)) {
 
 		/** Generate models and load them to renderer (note that ordering of model loading is assumed by JSON) **/
 		SphereGenerator sg(gamedata.sunColor, gamedata.sunSubdivides);

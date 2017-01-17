@@ -1,3 +1,0 @@
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -E remove -f CMakeFiles\lowpoly3d-example.dir/objects.a
-C:\tools\mingw64\bin\ar.exe cr CMakeFiles\lowpoly3d-example.dir/objects.a @CMakeFiles\lowpoly3d-example.dir\objects1.rsp
-C:\tools\mingw64\bin\g++.exe   -g -Wall -std=c++14   -Wl,--whole-archive CMakeFiles\lowpoly3d-example.dir/objects.a -Wl,--no-whole-archive  -o lowpoly3d-example.exe -Wl,--out-implib,liblowpoly3d-example.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\lowpoly3d-example.dir\linklibs.rsp

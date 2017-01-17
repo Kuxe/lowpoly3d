@@ -1,11 +1,7 @@
 #ifndef DUMMYSIMULATION_HPP
 #define DUMMYSIMULATION_HPP
 
-#include "camera.hpp"
-#include "renderquerier.hpp"
-#include "ilowpolyinput.hpp"
-#include "renderdata.hpp"
-#include "celestialbody.hpp"
+#include "lowpoly3d.hpp"
 #include <atomic>
 
 class Gamedata;
@@ -16,6 +12,7 @@ private:
 	bool forceDaytime;
 	float gametimeSpeedFactor;
 	std::atomic<bool> running;
+	std::unordered_set<int> heldKeys;
 public:
 	DummySimulation(const Gamedata& gd);
 
@@ -27,12 +24,11 @@ public:
 
 	/** Required by ILowpolyInput **/
 	void onError();
-	void onFramebufferResize();
-	void onKeyPress();
-	void onKeyRelease();
-	void onMouseEnter();
-	void onMouseExit();
-	void onMouse();
+	void onFramebufferResize(int width, int height);
+	void onKey(int key, int scancode, int action, int mods);
+	void onMouseEnter(double xpos, double ypos);
+	void onMouseExit(double xpos, double ypos);
+	void onMouse(double xpos, double ypos);
 
 	/** Regular methods **/
 	void run();

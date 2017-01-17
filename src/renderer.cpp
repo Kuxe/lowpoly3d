@@ -32,7 +32,6 @@ using namespace gl;
 
 /** TODO LIST
 
-    TODO:   Renderer should not handle input. Forward it to a "LowpolyInput"-interface, which someone else can implement.
     TODO:   Field of depth would be nice
     TODO:   Instanced indexed drawing could increase performance
     TODO:   Text
@@ -53,6 +52,7 @@ static void error_callback(int error, const char* description) {
 static void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
     lowpolyInput->onFramebufferResize(w, h);
+    publish<OnResize>({w, h});
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

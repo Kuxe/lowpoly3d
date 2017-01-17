@@ -3,11 +3,7 @@
 #include "glm/ext.hpp"
 
 Camera::Camera(const glm::mat4& origin) : 
-	side(1.0, 0.0, 0.0, 0.0), up(0.0, 1.0, 0.0, 0.0), forward(0.0, 0.0, 1.0, 0.0), eye(0.0, 0.707/2.0, 2.0, 1.0), mouseX(0.0), mouseY(0.0) {
-
-}
-
-Camera::~Camera() {
+	side(1.0, 0.0, 0.0, 0.0), up(0.0, 1.0, 0.0, 0.0), forward(0.0, 0.0, 1.0, 0.0), eye(0.0, 0.707/2.0, 2.0, 1.0) {
 
 }
 
@@ -39,53 +35,16 @@ void Camera::truck(const float f) {
 	eye += side * f * DeltaTime::dt;
 }
 
+void Camera::look(const glm::vec2& mouse) {
+	pan((mouse.x-lastMouseCoord.x) * DeltaTime::dt * 10.0f);
+	tilt((mouse.y-lastMouseCoord.y) * DeltaTime::dt * 6.0f);
+	lastMouseCoord = mouse;
+}
+
 const glm::mat4 Camera::get() const {
 	return glm::inverse(m()) * glm::translate(glm::mat4(), glm::vec3(eye)) * glm::rotate(glm::mat4(), yaw, glm::vec3(side)) * glm::translate(glm::mat4(), -glm::vec3(eye));
 }
 
 glm::mat4 Camera::m() const {
 	return glm::mat4(side, up, forward, eye);
-}
-
-void Camera::notify(const wPress& event) {
-	dolly(-3.0f);
-}
-
-void Camera::notify(const aPress& event) {
-	truck(-3.0f);
-}
-
-void Camera::notify(const sPress& event) {
-	dolly(+3.0f);
-}
-
-void Camera::notify(const dPress& event) {
-	truck(+3.0f);
-}
-
-void Camera::notify(const qPress& event) {
-	pedestal(-3.0f);
-}
-
-void Camera::notify(const ePress& event) {
-	pedestal(+3.0f);
-}
-
-void Camera::notify(const MouseEvent& event) {
-	if(focused) {
-		pan((event.x - mouseX) * DeltaTime::dt * 10.0f);
-		tilt((event.y - mouseY) * DeltaTime::dt * 6.0f);
-		mouseX = event.x;
-		mouseY = event.y;
-	}
-}
-
-void Camera::notify(const CursorEnterWindow& event) {
-	mouseX = event.x;
-	mouseY = event.y;
-	focused = true;
-}
-
-void Camera::notify(const CursorExitWindow& event) {
-	focused = false;
 }

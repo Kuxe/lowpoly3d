@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 include(ExternalProject)
 
-# TODO: There should be a build target
-
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 # -------------------- DOWNLOAD DEPENDICIES AUTOMAGICALLY -------------------- #
@@ -82,7 +80,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14")
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 #Run "make lowpoly3d" to build library target
-add_library(lowpoly3d
+add_library(lowpoly3d SHARED 
 	src/renderer.cpp
 	src/renderdata.cpp
 	src/model.cpp

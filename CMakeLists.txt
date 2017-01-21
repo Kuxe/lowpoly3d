@@ -108,6 +108,8 @@ if (UNIX)
     target_link_libraries(lowpoly3d glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
 endif (UNIX)
 
+add_dependencies(lowpoly3d configure)
+
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------------------- SETUP dev TARGET ------------------------------ #

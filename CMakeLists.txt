@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 include(ExternalProject)
 
+# TODO: There should be a build target
+
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 # -------------------- DOWNLOAD DEPENDICIES AUTOMAGICALLY -------------------- #
@@ -10,7 +12,7 @@ include(ExternalProject)
 SET(CONTRIB_DIR "${CMAKE_SOURCE_DIR}/contrib")
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_BASE "${CONTRIB_DIR}")
 
-ExternalProject_Add(glm_project
+ExternalProject_Add(glm
 	GIT_REPOSITORY https://github.com/g-truc/glm
 	UPDATE_DISCONNECTED 1
 	BUILD_IN_SOURCE 1
@@ -19,7 +21,7 @@ ExternalProject_Add(glm_project
 	INSTALL_COMMAND ""
 )
 
-ExternalProject_Add(glfw_project
+ExternalProject_Add(glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw
 	UPDATE_DISCONNECTED 1
 	BUILD_IN_SOURCE 1
@@ -35,7 +37,7 @@ ExternalProject_Add(glbinding_project
 	INSTALL_COMMAND ""
 )
 
-ExternalProject_Add(subber_project
+ExternalProject_Add(subber
 	GIT_REPOSITORY https://github.com/Kuxe/subber
 	UPDATE_DISCONNECTED 1
 	BUILD_IN_SOURCE 1
@@ -45,16 +47,16 @@ ExternalProject_Add(subber_project
 	INSTALL_COMMAND ""
 )
 
-add_dependencies(glbinding_project glfw_project)
+add_dependencies(glbinding_project glfw)
 
-#Run "make setup" to download dependencies
-#This must be done atleast once before running "make example" or "make playground"
-ADD_CUSTOM_TARGET(setup
-    DEPENDS glm_project glfw_project glbinding_project subber_project
+#Run "make conf" to download dependencies
+#This must be done atleast once before running "make example" or "make dev"
+add_custom_target(configure
+    DEPENDS glm glfw glbinding_project subber
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-link_directories(${CONTRIB_DIR}/Source/glfw_project/src)
+link_directories(${CONTRIB_DIR}/Source/glfw/src)
 link_directories(${CONTRIB_DIR}/Source/glbinding_project)
 
 # ---------------------------------------------------------------------------- #
@@ -66,21 +68,21 @@ project(lowpoly3d)
 
 include_directories(
 	${CMAKE_SOURCE_DIR}/include
-	${CONTRIB_DIR}/Source/glfw_project/include
-	${CONTRIB_DIR}/Source/glfw_project/deps
-	${CONTRIB_DIR}/Source/glm_project
+	${CONTRIB_DIR}/Source/glfw/include
+	${CONTRIB_DIR}/Source/glfw/deps
+	${CONTRIB_DIR}/Source/glm
 	${CONTRIB_DIR}/Source/glbinding_project/source/glbinding/include
-	${CONTRIB_DIR}/Source/subber_project
+	${CONTRIB_DIR}/Source/subber
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14")
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-# ------------------------- SETUP playground TARGET -------------------------- #
+# -------------------------- SETUP lowpoly3d TARGET -------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-add_executable(lowpoly3d-playground 
-	src/main.cpp
+#Run "make lowpoly3d" to build library target
+add_library(lowpoly3d
 	src/renderer.cpp
 	src/renderdata.cpp
 	src/model.cpp
@@ -98,57 +100,51 @@ add_executable(lowpoly3d-playground
 	src/uniformbuffer.cpp
 )
 
-add_dependencies(lowpoly3d-playground  glm_project)
-add_dependencies(lowpoly3d-playground  glfw_project)
-add_dependencies(lowpoly3d-playground  glbinding_project)
-add_dependencies(lowpoly3d-playground  subber_project)
-
 if (WIN32)
-	target_link_libraries(lowpoly3d-playground glbinding glfw3 opengl32)
+	target_link_libraries(lowpoly3d glbinding glfw3 opengl32)
 endif (WIN32)
 
 if (UNIX)
-    target_link_libraries(lowpoly3d-playground glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
+    target_link_libraries(lowpoly3d glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
 endif (UNIX)
 
-#Run "make playground" to build the playground
-ADD_CUSTOM_TARGET(playground
-    DEPENDS lowpoly3d-playground
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------- SETUP dev TARGET ------------------------------ #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+#Run "make dev" to build dev target
+add_executable(dev src/main.cpp)
+target_link_libraries(dev lowpoly3d)
+set_target_properties(dev PROPERTIES OUTPUT_NAME lowpoly3d)
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 # --------------------------- SETUP example TARGET --------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-
-add_executable(lowpoly3d-example 
-	src/renderer.cpp
-	src/renderdata.cpp
-	src/model.cpp
-	src/shaderprogram.cpp
-	src/camera.cpp
-	src/deltatime.cpp
-	src/terraingenerator.cpp
-	src/cubegenerator.cpp
-	src/spheregenerator.cpp
-	src/example.cpp
-	src/framebuffer.cpp
-	src/depthframebuffer.cpp
-	src/uniformbuffer.cpp
-)
-
-if (WIN32)
-	target_link_libraries(lowpoly3d-example glbinding glfw3 opengl32)
-endif (WIN32)
-
-if (UNIX)
-    target_link_libraries(lowpoly3d-example glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
-endif (UNIX)
-
 #Run "make example" to build the example
-ADD_CUSTOM_TARGET(example
-    DEPENDS lowpoly3d-example
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
+add_executable(example src/example.cpp)
+target_link_libraries(example lowpoly3d)
+set_target_properties(example PROPERTIES OUTPUT_NAME example)
+
+
+# All targets trigger the library target build. Library target output shared libraries into "libs" directory
+# dev target depends on library target
+# example target depends on library target
+# "make configure" should run the configure target
+# "make build" should build library
+# "make dev" should build dev and library
+# "make example" should build example and library
+# "make install" should output headers + library into install directory
+
+
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# --------------------------- SETUP install TARGET --------------------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+install(TARGETS lowpoly3d DESTINATION lib)
+install(DIRECTORY include DESTINATION .)
+install(DIRECTORY shaders DESTINATION .)
+

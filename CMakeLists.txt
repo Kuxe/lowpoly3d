@@ -66,14 +66,14 @@ link_directories(${CONTRIB_DIR}/Source/glbinding_project)
 # ---------------------------------------------------------------------------- #
 project(lowpoly3d)
 
-include_directories(
+set(LOWPOLY3D_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/include
 	${CONTRIB_DIR}/Source/glfw/include
-	${CONTRIB_DIR}/Source/glfw/deps
 	${CONTRIB_DIR}/Source/glm
 	${CONTRIB_DIR}/Source/glbinding_project/source/glbinding/include
 	${CONTRIB_DIR}/Source/subber
 )
+include_directories(${LOWPOLY3D_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14")
 
 # ---------------------------------------------------------------------------- #
@@ -148,5 +148,9 @@ set_target_properties(example PROPERTIES OUTPUT_NAME example)
 # ---------------------------------------------------------------------------- #
 install(TARGETS lowpoly3d DESTINATION lib)
 install(DIRECTORY include DESTINATION .)
+install(DIRECTORY contrib/Source/glfw/include/ DESTINATION include)
+install(DIRECTORY contrib/Source/glm/glm DESTINATION include)
+install(DIRECTORY contrib/Source/glbinding_project/source/glbinding/include/glbinding DESTINATION include)
+install(FILES contrib/Source/subber/subber.hpp DESTINATION include)
 install(DIRECTORY shaders DESTINATION .)
 

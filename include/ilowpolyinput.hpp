@@ -15,15 +15,4 @@ struct ILowpolyInput {
 	virtual void onMouse(double xpos, double ypos) { }
 };
 
-struct DummyLowpolyInput : ILowpolyInput {
-	~DummyLowpolyInput() { }
-	void onError() { }
-	void onFramebufferResize(int width, int height) { }
-	void onKey(int key, int scancode, int action, int mods) { }
-	void onMouseEnter(double xpos, double ypos) { }
-	void onMouseExit(double xpos, double ypos) { }
-	void onMouse(double xpos, double ypos) { }
-};
-
-
 #endif //ILOWPOLYINPUT_HPP

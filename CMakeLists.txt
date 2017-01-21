@@ -88,11 +88,9 @@ add_library(lowpoly3d
 	src/model.cpp
 	src/shaderprogram.cpp
 	src/camera.cpp
-	src/deltatime.cpp
 	src/terraingenerator.cpp
 	src/cubegenerator.cpp
 	src/spheregenerator.cpp
-	src/dummysimulation.cpp
 	src/planegenerator.cpp
 	src/circlegenerator.cpp
 	src/framebuffer.cpp
@@ -116,7 +114,7 @@ add_dependencies(lowpoly3d configure)
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 #Run "make dev" to build dev target
-add_executable(dev src/main.cpp)
+add_executable(dev src/main.cpp src/dummysimulation.cpp)
 target_link_libraries(dev lowpoly3d)
 set_target_properties(dev PROPERTIES OUTPUT_NAME lowpoly3d)
 

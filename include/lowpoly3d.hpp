@@ -13,7 +13,6 @@
 #include "terraingenerator.hpp"
 #include "renderer.hpp"
 #include "ilowpolyinput.hpp"
-#include "deltatime.hpp"
 #include "celestialbody.hpp"
 
 

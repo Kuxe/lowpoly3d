@@ -12,7 +12,6 @@
 #include "renderer.hpp"
 #include "model.hpp"
 #include "renderdata.hpp"
-#include "deltatime.hpp"
 #include "camera.hpp"
 #include "events.hpp"
 #include "shaderprogram.hpp"
@@ -362,7 +361,6 @@ bool Renderer::render(RenderQuerier& rq) const {
             should render. When the renderer is done, wake the simulation. That is all.
         **/
 
-        DeltaTime::start();
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
         const glm::vec2 windowResolution(width, height);
@@ -535,15 +533,6 @@ bool Renderer::render(RenderQuerier& rq) const {
             printf("ERROR: Unknown error in renderer!\n");
             return false;
         }
-
-        DeltaTime::stop();
-
-        //Print time to console every sec
-        if(printFrameTime) {
-            static float accumfps = 0, numframes = 0;
-            printf("avgfps: %f\n",  (accumfps += DeltaTime::dt)/(numframes+=1.0f));
-        }
-
     }
     rq.rendererActive = false; //This one take care of all possible waits happening _later_ in time
     rq.cv.notify_one(); //This one take care of all possible waits that happened _before_ in time

@@ -11,6 +11,7 @@ private:
 	std::vector<RenderData> renderDatas;
 	bool forceDaytime;
 	float gametimeSpeedFactor;
+	float dt = 0.0f;
 	std::atomic<bool> running;
 	std::unordered_set<int> heldKeys;
 public:

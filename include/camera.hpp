@@ -25,7 +25,7 @@ public:
 	void pedestal(const float f);
 	void dolly(const float f);
 	void truck(const float f);
-	void look(const glm::vec2& mouse);
+	void look(const glm::vec2& mouse, float dt);
 	const glm::mat4 get() const;
 };
 

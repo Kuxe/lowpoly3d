@@ -1,5 +1,4 @@
 #include "camera.hpp"
-#include "deltatime.hpp"
 #include "glm/ext.hpp"
 
 Camera::Camera(const glm::mat4& origin) : 
@@ -8,13 +7,13 @@ Camera::Camera(const glm::mat4& origin) :
 }
 
 void Camera::tilt(const float f) {
-	yaw += f * DeltaTime::dt;
+	yaw += f;
 	yaw = yaw > 3.14f/2.0f ? 3.14f/2.0f : yaw;
 	yaw = yaw < -3.14f/2.0f ? -3.14f/2.0f : yaw;
 }
 
 void Camera::pan(const float f) {
-	const glm::mat4 rotAroundY = glm::translate(glm::mat4(), glm::vec3(eye)) * glm::rotate(glm::mat4(), f * DeltaTime::dt, -glm::vec3(0.0, 1.0, 0.0)) * glm::translate(glm::mat4(), glm::vec3(-eye));
+	const glm::mat4 rotAroundY = glm::translate(glm::mat4(), glm::vec3(eye)) * glm::rotate(glm::mat4(), f, -glm::vec3(0.0, 1.0, 0.0)) * glm::translate(glm::mat4(), glm::vec3(-eye));
 	forward = rotAroundY * forward;
 	side = rotAroundY * side;
 }
@@ -24,20 +23,20 @@ void Camera::zoom(const float f) {
 }
 
 void Camera::pedestal(const float f) {
-	eye += glm::vec4(0.0, 1.0, 0.0, 0.0) * f * DeltaTime::dt;
+	eye += glm::vec4(0.0, 1.0, 0.0, 0.0) * f;
 }
 
 void Camera::dolly(const float f) {
-	eye += glm::rotate(glm::mat4(), -yaw, glm::vec3(side)) * forward * f * DeltaTime::dt;;
+	eye += glm::rotate(glm::mat4(), -yaw, glm::vec3(side)) * forward * f;
 }
 
 void Camera::truck(const float f) {
-	eye += side * f * DeltaTime::dt;
+	eye += side * f;
 }
 
-void Camera::look(const glm::vec2& mouse) {
-	pan((mouse.x-lastMouseCoord.x) * DeltaTime::dt * 10.0f);
-	tilt((mouse.y-lastMouseCoord.y) * DeltaTime::dt * 6.0f);
+void Camera::look(const glm::vec2& mouse, float dt) {
+	pan((mouse.x-lastMouseCoord.x) * dt * 10.0f);
+	tilt((mouse.y-lastMouseCoord.y) * dt * 6.0f);
 	lastMouseCoord = mouse;
 }
 

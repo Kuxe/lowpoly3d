@@ -36,22 +36,24 @@ void DummySimulation::onKey(int key, int scancode, int action, int mods) {
 
 void DummySimulation::onMouseEnter(double xpos, double ypos) { }
 void DummySimulation::onMouseExit(double xpos, double ypos) { }
-void DummySimulation::onMouse(double xpos, double ypos) { camera.look({xpos, ypos}); }
+void DummySimulation::onMouse(double xpos, double ypos) { camera.look({xpos, ypos}, dt); }
 
 void DummySimulation::run() {
 	while(running) {
+		float start = getGametime();
 		for(const int key : heldKeys) {
 			switch(key) {
-				case GLFW_KEY_W: camera.dolly(-3.0f); break;
-				case GLFW_KEY_A: camera.truck(-3.0f); break;
-				case GLFW_KEY_S: camera.dolly(+3.0f); break;
-				case GLFW_KEY_D: camera.truck(+3.0f); break;
-				case GLFW_KEY_Q: camera.pedestal(-3.0f); break;
-				case GLFW_KEY_E: camera.pedestal(+3.0f); break;
+				case GLFW_KEY_W: camera.dolly(-30.0f * dt); break;
+				case GLFW_KEY_A: camera.truck(-30.0f * dt); break;
+				case GLFW_KEY_S: camera.dolly(+30.0f * dt); break;
+				case GLFW_KEY_D: camera.truck(+30.0f * dt); break;
+				case GLFW_KEY_Q: camera.pedestal(-30.0f * dt); break;
+				case GLFW_KEY_E: camera.pedestal(+30.0f * dt); break;
 				case GLFW_KEY_ESCAPE: running = false; break;
 			}
 		}
 		signalRenderer();
+		dt = getGametime() - start;
 	}
 };
 

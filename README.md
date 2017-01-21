@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 Run `cmake .. && make` from within the build directory.
 
 ## Building (Windows)
-Run `cmake -G "MinGW Makefiles" ..; make` from within the example directory.
+Run `cmake -G "MinGW Makefiles" ..; make` from within the build directory.
 
 ## Installing (Windows and Linux)
 After building, run `make install` from within the build directory.

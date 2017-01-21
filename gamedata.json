@@ -39,8 +39,8 @@
                     "m[3][2]": -100.0,
                     "m[3][3]": 1.0
                 },
-                "vertexArray": 2,
-                "shader": 0
+                "model": "terrain",
+                "shader": "default"
             },
             {
                 "modelMatrix": {
@@ -61,8 +61,8 @@
                     "m[3][2]": 0.0,
                     "m[3][3]": 1.0
                 },
-                "vertexArray": 4,
-                "shader": 2
+                "model": "sphere",
+                "shader": "skybox"
             },
             {
                 "modelMatrix": {
@@ -83,8 +83,8 @@
                     "m[3][2]": 0.0,
                     "m[3][3]": 1.0
                 },
-                "vertexArray": 4,
-                "shader": 0
+                "model": "sphere",
+                "shader": "default"
             }
         ]
     }

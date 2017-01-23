@@ -85,8 +85,9 @@ static void mouse_callback(GLFWwindow* window, double x, double y) {
 /** Public methods **/
 /*********************/
 
-bool Renderer::initialize(ILowpolyInput* li) {
+bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory) {
     lowpolyInput = li;
+    this->shaderDirectory = shaderDirectory;
     glfwSetErrorCallback(error_callback);
     if(!glfwInit()) {
         fprintf(stderr, "Could not load glfw (call to glfwInit returned 0)\n");
@@ -210,49 +211,49 @@ bool Renderer::render(RenderQuerier& rq) const {
         NO not nice either, dont wanna subclass. **/
     ShaderProgram program("default");
     if(!(
-        program.add(GL_VERTEX_SHADER, "../shaders/shader.vert") &&
-        program.add(GL_FRAGMENT_SHADER, "../shaders/shader.frag") &&
-        program.add(GL_GEOMETRY_SHADER, "../shaders/shader.geom") && 
+        program.add(GL_VERTEX_SHADER, shaderDirectory + "shader.vert") &&
+        program.add(GL_FRAGMENT_SHADER, shaderDirectory + "shader.frag") &&
+        program.add(GL_GEOMETRY_SHADER, shaderDirectory + "shader.geom") && 
         program.link())) {
         return false;
     }
 
     ShaderProgram sunProgram("sun");
     if(!(
-        sunProgram.add(GL_VERTEX_SHADER, "../shaders/sun.vert") &&
-        sunProgram.add(GL_FRAGMENT_SHADER, "../shaders/sun.frag") &&
+        sunProgram.add(GL_VERTEX_SHADER, shaderDirectory + "sun.vert") &&
+        sunProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "sun.frag") &&
         sunProgram.link())) {
         return false;
      }
 
      ShaderProgram skyboxProgram("skybox");
      if(!(
-        skyboxProgram.add(GL_VERTEX_SHADER, "../shaders/skybox.vert") &&
-        skyboxProgram.add(GL_FRAGMENT_SHADER, "../shaders/skybox.frag") &&
+        skyboxProgram.add(GL_VERTEX_SHADER, shaderDirectory + "skybox.vert") &&
+        skyboxProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "skybox.frag") &&
         skyboxProgram.link())) {
         return false;
     }
 
     ShaderProgram waterProgram("water");
     if(!(
-        waterProgram.add(GL_VERTEX_SHADER, "../shaders/water.vert") &&
-        waterProgram.add(GL_FRAGMENT_SHADER, "../shaders/water.frag") &&
+        waterProgram.add(GL_VERTEX_SHADER, shaderDirectory + "water.vert") &&
+        waterProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "water.frag") &&
         waterProgram.link())) {
         return false;
     }
 
     ShaderProgram postprocessProgram("post-process");
     if(!(
-        postprocessProgram.add(GL_VERTEX_SHADER, "../shaders/passthrough.vert") &&
-        postprocessProgram.add(GL_FRAGMENT_SHADER, "../shaders/postprocess.frag") &&
+        postprocessProgram.add(GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert") &&
+        postprocessProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "postprocess.frag") &&
         postprocessProgram.link())) {
         return false;
     }
 
     ShaderProgram depthProgram("depth");
     if(!(
-        depthProgram.add(GL_VERTEX_SHADER, "../shaders/depth.vert") &&
-        depthProgram.add(GL_FRAGMENT_SHADER, "../shaders/depth.frag") &&
+        depthProgram.add(GL_VERTEX_SHADER, shaderDirectory + "depth.vert") &&
+        depthProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "depth.frag") &&
         depthProgram.link())) {
         return false;
     }

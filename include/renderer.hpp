@@ -20,14 +20,19 @@ class Renderer {
 private:
 	bool initialized = false, printFrameTime = false;
 	GLFWwindow* window;
+	std::string shaderDirectory;
 
 	//Keep track of triangles count per model and what vertex array is associated with what name
 	std::unordered_map<std::string, int> triangles, models;
 public:
 
-	//Initializes renderer (create window and get ready for rendering)
-	//returns an error code if fail
-	bool initialize(ILowpolyInput* li);
+	/** Initializes renderer (create window and get ready for rendering)
+		First argument "li" is the class to which the renderer will forward
+		callbacks such as key presses or window resize.
+		shaderDirectory is a relative or absolute path to the directory containing
+		shaders used by lowpoly3d. These shaders are provided by lowpoly3d.
+		returns an error code if fail **/
+	bool initialize(ILowpolyInput* li, const std::string& shaderDirectory);
 
 	//Terminates renderer (destroy window, no longer ready for rendering)
 	void terminate();

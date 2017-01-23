@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
 	args::ValueFlag<float> gametimeSpeedFactor(parser, "gametime", "Increases gametime speed by a factor", {"gt", "gametimespeedfactor"});
 	args::Flag forceDaytime(parser, "forcedaytime", "Disable day/night cycle", {"forcedaytime"});
 	args::Flag printFrameTimeFlag(parser, "printframetime", "Prints frame time", {"printframetime"});
+	args::ValueFlag<std::string> shaderDirectoryArg(parser, "shaderdir", "Set directory containing shaders", {"shaderdir"});
     try {
     	parser.ParseCLI(argc, argv);
     } catch (args::Help) {
@@ -79,10 +80,12 @@ int main(int argc, char** argv) {
 		renderer.setPrintFrameTime(true);
 	}
 
+	std::string shaderDirectory = shaderDirectoryArg ? args::get(shaderDirectoryArg) : "../shaders/";
+
 	/** Use members of gamedata, such as vectors, to initialize different objects in game engine **/
 	DummySimulation ds(gamedata);
 
-	if(renderer.initialize(&ds)) {
+	if(renderer.initialize(&ds, shaderDirectory)) {
 
 		/** Generate models and load them to renderer (note that ordering of model loading is assumed by JSON) **/
 		SphereGenerator sg(gamedata.sunColor, gamedata.sunSubdivides);

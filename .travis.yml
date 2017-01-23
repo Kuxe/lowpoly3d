@@ -13,6 +13,7 @@ addons:
       - g++-5
       - xorg-dev
       - libglu1-mesa-dev
+      - cmake
 # Build steps
 script:
   - cd build

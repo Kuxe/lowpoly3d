@@ -11,7 +11,7 @@ SET(CONTRIB_DIR "${CMAKE_SOURCE_DIR}/contrib")
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_BASE "${CONTRIB_DIR}")
 
 ExternalProject_Add(glm
-	GIT_REPOSITORY https://github.com/g-truc/glm
+	GIT_REPOSITORY https://github.com/g-truc/glm.git
 	UPDATE_DISCONNECTED 1
 	BUILD_IN_SOURCE 1
 	CONFIGURE_COMMAND ""
@@ -20,7 +20,7 @@ ExternalProject_Add(glm
 )
 
 ExternalProject_Add(glfw
-	GIT_REPOSITORY https://github.com/glfw/glfw
+	GIT_REPOSITORY https://github.com/glfw/glfw.git
 	UPDATE_DISCONNECTED 1
 	BUILD_IN_SOURCE 1
 	CMAKE_ARGS -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
@@ -28,7 +28,7 @@ ExternalProject_Add(glfw
 )
 
 ExternalProject_Add(glbinding_project
-	GIT_REPOSITORY https://github.com/cginternals/glbinding
+	GIT_REPOSITORY https://github.com/cginternals/glbinding.git
 	UPDATE_DISCONNECTED 1
 	BUILD_IN_SOURCE 1
 	CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF -DOPTION_BUILD_TESTS=OFF
@@ -36,7 +36,7 @@ ExternalProject_Add(glbinding_project
 )
 
 ExternalProject_Add(subber
-	GIT_REPOSITORY https://github.com/Kuxe/subber
+	GIT_REPOSITORY https://github.com/Kuxe/subber.git
 	UPDATE_DISCONNECTED 1
 	BUILD_IN_SOURCE 1
 	CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF -DOPTION_BUILD_TESTS=OFF

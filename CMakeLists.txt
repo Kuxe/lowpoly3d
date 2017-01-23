@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR)
 
 include(ExternalProject)
 
+# Only set UPDATE_DISCONNECTED 1 if cmake supports it
+if(CMAKE_VERSION VERSION_LESS 3.2)
+	set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+else()
+	set(UPDATE_DISCONNECTED_IF_AVAILABLE UPDATE_DISCONNECTED 1)
+endif()
+
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 # -------------------- DOWNLOAD DEPENDICIES AUTOMAGICALLY -------------------- #
@@ -12,7 +19,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_BASE "${CONTRIB_DIR}")
 
 ExternalProject_Add(glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	UPDATE_DISCONNECTED 1
+	${UPDATE_DISCONNECTED_IF_AVAILABLE}
 	BUILD_IN_SOURCE 1
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""
@@ -21,7 +28,7 @@ ExternalProject_Add(glm
 
 ExternalProject_Add(glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
-	UPDATE_DISCONNECTED 1
+	${UPDATE_DISCONNECTED_IF_AVAILABLE}
 	BUILD_IN_SOURCE 1
 	CMAKE_ARGS -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
 	INSTALL_COMMAND ""
@@ -29,7 +36,7 @@ ExternalProject_Add(glfw
 
 ExternalProject_Add(glbinding_project
 	GIT_REPOSITORY https://github.com/cginternals/glbinding.git
-	UPDATE_DISCONNECTED 1
+	${UPDATE_DISCONNECTED_IF_AVAILABLE}
 	BUILD_IN_SOURCE 1
 	CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF -DOPTION_BUILD_TESTS=OFF
 	INSTALL_COMMAND ""
@@ -37,7 +44,7 @@ ExternalProject_Add(glbinding_project
 
 ExternalProject_Add(subber
 	GIT_REPOSITORY https://github.com/Kuxe/subber.git
-	UPDATE_DISCONNECTED 1
+	${UPDATE_DISCONNECTED_IF_AVAILABLE}
 	BUILD_IN_SOURCE 1
 	CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF -DOPTION_BUILD_TESTS=OFF
 	CONFIGURE_COMMAND ""

@@ -3,6 +3,8 @@
 
 #include "modelgenerator.hpp"
 
+namespace lowpoly3d {
+
 struct SphereGenerator : public ModelGenerator {
 	const Color color;
 	const uint8_t subdivides;
@@ -10,5 +12,7 @@ struct SphereGenerator : public ModelGenerator {
 	std::string name() const;
 	Model generate() override;
 };
+
+}
 
 #endif //SPHEREGENERATOR_HPP

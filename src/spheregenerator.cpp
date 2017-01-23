@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <algorithm>
 
+namespace lowpoly3d {
+
 SphereGenerator::SphereGenerator(const Color& color, uint8_t subdivides) : color(color), subdivides(subdivides) { }
 
 Model SphereGenerator::generate() {
@@ -14,4 +16,6 @@ Model SphereGenerator::generate() {
 		[](const glm::vec3& v) { return v / glm::length(v); }
 	);
 	return sphere;
+}
+
 }

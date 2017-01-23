@@ -32,6 +32,8 @@ namespace glm {
 	}
 }
 
+namespace lowpoly3d {
+
 //The renderer receives an array of RenderDatas,
 //looping through each RenderData and renders the
 //model given by modelId and modelMatrix
@@ -46,5 +48,7 @@ struct RenderData {
 		archive(CEREAL_NVP(modelMatrix), CEREAL_NVP(model), CEREAL_NVP(shader)); 
 	}
 };
+
+}
 
 #endif //RENDERDATA_HPP

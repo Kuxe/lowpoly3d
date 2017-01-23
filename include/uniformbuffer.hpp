@@ -7,6 +7,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+namespace lowpoly3d {
+
 struct UniformBuffer {
 	const std::string name;
 	gl::GLuint ubo, bindingPoint;
@@ -26,5 +28,6 @@ struct UniformBuffer {
 	}
 };
 
+}
 
 #endif //UNIFORMBUFFER_HPP

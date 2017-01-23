@@ -3,6 +3,8 @@
 #include <chrono>
 #include "gamedata.hpp"
 
+namespace lowpoly3d {
+
 DummySimulation::DummySimulation(const Gamedata& gd) : 
 	renderDatas(gd.renderDatas), forceDaytime(gd.forceDaytime), gametimeSpeedFactor(gd.gametimeSpeedFactor), running(true)
  {
@@ -61,3 +63,4 @@ void DummySimulation::terminate() {
 	running = false;
 }
 
+}

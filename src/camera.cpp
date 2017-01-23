@@ -1,6 +1,8 @@
 #include "camera.hpp"
 #include "glm/ext.hpp"
 
+namespace lowpoly3d {
+
 Camera::Camera(const glm::mat4& origin) : 
 	side(1.0, 0.0, 0.0, 0.0), up(0.0, 1.0, 0.0, 0.0), forward(0.0, 0.0, 1.0, 0.0), eye(0.0, 0.707/2.0, 2.0, 1.0) {
 
@@ -46,4 +48,6 @@ const glm::mat4 Camera::get() const {
 
 glm::mat4 Camera::m() const {
 	return glm::mat4(side, up, forward, eye);
+}
+
 }

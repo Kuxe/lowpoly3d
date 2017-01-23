@@ -4,6 +4,8 @@
 #include <random>
 #include <glm/glm.hpp>
 
+namespace lowpoly3d {
+
 Model TerrainGenerator::generate() {
 	std::vector<glm::vec3> vertices;
 	std::vector<Color> colors;
@@ -37,6 +39,7 @@ Model TerrainGenerator::generate() {
 			triangles.push_back({i+1, i+numVerticesPerSide, i+numVerticesPerSide+1});
 		}
 	}
-
 	return {vertices, colors, triangles};
+}
+
 }

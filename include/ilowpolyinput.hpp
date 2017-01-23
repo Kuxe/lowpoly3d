@@ -1,6 +1,8 @@
 #ifndef ILOWPOLYINPUT_HPP
 #define ILOWPOLYINPUT_HPP
 
+namespace lowpoly3d {
+
 /** Interface whose realizations can be passed to renderer. These methods will
 	be called whenever such an event is received within the renderer. It is then up
 	to the realization to decide what to do with these events.
@@ -14,5 +16,7 @@ struct ILowpolyInput {
 	virtual void onMouseExit(double xpos, double ypos) { }
 	virtual void onMouse(double xpos, double ypos) { }
 };
+
+}
 
 #endif //ILOWPOLYINPUT_HPP

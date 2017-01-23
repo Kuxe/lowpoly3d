@@ -7,6 +7,8 @@
 
 using namespace gl;
 
+namespace lowpoly3d {
+
 ShaderProgram::ShaderProgram(const std::string& name) : programHandle(glCreateProgram()), name(name) { }
 ShaderProgram::~ShaderProgram() {
 	glDeleteProgram(programHandle);
@@ -218,4 +220,6 @@ void ShaderProgram::notify(const rPress& event) {
 		link())) {
 		printf("ERROR: Can not live-reload shader program\n");
     }
+}
+
 }

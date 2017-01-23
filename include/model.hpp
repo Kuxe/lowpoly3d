@@ -6,6 +6,8 @@
 #include <string>
 #include "modeldefs.hpp"
 
+namespace lowpoly3d {
+
 struct Model {
 	std::vector<Vertex> vertices;
 	std::vector<Color> colors;
@@ -23,5 +25,7 @@ struct Model {
 
 	void subdivide(int i = 1);
 };
+
+}
 
 #endif //MODEL_HPP

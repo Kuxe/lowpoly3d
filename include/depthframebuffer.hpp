@@ -7,6 +7,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+namespace lowpoly3d {
+
 /** Class representing a framebuffer. In essence, call
 	DepthFramebuffer::use() before drawing anything to the screen,
 	and you can use getTexture() which returns a handle to
@@ -21,5 +23,6 @@ public:
 	gl::GLuint getTexture() const;
 };
 
+}
 
 #endif //DEPTHFRAMEBUFFER_HPP

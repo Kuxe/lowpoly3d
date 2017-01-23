@@ -1,6 +1,8 @@
 #include "model.hpp"
 #include <algorithm>
 
+namespace lowpoly3d {
+
 Model::Model(
 	const std::vector<Vertex>& vertices,
 	const std::vector<Color>& colors,
@@ -63,4 +65,6 @@ void Model::subdivide(int i) {
 		colors.push_back(colors[triangle.y]/uint8_t(2) + colors[triangle.z]/uint8_t(2));
 	}
 	subdivide(i-1);
+}
+
 }

@@ -6,8 +6,11 @@
 #include <unordered_map>
 #include "renderquerier.hpp"
 
-class Model;
 class GLFWwindow;
+
+namespace lowpoly3d {
+
+class Model;
 class ILowpolyInput;
 
 /** Renderer can render RenderDatas provided by a RenderQuerier. Intended use is to first
@@ -41,5 +44,7 @@ public:
 	void setPrintFrameTime(bool printFrameTime);
 	void setMultisamples(int msaa);
 };
+
+}
 
 #endif //RENDERER_HPP

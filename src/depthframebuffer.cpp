@@ -2,6 +2,8 @@
 
 using namespace gl;
 
+namespace lowpoly3d {
+
 DepthFramebuffer::DepthFramebuffer(const gl::GLsizei width, const gl::GLsizei height) {
 
 	/** Create and bind framebuffer **/
@@ -74,4 +76,6 @@ bool DepthFramebuffer::use() const {
 
 GLuint DepthFramebuffer::getTexture() const {
 	return texture;
+}
+
 }

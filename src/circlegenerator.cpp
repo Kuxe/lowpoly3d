@@ -2,6 +2,8 @@
 #include "model.hpp"
 #include <math.h>
 
+namespace lowpoly3d {
+
 CircleGenerator::CircleGenerator(const Vertex& normal, const Color& color) : normal(normal), color(color) { }
 
 Model CircleGenerator::generate() {
@@ -10,4 +12,6 @@ Model CircleGenerator::generate() {
 	std::vector<Color> colors(vertices.size(), color);
 	std::vector<Triangle> triangles;
 	return {vertices, colors, triangles};
+}
+
 }

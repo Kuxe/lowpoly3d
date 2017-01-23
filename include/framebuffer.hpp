@@ -9,6 +9,8 @@
 #include "subber.hpp"
 #include "events.hpp"
 
+namespace lowpoly3d {
+
 /** Class representing a framebuffer. In essence, call
 	Framebuffer::use() before drawing anything to the screen,
 	and you can use getTexture() which returns a handle to
@@ -27,5 +29,6 @@ public:
 	void notify(const OnResize& evt);
 };
 
+}
 
 #endif //FRAMEBUFFER_HPP

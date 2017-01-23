@@ -13,6 +13,8 @@
 	Whenever the renderer should render, pass the simulation to
 	render(const RenderQuerier& rq) **/
 
+namespace lowpoly3d {
+
 class RenderData;
 class Camera;
 class Renderer;
@@ -46,5 +48,7 @@ public:
 		cv.wait(lk, [this] { return !shouldRender || !rendererActive; });
 	}
 };
+
+}
 
 #endif //RENDERQUERIER_HPP

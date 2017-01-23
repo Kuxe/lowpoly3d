@@ -5,6 +5,7 @@
 	If it's pitch dark, wait until the morning appears! **/
 using namespace glm;
 using namespace std::chrono;
+using namespace lowpoly3d;
 struct Game : public RenderQuerier, public ILowpolyInput {
 	bool running = true;
 	float dt = 0.0f;

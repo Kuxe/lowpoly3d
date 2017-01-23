@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 #include "renderdata.hpp" //For specialized serializers for glm::vec3
 
+namespace lowpoly3d {
+
 /** A class for spheres moving in periodic orbits, such as the sun or the moon **/
 class CelestialBody {
 	glm::vec3 center, axis;
@@ -33,5 +35,7 @@ public:
 		); 
 	}
 };
+
+}
 
 #endif //CELESTIALBODY_HPP 

@@ -15,6 +15,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "ilowpolyinput.hpp"
 
+using namespace lowpoly3d;
+
 int generateJSON(const std::string& gamedataPath) {
     Gamedata gamedata;
     gamedata.renderDatas.push_back({glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)), "type model name here", "type shader name here"});

@@ -2,6 +2,8 @@
 #include "model.hpp"
 #include <math.h>
 
+namespace lowpoly3d {
+
 PlaneGenerator::PlaneGenerator(const Vertex& normal, const Color& color, const uint8_t subdivides) :
 	normal(normal), color(color), subdivides(subdivides) { }
 
@@ -17,4 +19,6 @@ Model PlaneGenerator::generate() {
 	Model m = {vertices, colors, triangles};
 	m.subdivide(subdivides);
 	return m;
+}
+
 }

@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+namespace lowpoly3d {
+
 /** Camera can perform standard camera movements such as pan or truck.
 	The standard camera movements are applied onto a matrix m which
 	can be read via the get()-method. Intended use is as view-matrix
@@ -28,5 +30,7 @@ public:
 	void look(const glm::vec2& mouse, float dt);
 	const glm::mat4 get() const;
 };
+
+}
 
 #endif //CAMERA_HPP

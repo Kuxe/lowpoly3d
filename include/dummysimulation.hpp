@@ -4,6 +4,8 @@
 #include "lowpoly3d.hpp"
 #include <atomic>
 
+namespace lowpoly3d {
+
 class Gamedata;
 class DummySimulation : public RenderQuerier, public ILowpolyInput {
 private:
@@ -35,5 +37,7 @@ public:
 	void run();
 	void terminate();
 };
+
+}
 
 #endif //DUMMYSIMULATION_HPP

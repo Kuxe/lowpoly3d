@@ -25,6 +25,8 @@
 
 using namespace gl;
 
+namespace lowpoly3d {
+
 /** FIXME LIST
     //Empty
 **/
@@ -542,4 +544,6 @@ bool Renderer::render(RenderQuerier& rq) const {
 
 void Renderer::setPrintFrameTime(bool printFrameTime) {
     this->printFrameTime = printFrameTime;
+}
+
 }

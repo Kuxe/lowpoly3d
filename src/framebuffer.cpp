@@ -2,6 +2,8 @@
 
 using namespace gl;
 
+namespace lowpoly3d {
+
 Framebuffer::Framebuffer(const std::string& framebufferName, const gl::GLsizei width, const gl::GLsizei height, gl::GLsizei samples) :
 	framebufferName(framebufferName), samples(samples), multisampled(samples > 0) {
 	/** Create and bind texture **/
@@ -113,4 +115,6 @@ void Framebuffer::notify(const OnResize& evt) {
 
 GLuint Framebuffer::getTexture() const {
 	return texture;
+}
+
 }

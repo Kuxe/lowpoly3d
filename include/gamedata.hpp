@@ -8,6 +8,8 @@
 #include "cereal/types/vector.hpp"
 #include <glm/glm.hpp>
 
+namespace lowpoly3d {
+
 /** Gamedata contains whatever (non-pointer) data is required to get the simulation going,
 	such as:
 		* Color of sun
@@ -48,5 +50,7 @@ struct Gamedata {
 		); 
 	}
 };
+
+}
 
 #endif //GAMEDATA_HPP

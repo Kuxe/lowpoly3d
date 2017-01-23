@@ -10,6 +10,8 @@
 #include "events.hpp"
 #include <string>
 
+namespace lowpoly3d {
+
 class UniformBuffer;
 class ShaderProgram : public Subber<rPress> {
 private:
@@ -52,5 +54,7 @@ public:
 	//If r is pressed to a live-reload of the shaderprogram
 	void notify(const rPress& event);
 };
+
+}
 
 #endif //SHADERPROGRAM_HPP

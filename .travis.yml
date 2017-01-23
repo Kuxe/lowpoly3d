@@ -1,7 +1,3 @@
-# Use version of Ubuntu which has cmake 2.8.12
-sudo: required
-dist: trusty
-
 # Enable C++ support
 language: cpp
 # Compiler selection
@@ -15,6 +11,8 @@ addons:
     packages:
       - gcc-5
       - g++-5
+      - xorg-dev
+      - libglu1-mesa-dev
 # Build steps
 script:
   - cd build

@@ -16,6 +16,7 @@ addons:
       - libglu1-mesa-dev
       - cmake-data
       - cmake
+env: COMPILER=g++-5
 # Build steps
 script:
   - cd build

@@ -6,7 +6,7 @@ before_build:
   - set PATH=%PATH:C:\Program Files (x86)\Git\bin;=%
   - set PATH=C:\MinGW\bin;%PATH%
 
-install:
+build_script:
   - cd build
   - cmake -G "MinGW Makefiles" ..
   - make

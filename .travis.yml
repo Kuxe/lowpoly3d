@@ -8,7 +8,7 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - sourceline: ppa:smspillaz/cmake-2.8.12
+      - sourceline: ppa:george-edison55/precise-backports
     packages:
       - gcc-5
       - g++-5

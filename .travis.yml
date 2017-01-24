@@ -8,7 +8,6 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - sourceline: ppa:george-edison55/precise-backports
     packages:
       - gcc-5
       - g++-5
@@ -16,7 +15,7 @@ addons:
       - libglu1-mesa-dev
       - cmake-data
       - cmake
-env: COMPILER=g++-5
+env: CXX=g++-5 CC=gcc-5
 # Build steps
 script:
   - cd build

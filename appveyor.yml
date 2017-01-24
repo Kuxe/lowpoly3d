@@ -12,4 +12,4 @@ before_build:
 build_script:
   - cd build
   - cmake -G "MinGW Makefiles" ..
-  - make
+  - cmake --build .

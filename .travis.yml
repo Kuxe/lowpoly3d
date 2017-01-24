@@ -8,6 +8,7 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - sourceline: ppa:george-edison55/precise-backports
     packages:
       - gcc-5
       - g++-5

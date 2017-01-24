@@ -11,7 +11,7 @@ before_build:
   - set PATH=%PATH:C:\Program Files (x86)\Git\usr\bin;=%
   - set PATH=%PATH:C:\Program Files\Git\bin;=%
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
-  - refreshenv
+  - set PATH=C:\tools\mingw64\bin;%PATH%
 
 build_script:
   - cd build

@@ -1,7 +1,11 @@
 image: Visual Studio 2015
 
 # Credit for workaround goes to Jørgen Ibsen https://github.com/jibsen/brieflz/blob/0c6fb73984f11e697dfaade5cdc5e291c1655c67/appveyor.yml
-# Workaround for CMake not wanting sh.exe on PATH for MinGW 
+# Workaround for CMake not wanting sh.exe on PATH for MinGW
+
+install:
+  choco install mingw --version 5.3.0
+
 before_build:
   - set PATH=%PATH:C:\Program Files (x86)\Git\bin;=%
   - set PATH=%PATH:C:\Program Files (x86)\Git\usr\bin;=%

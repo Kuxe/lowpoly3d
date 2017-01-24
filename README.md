@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/Kuxe/lowpoly3d.svg?branch=master)](https://travis-ci.org/Kuxe/lowpoly3d)
-[https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)
+[![Build Status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)
 
 ![alt tag](lowpoly3d.png)
 A 3D engine tailored towards procedurally generated low poly graphics. It is a hobby project :).

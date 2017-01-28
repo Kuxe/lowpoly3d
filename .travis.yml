@@ -33,9 +33,8 @@ deploy:
   api_key:
     secure: aY81dhM0dxmO1a3xpBrrY0DE6hkiBrlIkNj3REO//qqLN4sFJzD9kLwNS/ggAr8nIJHW9wwMwQPM3bAkCak9CL+njxE0F7a9yoDltqEEI4KvCtOoQATC9ZDfZZhMvOBV0wk0lhqTZTXsKURD7ie3qn7ICNQI9f8SkOQOcMeAEPXroyloY11fmPBbhsg+ftT9Cz8a4ku4Bryako2A+AnVX7nXdx4rFOaXGuLdMzV04T42i3+clPJkDmVYJBVSnEt4K3hupoGICu/Ec8AenHXcXqwaoXyWn4283yz/KSUsPEyBGB24eZ/lnrs6nFistQTPKqDjYF4uM589OBn7zoyHv14o7KX+kgl8KPLZPsiMEZH0Eu5/+9VCbhTfBYOlb+iPqJNLI9MSN16EF3+jKWo6u+qZGEThauc4exh3KqY79cb54hTQGRUk9cjjeqGCfwMd/oKyF7he9vF3dZdyPOh9sr1JnevGP3yOGgPl838AhnWUGPpfweGtO2lbk05cbD6FK9BEob3P/wG4J9nrGyvjbTsseqvSOt3NGotK4k3DEvtwQJrvM4ImaVzS/eLaQwyCbZZ3bcGOXRkcW0CfTv/kK5NS7Gilj0IzBiJ2OsjaZn/8o6CPTaGPVQTWXItuLzlmrSlpdsZG6T+//E2UghEGB7GVVwMPC+uZbp3pcRKEfZc=
   file_glob: true
-  file: build/lowpoly3d-*.tar.gz
+  file: "build/lowpoly3d-*.tar.gz"
   skip_cleanup: true
   on:
-    branch: master
     repo: Kuxe/lowpoly3d
     tags: true

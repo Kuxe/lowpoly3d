@@ -6,12 +6,12 @@
 #include <unordered_map>
 #include "renderquerier.hpp"
 
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace lowpoly3d {
 
-class Model;
-class ILowpolyInput;
+struct Model;
+struct ILowpolyInput;
 
 /** Renderer can render RenderDatas provided by a RenderQuerier. Intended use is to first
 	load a set of models via the loadModels-method. The loadModels-method return a set of integer

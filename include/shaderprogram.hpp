@@ -12,7 +12,7 @@
 
 namespace lowpoly3d {
 
-class UniformBuffer;
+struct UniformBuffer;
 class ShaderProgram : public Subber<rPress> {
 private:
 	const gl::GLuint programHandle;

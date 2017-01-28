@@ -16,7 +16,7 @@ namespace lowpoly3d {
 class Camera {
 private:
 	glm::vec4 side, up, forward, eye;
-	float yaw, pitch;
+	float yaw;
 	glm::vec2 lastMouseCoord = {0.0f, 0.0f};
 	glm::mat4 m() const;
 public:

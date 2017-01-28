@@ -15,7 +15,7 @@
 
 namespace lowpoly3d {
 
-class RenderData;
+struct RenderData;
 class Camera;
 class Renderer;
 class RenderQuerier {

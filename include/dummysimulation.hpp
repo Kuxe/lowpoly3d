@@ -6,7 +6,7 @@
 
 namespace lowpoly3d {
 
-class Gamedata;
+struct Gamedata;
 class DummySimulation : public RenderQuerier, public ILowpolyInput {
 private:
 	Camera camera;

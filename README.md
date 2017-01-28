@@ -2,7 +2,9 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kuxe/lowpoly3d?svg=true)](https://ci.appveyor.com/project/Kuxe/lowpoly3d)
 
 ![alt tag](lowpoly3d.png)
-A 3D engine tailored towards procedurally generated low poly graphics. It is a hobby project :).
+A 3D engine tailored towards procedurally generated low poly graphics, using OpenGL. Lowpoly3d builds under Windows, OSX and Linux.
+
+Lowpoly3d is a hobby project :).
 
 ## Self-contained example
 ```c++
@@ -75,7 +77,7 @@ int main(int argc, char** argv) {
 }
 ```
 
-## Building (Linux)
+## Building (Linux and OSX)
 Run `cmake .. && make` from within the build directory.
 
 ## Building (Windows)
@@ -83,6 +85,9 @@ Run `cmake -G "MinGW Makefiles" ..; make` from within the build directory.
 
 ## Installing (Windows and Linux)
 After building, run `make install` from within the build directory.
+
+## Installing (OSX)
+Have not tried installing on OSX.
 
 # How do I use lowpoly3d?
 ## Two important interfaces

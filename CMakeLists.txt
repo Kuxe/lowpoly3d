@@ -113,7 +113,7 @@ elseif(APPLE)
 	find_library(IOKIT_LIBRARY IOKit)
 	find_library(COREVIDEO CoreVideo)
 	target_link_libraries(lowpoly3d glbinding glfw3 dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO})
-endif(APPLE)
+endif(WIN32)
 
 add_dependencies(lowpoly3d configure)
 
@@ -153,6 +153,7 @@ set_target_properties(example PROPERTIES OUTPUT_NAME example)
 # --------------------------- SETUP install TARGET --------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
+set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install)
 install(TARGETS lowpoly3d DESTINATION lib)
 install(DIRECTORY include DESTINATION .)
 install(DIRECTORY contrib/Source/glfw/include/ DESTINATION include)
@@ -161,3 +162,14 @@ install(DIRECTORY contrib/Source/glbinding_project/source/glbinding/include/glbi
 install(FILES contrib/Source/subber/subber.hpp DESTINATION include)
 install(DIRECTORY shaders DESTINATION .)
 
+# Create zip on windows but TGZ on linux and apple
+set(CPACK_PACKAGE_NAME lowpoly3d)
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
+set(CPACK_PACKAGE_CONTACT joakimthoren93@gmail.com)
+if(WIN32)
+	set(CPACK_GENERATOR ZIP)
+elseif(UNIX)
+	set(CPACK_GENERATOR TGZ)
+endif(WIN32)
+
+include(CPack)

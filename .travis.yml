@@ -3,25 +3,32 @@ notifications:
   email: false
 # Enable C++ support
 language: cpp
-# Compiler selection
-compiler:
-  - gcc
-# Update build toolchain
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - sourceline: ppa:george-edison55/precise-backports
-    packages:
-      - gcc-5
-      - g++-5
-      - xorg-dev
-      - libglu1-mesa-dev
-      - cmake-data
-      - cmake
-# Use g++5
-install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+
+matrix:
+  include:
+    # Linux w/ gcc
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: ppa:george-edison55/precise-backports
+          packages:
+            - gcc-5
+            - g++-5
+            - xorg-dev
+            - libglu1-mesa-dev
+            - cmake-data
+            - cmake
+      # Use g++5
+      install:
+        - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+
+    # OSX w/ clang
+    - os: osx
+      compiler: clang
+
 # Build steps
 script:
   - cd build

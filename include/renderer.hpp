@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "renderquerier.hpp"
+#include <string>
 
 struct GLFWwindow;
 

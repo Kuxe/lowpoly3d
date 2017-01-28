@@ -103,13 +103,17 @@ add_library(lowpoly3d SHARED
 	src/uniformbuffer.cpp
 )
 
-if (WIN32)
+if(WIN32)
 	target_link_libraries(lowpoly3d glbinding glfw3 opengl32)
-endif (WIN32)
-
-if (UNIX)
+elseif(UNIX AND NOT APPLE)
     target_link_libraries(lowpoly3d glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
-endif (UNIX)
+elseif(APPLE)
+	find_package(OpenGL REQUIRED)
+	find_library(COCOA_LIBRARY Cocoa)
+	find_library(IOKIT_LIBRARY IOKit)
+	find_library(COREVIDEO CoreVideo)
+	target_link_libraries(lowpoly3d glbinding glfw3 dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO})
+endif(APPLE)
 
 add_dependencies(lowpoly3d configure)
 

@@ -21,12 +21,15 @@ build_script:
   - move lowpoly3d*.zip ..
   - cd ..
 
+artifacts: 
+  - path: build/lowpoly3d*.zip
+    name: lowpoly3dzip
+
 deploy:
   description: 'Latest binaries and headers for lowpoly3d'
   provider: GitHub
   auth_token:
     secure: qpxxGP1vPIUbfG3zFl1dtqPi9Hsr8A+ldrPmAJGt8oaV6VmFb2JzHyf0nD+XJ0EQ
-  artifact: 'lowpoly3d-*.zip'
   draft: false
   prerelease: false
   on:

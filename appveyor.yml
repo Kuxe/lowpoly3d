@@ -16,8 +16,8 @@ before_build:
 build_script:
   - cd build
   - cmake -G "MinGW Makefiles" ..
-  - cmake --build . -- j4
-  - cmake --build . --target package -- j4
+  - cmake --build . -- -j4
+  - cmake --build . --target package -- -j4
   - move lowpoly3d*.zip ..
   - cd ..
 

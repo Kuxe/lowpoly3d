@@ -27,7 +27,7 @@ float sigmoid(float x, float k ) {
 }
 
 float readShadowmap(vec4 fragSunspace) {
-	return texture(shadowmap, fragSunspace.xy).z;
+	return texture(shadowmap, fragSunspace.xy).x;
 }
 
 //Returns a floating point in range [0.0, 1.0] representing "how much" this fragment is shadowed

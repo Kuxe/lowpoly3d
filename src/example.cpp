@@ -54,7 +54,7 @@ struct Game : public RenderQuerier, public ILowpolyInput {
 int main(int argc, char** argv) {
 	Game game; //This is your game class which realizes the RenderQuerier interface
 	Renderer renderer; //This is the lowpoly3d renderer
-	renderer.initialize(&game, "../shaders/"); //Can pass game as argument since game inherits from ILowpolyInput
+	if(!renderer.initialize(&game, "../shaders/")) return 1; //Can pass game as argument since game inherits from ILowpolyInput
 	SphereGenerator sphereGenerator({125.0f, 125.0f, 125.0f}, 3);
 	TerrainGenerator terrainGenerator;
 	renderer.loadModel("sphere", sphereGenerator.generate());

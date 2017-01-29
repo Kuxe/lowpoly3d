@@ -97,7 +97,7 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     glfwWindowHint(GLFW_SAMPLES, 4);
     window = glfwCreateWindow(480, 270, "Lowpoly3D", NULL, NULL);
     if(!window) {
-        fprintf(stderr, "Could open window (call to glfwCreateWindow returned NULL)\n");
+        printf("ERROR: Could open window (call to glfwCreateWindow returned NULL)\n");
         glfwTerminate();
         return false;
     }
@@ -109,11 +109,31 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
     glbinding::Binding::initialize();
+
+    /** Check that required OpenGL version 3.0 is met.
+        glGetIntegerv(GL_MAJOR_VERSION) not supported on OpenGL <=3.0 hence this approach **/
+    const GLubyte* glVersion(glGetString(GL_VERSION));
+    const GLubyte
+        majorVersion(glVersion[0]), minorVersion(glVersion[2]),
+        requiredMajorVersion('3'), requiredMinorVersion('0');
+    if(majorVersion < requiredMajorVersion || (majorVersion == requiredMajorVersion && minorVersion < requiredMinorVersion)) {
+        printf("ERROR: Your have OpenGL %c.%c, but OpenGL >=%c.%c is required by Lowpoly3d.\n",
+            majorVersion, minorVersion, requiredMajorVersion, requiredMinorVersion);
+        return false;
+    }
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glClearColor(23.0f/255.0f, 126.0f/255.0f, 137.0f/255.0f, 255.0f/255.0f);
     glEnable(GL_MULTISAMPLE);
+
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Unknown error encountered within renderer::initialize()\n");
+        return false;
+    }
+
     initialized = true;
     return true;
 }
@@ -138,29 +158,104 @@ bool Renderer::loadModel(const std::string& name, const Model& model) {
     GLuint vertexBuffer, colorBuffer, indexBuffer, vertexArray;
 
     glGenVertexArrays(1, &vertexArray);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not generate vertex array\n");
+        return false;
+    }
+
     glBindVertexArray(vertexArray);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not bind vertex array\n");
+        return false;
+    }
 
     glGenBuffers(1, &vertexBuffer);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not generate vertex buffer\n");
+        return false;
+    }
+
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not bind vertex buffer\n");
+        return false;
+    }
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * model.vertices.size(), &model.vertices[0], GL_STATIC_DRAW);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not send vertex buffer to GPU\n");
+        return false;
+    }
+
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not set vertex attribute pointer for vertex buffer\n");
+        return false;
+    }
+
     glEnableVertexAttribArray(0);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not enable attribute pointer for vertex buffer\n");
+        return false;
+    }
 
     glGenBuffers(1, &colorBuffer);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not generate color buffer\n");
+        return false;
+    }
+
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not bind color buffer\n");
+        return false;
+    }
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(Color) * model.colors.size(), &model.colors[0], GL_STATIC_DRAW);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could send color buffer to GPU\n");
+        return false;
+    }
+
     glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not set vertex attribute pointer for color buffer\n");
+        return false;
+    }
+
     glEnableVertexAttribArray(1);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not enable vertex attribute for color buffer\n");
+        return false;
+    }
 
     glGenBuffers(1, &indexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Triangle) * model.triangles.size(), &model.triangles[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(3, 3, GL_UNSIGNED_SHORT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(3);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not generate index buffer\n");
+        return false;
+    }
 
-    const auto error = glGetError();
-    if(error != GL_NO_ERROR) {
-        printf("ERROR: Could not load model\n");
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not bind index buffer\n");
+        return false;
+    }
+
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Triangle) * model.triangles.size(), &model.triangles[0], GL_STATIC_DRAW);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not send index buffer to GPU\n");
+        return false;
+    }
+    
+    glVertexAttribPointer(3, 3, GL_UNSIGNED_SHORT, GL_FALSE, 0, 0);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not set set vertex attribute for index buffer\n");
+        return false;
+    }
+
+    glEnableVertexAttribArray(3);
+    if(glGetError() != GL_NO_ERROR) {
+        printf("ERROR: Could not enable vertex attribute for index buffer\n");
         return false;
     }
 

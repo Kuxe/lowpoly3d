@@ -80,6 +80,8 @@ set(LOWPOLY3D_INCLUDE_DIRS
 )
 include_directories(${LOWPOLY3D_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++14")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s")
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #

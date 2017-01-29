@@ -1,7 +1,6 @@
 #include "lowpoly3d.hpp"
 
-/** Example file illustrating how to use lowpoly3d.
-	Most error handling and encapsulation have been omitted for brevity. **/
+/** Example file illustrating how to use lowpoly3d **/
 using namespace glm;
 using namespace std::chrono;
 using namespace lowpoly3d;
@@ -47,7 +46,7 @@ struct Game : public RenderQuerier, public ILowpolyInput {
 		startTime = high_resolution_clock::now();
 		while(running) {
 			//Game logic here - handle input and make a sphere go round and round
-			float start = getGametime();
+			float gametime = getGametime();
 			for(const int key : heldKeys) {
 				switch(key) {
 					case GLFW_KEY_W: camera.dolly(-3.0f * dt); break;
@@ -59,24 +58,26 @@ struct Game : public RenderQuerier, public ILowpolyInput {
 					case GLFW_KEY_ESCAPE: running = false; break;
 				}
 			}
-			rds[2].modelMatrix[3] = 5.0f*vec4(cosf(getGametime()), 1.0f, sinf(getGametime()), .2f);
+			rds[2].modelMatrix[3] = 5.0f*vec4(cosf(gametime), 1.0f, sinf(gametime), .2f);
 			signalRenderer(); //Current thread blocked here until renderer is done rendering
-			dt = getGametime() - start;
+			dt = getGametime() - gametime;
 		}
 	}
 };
 
 int main(int argc, char** argv) {
 	Game game; //This is your game class which realizes the RenderQuerier interface
-	Renderer renderer; //This is the lowpoly3d renderer
-	if(!renderer.initialize(&game, "../shaders/")) return 1; //Can pass game as argument since game inherits from ILowpolyInput
-	SphereGenerator sphereGenerator({125.0f, 125.0f, 125.0f}, 3);
-	TerrainGenerator terrainGenerator;
-	renderer.loadModel("sphere", sphereGenerator.generate());
-	renderer.loadModel("terrain", terrainGenerator.generate());
 	std::thread thread(&Game::run, &game); //Run game in a thread
-	renderer.render(game); //Main-thread will remain in here until renderer terminates
-	game.running = false; //Renderer has quit, so terminate simulation and join simulation thread with main thread
+
+	/** Initialize renderer and send a sphere and terrain to GPU, then start render the game **/
+	SphereGenerator sg({125.0f, 125.0f, 125.0f}, 3);
+	TerrainGenerator tg;
+	Renderer renderer;
+	if(!renderer.initialize(&game, "../shaders/")) return 1;
+	if(!renderer.loadModels("sphere", sg.generate(), "terrain", tg.generate())) return 1;
+	if(!renderer.render(game)) return 1; //Main-thread will remain in here until renderer terminates
+	game.running = false; //Renderer has quit, so terminate game and join game thread with main thread
 	thread.join();
 	renderer.terminate();
+	return 0;
 }

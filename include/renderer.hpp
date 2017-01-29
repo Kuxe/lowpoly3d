@@ -44,6 +44,12 @@ public:
 	//Load a 3D-model to GPU memory, returns a handle to the model
 	bool loadModel(const std::string& name, const Model& model);
 
+	bool loadModels() { return true; }
+	template<typename T, typename S, typename... Ts, typename... Ss>
+	bool loadModels(const T& t, const S& s, const Ts&... ts, const Ss&... ss) {
+		return loadModel(t, s) && loadModels(ts..., ss...);
+	}
+
 	//Keep tracks of what keys are held down
 	static std::unordered_set<int> keysHeld;
 

@@ -96,9 +96,6 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
         return false;
     }
 
-
-    glfwWindowHint(GLFW_SAMPLES, 4);
-
     //Ensure that 3.0 context is used
     const GLubyte requiredMajorVersion('4'), requiredMinorVersion('1');
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredMajorVersion-'0');
@@ -136,7 +133,6 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glClearColor(23.0f/255.0f, 126.0f/255.0f, 137.0f/255.0f, 255.0f/255.0f);
-    glEnable(GL_MULTISAMPLE);
 
     if(glGetError() != GL_NO_ERROR) {
         printf("ERROR: Unknown error encountered within renderer::initialize()\n");

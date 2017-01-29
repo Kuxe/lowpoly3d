@@ -37,8 +37,8 @@ void Camera::truck(const float f) {
 }
 
 void Camera::look(const glm::vec2& mouse, float dt) {
-	pan((mouse.x-lastMouseCoord.x) * dt * 10.0f);
-	tilt((mouse.y-lastMouseCoord.y) * dt * 6.0f);
+	pan((mouse.x-lastMouseCoord.x) * dt);
+	tilt((mouse.y-lastMouseCoord.y) * dt * .6f);
 	lastMouseCoord = mouse;
 }
 

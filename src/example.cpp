@@ -1,13 +1,13 @@
 #include "lowpoly3d.hpp"
 
 /** Example file illustrating how to use lowpoly3d.
-	Error handling and encapsulation have been omitted for brevity.
-	If it's pitch dark, wait until the morning appears! **/
+	Most error handling and encapsulation have been omitted for brevity. **/
 using namespace glm;
 using namespace std::chrono;
 using namespace lowpoly3d;
 struct Game : public RenderQuerier, public ILowpolyInput {
 	bool running = true;
+	decltype(high_resolution_clock::now()) startTime;
 	float dt = 0.0f;
 	Camera camera;
 	std::unordered_set<int> heldKeys;
@@ -17,34 +17,49 @@ struct Game : public RenderQuerier, public ILowpolyInput {
 		{mat4(), "sphere", "default"}
 	};
 
-	const std::vector<RenderData>& getRenderDatas() const { return rds; }
-	const mat4 getView() const { return camera.get(); }
-	const float getGametime() const { return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count()/36000.0f; }
-	const float getSunRadians() const { return getGametime(); }
+	const std::vector<RenderData>& getRenderDatas() const {
+		return rds;
+	}
+
+	const mat4 getView() const {
+		return camera.get();
+	}
+
+	const float getGametime() const {
+		using ms = duration<float, std::milli>;
+		return duration_cast<ms>(high_resolution_clock::now() - startTime).count() / 1000.0f;
+	}
+
+	const float getSunRadians() const {
+		return .1f*getGametime();
+	}
 
 	void onKey(int key, int scancode, int action, int mods) {
 		if(action == GLFW_PRESS) heldKeys.insert(key);
 		else if(action == GLFW_RELEASE) heldKeys.erase(key);
 	}
 
-	void onMouse(double xpos, double ypos) { camera.look({xpos, ypos}, dt); }
+	void onMouse(double xpos, double ypos) {
+		camera.look({xpos, ypos}, dt);
+	}
 
 	void run() {
+		startTime = high_resolution_clock::now();
 		while(running) {
 			//Game logic here - handle input and make a sphere go round and round
 			float start = getGametime();
 			for(const int key : heldKeys) {
 				switch(key) {
-					case GLFW_KEY_W: camera.dolly(-30.0f * dt); break;
-					case GLFW_KEY_A: camera.truck(-30.0f * dt); break;
-					case GLFW_KEY_S: camera.dolly(+30.0f * dt); break;
-					case GLFW_KEY_D: camera.truck(+30.0f * dt); break;
-					case GLFW_KEY_Q: camera.pedestal(-30.0f * dt); break;
-					case GLFW_KEY_E: camera.pedestal(+30.0f * dt); break;
+					case GLFW_KEY_W: camera.dolly(-3.0f * dt); break;
+					case GLFW_KEY_A: camera.truck(-3.0f * dt); break;
+					case GLFW_KEY_S: camera.dolly(+3.0f * dt); break;
+					case GLFW_KEY_D: camera.truck(+3.0f * dt); break;
+					case GLFW_KEY_Q: camera.pedestal(-3.0f * dt); break;
+					case GLFW_KEY_E: camera.pedestal(+3.0f * dt); break;
 					case GLFW_KEY_ESCAPE: running = false; break;
 				}
 			}
-			rds[2].modelMatrix[3] = vec4(5.0f*cosf(10.0f*getGametime()), 5.0f, 5.0f*sinf(10.0f*getGametime()), 1.0f);
+			rds[2].modelMatrix[3] = 5.0f*vec4(cosf(getGametime()), 1.0f, sinf(getGametime()), .2f);
 			signalRenderer(); //Current thread blocked here until renderer is done rendering
 			dt = getGametime() - start;
 		}

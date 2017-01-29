@@ -28,6 +28,7 @@ script:
 - cmake --build .
 - cmake --build . --target package
 - mv lowpoly3d*.tar.gz ../lowpoly3d.tar.gz
+- cd ..
 
 deploy:
   provider: releases

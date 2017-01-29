@@ -25,8 +25,8 @@ matrix:
 script:
 - cd build
 - cmake ..
-- cmake --build .
-- cmake --build . --target package
+- cmake --build . -- j4
+- cmake --build . --target package -- j4
 - mv lowpoly3d*.tar.gz ..
 - cd ..
 

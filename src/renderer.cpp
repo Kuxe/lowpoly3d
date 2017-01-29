@@ -100,7 +100,7 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     //Ensure that 3.0 context is used
-    const GLubyte requiredMajorVersion('3'), requiredMinorVersion('2');
+    const GLubyte requiredMajorVersion('4'), requiredMinorVersion('1');
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredMajorVersion-'0');
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredMinorVersion-'0');
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);

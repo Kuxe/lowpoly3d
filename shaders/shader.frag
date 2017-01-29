@@ -1,4 +1,4 @@
-#version 450
+#version 410
 
 in vec3 geomOutColor;
 in vec3 geomOutNormal;
@@ -27,7 +27,7 @@ float sigmoid(float x, float k ) {
 }
 
 float readShadowmap(vec4 fragSunspace) {
-	return texture2D(shadowmap, fragSunspace.xy).z;
+	return texture(shadowmap, fragSunspace.xy).z;
 }
 
 //Returns a floating point in range [0.0, 1.0] representing "how much" this fragment is shadowed
@@ -36,7 +36,7 @@ float shadowed(vec4 fragSunspace) {
 }
 
 vec3 fog(vec3 color) {
-	const vec3 fogcolor = vec3(mix(vec3(0.5), vec3(timeOfDayColor), 0.8));
+	vec3 fogcolor = mix(vec3(0.5), vec3(timeOfDayColor), 0.8);
 	return mix(color, fogcolor, clamp(sqrt(0.02*gl_FragCoord.z / gl_FragCoord.w) - 1.0, 0.0, 1.0));
 }
 

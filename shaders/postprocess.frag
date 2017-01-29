@@ -1,4 +1,4 @@
-#version 450
+#version 410
 
 out vec3 color;
 
@@ -7,15 +7,15 @@ uniform vec2 resolution;
 
 vec3 sobel() {
 	return -1.0 / 16.0*(
-		2.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(1, 0))/resolution).xyz +
-		2.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 0))/resolution).xyz +
-		2.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, 1))/resolution).xyz +
-		2.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, -1))/resolution).xyz +
-		texture2D(renderedTexture, (gl_FragCoord.xy + vec2(1, 1))/resolution).xyz +
-		texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
-		texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
-		texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, -1))/resolution).xyz -
-		12*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, 0))/resolution).xyz)
+		2.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(1, 0))/resolution).xyz +
+		2.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, 0))/resolution).xyz +
+		2.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(0, 1))/resolution).xyz +
+		2.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(0, -1))/resolution).xyz +
+		texture(renderedTexture, (gl_FragCoord.xy + vec2(1, 1))/resolution).xyz +
+		texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
+		texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
+		texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, -1))/resolution).xyz -
+		12*texture(renderedTexture, (gl_FragCoord.xy + vec2(0, 0))/resolution).xyz)
 	;
 }
 
@@ -39,15 +39,15 @@ vec3 avgNeighborus(int n) {
 
 vec3 screenspaceAA() {
 	return (
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(1, 0))/resolution).xyz +
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 0))/resolution).xyz +
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, 1))/resolution).xyz +
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, -1))/resolution).xyz +
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(1, 1))/resolution).xyz +
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
-		1.0/18.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(-1, -1))/resolution).xyz +
-		1.0/2.0*texture2D(renderedTexture, (gl_FragCoord.xy + vec2(0, 0))/resolution).xyz)
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(1, 0))/resolution).xyz +
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, 0))/resolution).xyz +
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(0, 1))/resolution).xyz +
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(0, -1))/resolution).xyz +
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(1, 1))/resolution).xyz +
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, 1))/resolution).xyz +
+		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(-1, -1))/resolution).xyz +
+		1.0/2.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(0, 0))/resolution).xyz)
 	;
 }
 

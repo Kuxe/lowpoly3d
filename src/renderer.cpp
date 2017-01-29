@@ -9,6 +9,8 @@
 #include <thread>
 #include <algorithm>
 #include <cmath>
+#include <stdio.h>
+#include <stdlib.h>
 #include "renderer.hpp"
 #include "model.hpp"
 #include "renderdata.hpp"
@@ -94,7 +96,16 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
         return false;
     }
 
+
     glfwWindowHint(GLFW_SAMPLES, 4);
+
+    //Ensure that 3.0 context is used
+    const GLubyte requiredMajorVersion('3'), requiredMinorVersion('2');
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredMajorVersion-'0');
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredMinorVersion-'0');
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     window = glfwCreateWindow(480, 270, "Lowpoly3D", NULL, NULL);
     if(!window) {
         printf("ERROR: Could open window (call to glfwCreateWindow returned NULL)\n");
@@ -115,9 +126,7 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     /** Check that required OpenGL version 3.0 is met.
         glGetIntegerv(GL_MAJOR_VERSION) not supported on OpenGL <=3.0 hence this approach **/
     const GLubyte* glVersion(glGetString(GL_VERSION));
-    const GLubyte
-        majorVersion(glVersion[0]), minorVersion(glVersion[2]),
-        requiredMajorVersion('3'), requiredMinorVersion('0');
+    const GLubyte majorVersion(glVersion[0]), minorVersion(glVersion[2]);
     if(majorVersion < requiredMajorVersion || (majorVersion == requiredMajorVersion && minorVersion < requiredMinorVersion)) {
         printf("ERROR: Your have OpenGL %c.%c, but OpenGL >=%c.%c is required by Lowpoly3d.\n",
             majorVersion, minorVersion, requiredMajorVersion, requiredMinorVersion);

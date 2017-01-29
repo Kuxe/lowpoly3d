@@ -22,7 +22,7 @@ build_script:
   - cd ..
 
 artifacts: 
-  - path: build/lowpoly3d*.zip
+  - path: lowpoly3d*.zip
     name: lowpoly3dzip
 
 deploy:

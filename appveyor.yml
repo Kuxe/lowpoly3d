@@ -18,7 +18,7 @@ build_script:
   - cmake -G "MinGW Makefiles" ..
   - cmake --build .
   - cmake --build . --target package
-  - mv lowpoly3d*.zip ..
+  - move lowpoly3d*.zip ..
   - cd ..
 
 deploy:

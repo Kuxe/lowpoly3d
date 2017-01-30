@@ -1,9 +1,7 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include <unordered_set>
 #include <unordered_map>
-#include "renderquerier.hpp"
 #include <string>
 
 struct GLFWwindow;
@@ -12,6 +10,7 @@ namespace lowpoly3d {
 
 struct Model;
 struct ILowpolyInput;
+class RenderQuerier;
 
 /** Renderer can render RenderDatas provided by a RenderQuerier. Intended use is to first
 	load a set of models via the loadModels-method. The loadModels-method return a set of integer
@@ -47,9 +46,6 @@ public:
 	bool loadModels(const T& t, const S& s, const Pack&... pack) {
 		return loadModel(t, s) && loadModels(pack...);
 	}
-
-	//Keep tracks of what keys are held down
-	static std::unordered_set<int> keysHeld;
 
 	void setPrintFrameTime(bool printFrameTime);
 	void setMultisamples(int msaa);

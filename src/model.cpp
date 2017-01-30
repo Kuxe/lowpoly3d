@@ -1,5 +1,4 @@
 #include "model.hpp"
-#include <algorithm>
 
 namespace lowpoly3d {
 

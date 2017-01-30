@@ -1,6 +1,5 @@
 #include "circlegenerator.hpp"
 #include "model.hpp"
-#include <math.h>
 
 namespace lowpoly3d {
 

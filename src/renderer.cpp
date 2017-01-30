@@ -6,11 +6,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/ext.hpp>
-#include <thread>
-#include <algorithm>
 #include <cmath>
-#include <stdio.h>
-#include <stdlib.h>
+#include "renderquerier.hpp"
 #include "renderer.hpp"
 #include "model.hpp"
 #include "renderdata.hpp"

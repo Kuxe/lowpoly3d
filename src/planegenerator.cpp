@@ -1,6 +1,6 @@
 #include "planegenerator.hpp"
 #include "model.hpp"
-#include <math.h>
+#include <glm/ext.hpp>
 
 namespace lowpoly3d {
 

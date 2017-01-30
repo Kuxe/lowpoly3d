@@ -1,6 +1,5 @@
 #include "terraingenerator.hpp"
 #include "model.hpp"
-#include <math.h>
 #include <random>
 #include <glm/glm.hpp>
 

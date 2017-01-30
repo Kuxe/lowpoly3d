@@ -1,7 +1,6 @@
 #ifndef GAMEDATA_HPP
 #define GAMEDATA_HPP
 
-#include <fstream>
 #include "renderdata.hpp"
 #include "modeldefs.hpp"
 #include "cereal/archives/json.hpp"

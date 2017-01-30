@@ -1,7 +1,9 @@
 #ifndef RENDERDATA_HPP
 #define RENDERDATA_HPP
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 #include "cereal/archives/json.hpp"
 
 /** Make glm::vec3 serializable by cereal **/

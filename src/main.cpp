@@ -1,9 +1,9 @@
 #include "renderer.hpp"
 #include <thread>
-#include <iostream>
+#include <stdio.h>
+#include <fstream>
 #include "model.hpp"
 #include <glm/glm.hpp>
-#include <algorithm>
 #include "renderdata.hpp"
 #include "terraingenerator.hpp"
 #include "spheregenerator.hpp"

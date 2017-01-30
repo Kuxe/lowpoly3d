@@ -3,9 +3,6 @@
 
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
-#include <glbinding/gl/functions-patches.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 
 namespace lowpoly3d {
 

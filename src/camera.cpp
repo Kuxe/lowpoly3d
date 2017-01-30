@@ -1,5 +1,5 @@
 #include "camera.hpp"
-#include "glm/ext.hpp"
+#include <glm/ext.hpp>
 
 namespace lowpoly3d {
 

@@ -1,7 +1,7 @@
 #ifndef PLANEGENERATOR_HPP
 #define PLANEGENERATOR_HPP
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 #include "modelgenerator.hpp"
 
 namespace lowpoly3d {

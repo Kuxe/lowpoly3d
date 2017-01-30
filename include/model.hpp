@@ -1,7 +1,6 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <glm/vec3.hpp>
 #include <vector>
 #include <string>
 #include "modeldefs.hpp"

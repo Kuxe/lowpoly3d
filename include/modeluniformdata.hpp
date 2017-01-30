@@ -1,6 +1,6 @@
 #ifndef MODELUNIFORMDATA_HPP
 #define MODELUNIFORMDATA_HPP
-#include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace lowpoly3d {
 

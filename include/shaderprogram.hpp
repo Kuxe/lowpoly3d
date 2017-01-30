@@ -2,13 +2,13 @@
 #define SHADERPROGRAM_HPP
 
 #include <glbinding/gl/gl.h>
-#include <glbinding/Binding.h>
-#include <glbinding/gl/functions-patches.h>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 #include <unordered_map>
+#include <string>
 #include "subber.hpp"
 #include "events.hpp"
-#include <string>
 
 namespace lowpoly3d {
 

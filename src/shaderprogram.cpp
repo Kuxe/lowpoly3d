@@ -1,7 +1,6 @@
 #include "shaderprogram.hpp"
 #include <sstream>
 #include <fstream>
-#include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 #include "uniformbuffer.hpp"
 

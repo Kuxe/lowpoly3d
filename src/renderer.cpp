@@ -363,8 +363,8 @@ bool Renderer::render(RenderQuerier& rq) const {
                           draw mainFBO w MSAA          Render mainFBO to postProcessFBO w postfx shaders (no MSAA)           Blit postfxFBO to defaultFBO
             depthFBO --------------------> mainFBO ----------------------------------------------------------> postfxFBO ----------------------------> defaultFBO
     **/
-    constexpr GLsizei numMultisamples = 4;
-    constexpr uint16_t SHADOW_WIDTH = 8192, SHADOW_HEIGHT = 8192;
+    constexpr GLsizei numMultisamples = 0; //FIXME: Causes crash on Linux (and possibly OSX too on >0)
+    constexpr uint16_t SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     Framebuffer mainFBO("Main FBO", width, height, numMultisamples);
     Framebuffer postfxFBO("PostFX FBO", width, height);
     DepthFramebuffer depthFBO(SHADOW_WIDTH, SHADOW_HEIGHT);

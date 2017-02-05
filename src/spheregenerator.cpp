@@ -1,7 +1,6 @@
 #include "spheregenerator.hpp"
 #include "cubegenerator.hpp"
-#include <glm/glm.hpp>
-#include <algorithm>
+#include <glm/ext.hpp>
 
 namespace lowpoly3d {
 
@@ -11,10 +10,9 @@ Model SphereGenerator::generate() {
 	CubeGenerator cg(color);
 	Model sphere = cg.generate();
 	sphere.subdivide(subdivides);
-	auto& vertices = sphere.vertices;
-	std::transform(vertices.begin(), vertices.end(), vertices.begin(),
-		[](const glm::vec3& v) { return v / glm::length(v); }
-	);
+	for(auto& vertex : sphere.vertices) {
+		vertex = vertex / glm::length(vertex);
+	}
 	return sphere;
 }
 

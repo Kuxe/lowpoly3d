@@ -25,16 +25,31 @@ public:
 
 	/** Add a shader (eg GL_VERTEX_SHADER) to a shader program,
 		compiles the shader and attaches it to this program.
-		Returns true on success, otherwise false
+		Returns true on success, otherwise false. You can also
+		call add(shaderType, "source", shaderType, "source" ...)
 	**/
+
 	bool add(gl::GLenum shaderType, const std::string& source);
+	bool add() const { return true; }
+	template<typename T, typename S, typename... Pack>
+	bool add(const T& t, const S& s, const Pack&... pack) {
+		return add(t, s) && add(pack...);
+	}
+
 	bool remove(gl::GLenum shaderType);
 
 	/** Link this program (must be called once before use!).
 		Deletes added shaders, which frees up GPU memory.
 		Returns true on success, otherwise false.
+		You can also use this similarily to that of variadic add()
+		which in addition to variadic add() also will link.
+		Most of the time you probably want to use variadic link().
 	**/
 	bool link() const;
+	template<typename T, typename S, typename... Pack>
+	bool link(const T& t, const S& s, const Pack&... pack) {
+		return add(t, s) && add(pack...) && link();
+	}
 
 	/** Use this shader for following draw calls.
 		Returns true on success, otherwise false.

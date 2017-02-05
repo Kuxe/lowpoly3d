@@ -4,7 +4,8 @@
 #include "cereal/archives/json.hpp"
 #include "cereal/types/vector.hpp"
 #include <math.h>
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/ext.hpp>
 #include "renderdata.hpp" //For specialized serializers for glm::vec3
 
 namespace lowpoly3d {

@@ -2,6 +2,7 @@
 #define SPHEREGENERATOR_HPP
 
 #include "modelgenerator.hpp"
+#include <string>
 
 namespace lowpoly3d {
 

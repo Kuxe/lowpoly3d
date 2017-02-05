@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "model.hpp"
 
 namespace lowpoly3d {

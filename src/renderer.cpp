@@ -307,51 +307,45 @@ bool Renderer::render(RenderQuerier& rq) const {
         No. This is not nice. I want uniforms to be defined in shader
         NO not nice either, dont wanna subclass. **/
     ShaderProgram program("default");
-    if(!(
-        program.add(GL_VERTEX_SHADER, shaderDirectory + "shader.vert") &&
-        program.add(GL_FRAGMENT_SHADER, shaderDirectory + "shader.frag") &&
-        program.add(GL_GEOMETRY_SHADER, shaderDirectory + "shader.geom") && 
-        program.link())) {
+    if(!program.link(
+        GL_VERTEX_SHADER, shaderDirectory + "shader.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "shader.frag",
+        GL_GEOMETRY_SHADER, shaderDirectory + "shader.geom")) {
         return false;
     }
 
     ShaderProgram sunProgram("sun");
-    if(!(
-        sunProgram.add(GL_VERTEX_SHADER, shaderDirectory + "sun.vert") &&
-        sunProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "sun.frag") &&
-        sunProgram.link())) {
+    if(!sunProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "sun.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "sun.frag")) {
         return false;
      }
 
      ShaderProgram skyboxProgram("skybox");
-     if(!(
-        skyboxProgram.add(GL_VERTEX_SHADER, shaderDirectory + "skybox.vert") &&
-        skyboxProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "skybox.frag") &&
-        skyboxProgram.link())) {
+     if(!skyboxProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "skybox.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "skybox.frag")) {
         return false;
     }
 
     ShaderProgram waterProgram("water");
-    if(!(
-        waterProgram.add(GL_VERTEX_SHADER, shaderDirectory + "water.vert") &&
-        waterProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "water.frag") &&
-        waterProgram.link())) {
+    if(!waterProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "water.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "water.frag")) {
         return false;
     }
 
     ShaderProgram postprocessProgram("post-process");
-    if(!(
-        postprocessProgram.add(GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert") &&
-        postprocessProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "postprocess.frag") &&
-        postprocessProgram.link())) {
+    if(!postprocessProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "postprocess.frag")) {
         return false;
     }
 
     ShaderProgram depthProgram("depth");
-    if(!(
-        depthProgram.add(GL_VERTEX_SHADER, shaderDirectory + "depth.vert") &&
-        depthProgram.add(GL_FRAGMENT_SHADER, shaderDirectory + "depth.frag") &&
-        depthProgram.link())) {
+    if(!depthProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "depth.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "depth.frag")) {
         return false;
     }
 
@@ -389,7 +383,6 @@ bool Renderer::render(RenderQuerier& rq) const {
     addProgram(waterProgram);
     addProgram(postprocessProgram);
     addProgram(depthProgram);
-
 
     rq.rendererActive = true;
 
@@ -489,7 +482,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             try {
                 glBindVertexArray(models.at(rd.model)); 
                 glDrawElements(GL_TRIANGLES, triangles.at(rd.model)*3, GL_UNSIGNED_SHORT, nullptr);
-            } catch(std::out_of_range oor) {
+            } catch(const std::out_of_range& oor) {
                 printf("ERROR: Could not lookup vertex array given by render data \"%s\"!\n", rd.model.c_str());
                 return false;
             }
@@ -536,7 +529,7 @@ bool Renderer::render(RenderQuerier& rq) const {
             for(const auto& rd : rds) {
                 try {
                     programs.at(rd.shader).use();
-                } catch (std::out_of_range) {
+                } catch (const std::out_of_range& e) {
                     printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%lu shaders)\n", rd.shader.c_str(), programs.size());
                     return false;
                 }

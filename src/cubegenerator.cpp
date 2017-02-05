@@ -1,7 +1,6 @@
 #include "cubegenerator.hpp"
 #include <complex>
 #include <vector>
-#include <glm/glm.hpp>
 
 typedef std::complex<float> fz;
 using namespace std::literals::complex_literals;

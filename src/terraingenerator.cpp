@@ -1,12 +1,11 @@
 #include "terraingenerator.hpp"
 #include "model.hpp"
 #include <random>
-#include <glm/glm.hpp>
 
 namespace lowpoly3d {
 
 Model TerrainGenerator::generate() {
-	std::vector<glm::vec3> vertices;
+	std::vector<Vertex> vertices;
 	std::vector<Color> colors;
 	std::vector<Triangle> triangles;
 

@@ -66,7 +66,7 @@ bool ShaderProgram::remove(gl::GLenum shaderType) {
 	try {
 		glDetachShader(programHandle, shaderHandles.at(shaderType));
 		shaderHandles.erase(shaderType);
-	} catch (std::out_of_range e) {
+	} catch (const std::out_of_range& e) {
 		printf("ERROR: Could not detach shader (was shadertype %i ever created?)\n", static_cast<int>(shaderType));
 		return false;
 	}

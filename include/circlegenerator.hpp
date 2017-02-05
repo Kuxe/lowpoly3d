@@ -1,7 +1,7 @@
 #ifndef CIRCLEGENERATOR_HPP
 #define CIRCLEGENERATOR_HPP
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 #include "modelgenerator.hpp"
 
 namespace lowpoly3d {

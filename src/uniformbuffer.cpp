@@ -4,7 +4,7 @@ using namespace gl;
 
 namespace lowpoly3d {
 
-UniformBuffer::UniformBuffer(const std::string& name, const gl::GLuint bindingPoint)
+UniformBuffer::UniformBuffer(const std::string& name, const GLuint bindingPoint)
 	: name(name), bindingPoint(bindingPoint) {
     glGenBuffers(1, &ubo);
 }

@@ -23,6 +23,11 @@ Model::Model(
 		}
 	}
 
+	//Make sanity check, it should always be the case that size of vertices does not exceed uint16_t
+	if(vertices.size() >= uint16_t(0-1)) {
+		printf("ERROR: To many vertices, can't have more vertices than %hu\n", uint16_t(0-1));
+	}
+
 	if(colors.size() < vertices.size()) {
 		printf("ERROR: Not one color per vertex of model, defaulting to purple\n");
 		for(size_t i = colors.size(); i < vertices.size(); i++) {

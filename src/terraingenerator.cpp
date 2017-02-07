@@ -4,28 +4,31 @@
 
 namespace lowpoly3d {
 
-Model TerrainGenerator::generate() {
-	std::vector<Vertex> vertices;
-	std::vector<Color> colors;
-	std::vector<Triangle> triangles;
+TerrainGenerator::TerrainGenerator(const uint16_t numVerticesPerSide, const float tileWidth)
+	: numVerticesPerSide(numVerticesPerSide), tileWidth(tileWidth) { }
 
-	const uint16_t numVerticesPerSide = 200;
-	const float tileWidth = 0.5f;
+Model TerrainGenerator::generate() {
+	if(numVerticesPerSide*numVerticesPerSide >= uint16_t(0-1)) {
+		printf("ERROR: Too many vertices %llu, max=%hu\n", static_cast<unsigned long long>(numVerticesPerSide*numVerticesPerSide), uint16_t(0-1));
+		numVerticesPerSide = sqrt(numVerticesPerSide);
+	}
+	std::vector<Vertex> vertices(numVerticesPerSide*numVerticesPerSide);
+	std::vector<Color> colors(numVerticesPerSide*numVerticesPerSide);
+	std::vector<Triangle> triangles;
 
 	std::random_device rd;
     std::knuth_b e2(rd());
     std::normal_distribution<> dist(0, 0.05);
-
 	//1. Generate vertices
-	for(int y = 0; y < numVerticesPerSide; y++) {
-		for(int x = 0; x < numVerticesPerSide; x++) {
-			vertices.push_back({x*tileWidth, dist(e2), y*tileWidth});
+	for(uint16_t y = 0; y < numVerticesPerSide; y++) {
+		for(uint16_t x = 0; x < numVerticesPerSide; x++) {
+			vertices[y*numVerticesPerSide+x] = {x*tileWidth, dist(e2), y*tileWidth};
 		}
 	}
 	//2. Color vertices
-	for(int y = 0; y < numVerticesPerSide; y++) {
-		for(int x = 0; x < numVerticesPerSide; x++) {
-			colors.push_back({151, 176, 74});
+	for(uint16_t y = 0; y < numVerticesPerSide; y++) {
+		for(uint16_t x = 0; x < numVerticesPerSide; x++) {
+			colors[y*numVerticesPerSide+x] = {151, 176, 74};
 		}
 	}
 

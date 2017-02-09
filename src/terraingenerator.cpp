@@ -1,6 +1,7 @@
 #include "terraingenerator.hpp"
 #include "model.hpp"
 #include <random>
+#include "perlin.hpp"
 
 namespace lowpoly3d {
 
@@ -16,13 +17,13 @@ Model TerrainGenerator::generate() {
 	std::vector<Color> colors(numVerticesPerSide*numVerticesPerSide);
 	std::vector<Triangle> triangles;
 
-	std::random_device rd;
-    std::knuth_b e2(rd());
-    std::normal_distribution<> dist(0, 0.05);
+	const size_t START_OCTAVE = 0, END_OCTAVE = 6;
+	const int seed = /** Und du bist mein **/0x50FA;
+	Perlin perlin(numVerticesPerSide, START_OCTAVE, END_OCTAVE, seed);
 	//1. Generate vertices
 	for(uint16_t y = 0; y < numVerticesPerSide; y++) {
 		for(uint16_t x = 0; x < numVerticesPerSide; x++) {
-			vertices[y*numVerticesPerSide+x] = {x*tileWidth, dist(e2), y*tileWidth};
+			vertices[y*numVerticesPerSide+x] = {x*tileWidth, perlin(x, y), y*tileWidth};
 		}
 	}
 	//2. Color vertices

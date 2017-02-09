@@ -83,9 +83,9 @@ int main(int argc, char** argv) {
 	SphereGenerator sg({125.0f, 125.0f, 125.0f}, 3);
 	TerrainGenerator tg;
 	Renderer renderer;
-	if(!renderer.initialize(&game, "../shaders/")) return 1;
-	if(!renderer.loadModels("sphere", sg.generate(), "terrain", tg.generate())) return 1;
-	if(!renderer.render(game)) return 1; //Main-thread will remain in here until renderer terminates
+	renderer.initialize(&game, "../shaders/") &&
+	renderer.loadModels("sphere", sg.generate(), "terrain", tg.generate()) &&
+	renderer.render(game); //Main-thread will remain in here until renderer terminates
 	game.running = false; //Renderer has quit, so terminate game and join game thread with main thread
 	thread.join();
 	renderer.terminate();

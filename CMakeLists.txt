@@ -103,6 +103,7 @@ add_library(lowpoly3d SHARED
 	src/framebuffer.cpp
 	src/depthframebuffer.cpp
 	src/uniformbuffer.cpp
+	src/perlin.cpp
 )
 
 if(WIN32)

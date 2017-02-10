@@ -23,14 +23,26 @@ Model TerrainGenerator::generate() {
 	//1. Generate vertices
 	for(uint16_t y = 0; y < numVerticesPerSide; y++) {
 		for(uint16_t x = 0; x < numVerticesPerSide; x++) {
-			vertices[y*numVerticesPerSide+x] = {x*tileWidth, perlin(x, y), y*tileWidth};
+
+			/** Squaring perlin noise emphasize high frequencies (=mountains) and dampen low frequencies (=ground)
+				It also removes any negative values whatsoever (=no sea). This is probably not what I want later on,
+				but for now it is fine. **/
+			const float height = powf(perlin(x, y), 2.0f);
+			vertices[y*numVerticesPerSide+x] = {x*tileWidth, height, y*tileWidth};
 		}
 	}
-	//2. Color vertices
-	for(uint16_t y = 0; y < numVerticesPerSide; y++) {
-		for(uint16_t x = 0; x < numVerticesPerSide; x++) {
-			colors[y*numVerticesPerSide+x] = {151, 176, 74};
-		}
+
+	//2. Color vertices from palette depending on height
+	const Color palette[5] {
+		{151, 176, 74},
+		{200, 180, 160},
+		{230, 230, 255}
+	};
+
+	for(uint16_t i = 0; i < numVerticesPerSide * numVerticesPerSide; i++) {
+		colors[i] =
+			vertices[i].y < 4 ? palette[0] :
+			vertices[i].y < 6 ? palette[1] : palette[2];
 	}
 
 	//4. Connect triangles (compute indices) by iterating over each triangle

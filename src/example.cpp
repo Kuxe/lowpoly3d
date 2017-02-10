@@ -11,8 +11,8 @@ struct Game : public RenderQuerier, public ILowpolyInput {
 	Camera camera;
 	std::unordered_set<int> heldKeys;
 	std::vector<RenderData> rds = {
-		{translate(mat4(), vec3(-50.0f, 0.0, -50.0f)), "terrain", "default"},
-		{scale(mat4(), vec3(-50.f)), "sphere", "skybox"},
+		{translate(mat4(), -100.0f*vec3(1.0f, 0.0, 1.0f)), "terrain", "default"},
+		{scale(mat4(), vec3(-150.f)), "sphere", "skybox"},
 		{mat4(), "sphere", "default"}
 	};
 
@@ -59,6 +59,7 @@ struct Game : public RenderQuerier, public ILowpolyInput {
 				}
 			}
 			rds[2].modelMatrix[3] = 5.0f*vec4(cosf(gametime), 1.0f, sinf(gametime), .2f);
+			rds[1].modelMatrix[3] = camera.eye;
 			signalRenderer(); //Current thread blocked here until renderer is done rendering
 			dt = getGametime() - gametime;
 		}

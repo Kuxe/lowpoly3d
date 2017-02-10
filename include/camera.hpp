@@ -17,11 +17,12 @@ namespace lowpoly3d {
 
 class Camera {
 private:
-	glm::vec4 side, up, forward, eye;
+	glm::vec4 side, up, forward;
 	float yaw;
 	glm::vec2 lastMouseCoord = {0.0f, 0.0f};
 	glm::mat4 m() const;
 public:
+	glm::vec4 eye;
 	Camera(const glm::mat4& origin = glm::mat4());
 	void tilt(const float f);
 	void pan(const float f);

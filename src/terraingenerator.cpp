@@ -27,7 +27,9 @@ Model TerrainGenerator::generate() {
 			/** Squaring perlin noise emphasize high frequencies (=mountains) and dampen low frequencies (=ground)
 				It also removes any negative values whatsoever (=no sea). This is probably not what I want later on,
 				but for now it is fine. **/
-			const float height = powf(perlin(x, y), 2.0f);
+			const float terrainPower = 2.0f;
+			const float terrainAmplitude = 20.0f;
+			const float height = terrainAmplitude*powf(perlin(x, y), terrainPower);
 			vertices[y*numVerticesPerSide+x] = {x*tileWidth, height, y*tileWidth};
 		}
 	}

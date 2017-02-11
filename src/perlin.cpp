@@ -38,12 +38,13 @@ Perlin::Perlin(size_t imageSize, size_t startOctave, size_t endOctave, int seed)
 			const auto lerp = [](float a, float b, float t) { return (1.0f - t) * a + t * b; };
 			const float x1 = lerp(dot1, dot2, u), x2 = lerp(dot3, dot4, u);
 			image[i] += amplitude * lerp(x1, x2, v);
+			max = std::abs(image[i]) > max ? std::abs(image[i]) : max;
 		}
 	}
 }
 
 float Perlin::get(size_t x, size_t y) const {
-	return x < imageSize && y < imageSize ? image[y * imageSize + x] : 0.0f;
+	return x < imageSize && y < imageSize ? image[y * imageSize + x] / max : 0.0f;
 }
 
 float Perlin::operator()(size_t x, size_t y) const {

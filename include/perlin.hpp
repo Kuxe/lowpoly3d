@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <vector>
 #include <random>
+#include <functional>
 
 namespace lowpoly3d {
 
@@ -24,7 +25,7 @@ public:
 	const auto begin() const { return image.begin(); }
 	const auto end() const { return image.end(); }
 
-	Perlin& binop(const Perlin& other, const auto& binaryop);
+	Perlin& binop(const Perlin& other, const std::function<float(float, float)>& binaryop);
 	Perlin& operator=(Perlin perlin);
 	Perlin& operator+=(const Perlin& perlin);
 	Perlin& operator-=(const Perlin& perlin);

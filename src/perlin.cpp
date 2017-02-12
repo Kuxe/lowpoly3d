@@ -56,7 +56,7 @@ Perlin::Perlin(size_t size, size_t start, size_t end, int seed) : imageSize(size
 	}
 }
 
-Perlin& Perlin::binop(const Perlin& other, const auto& binaryop) {
+Perlin& Perlin::binop(const Perlin& other, const std::function<float(float, float)>& binaryop) {
 	//For each binary operation made per pixel, ensure that max is updated
 	inplace_zip(image, other.image, [&](float a, float b) {
 		const float binopval = binaryop(a, b);

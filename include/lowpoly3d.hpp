@@ -7,7 +7,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "camera.hpp"
-#include "renderquerier.hpp"
 #include "renderdata.hpp"
 #include "spheregenerator.hpp"
 #include "terraingenerator.hpp"

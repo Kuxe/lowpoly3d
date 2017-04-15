@@ -7,7 +7,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/ext.hpp>
 #include <cmath>
-#include "renderquerier.hpp"
 #include "renderer.hpp"
 #include "model.hpp"
 #include "renderdata.hpp"
@@ -21,6 +20,7 @@
 #include "modeluniformdata.hpp"
 #include "ilowpolyinput.hpp"
 #include "celestialbody.hpp"
+#include "scene.hpp"
 
 using namespace gl;
 
@@ -268,7 +268,7 @@ bool Renderer::loadModel(const std::string& name, const Model& model) {
     return true;
 }
 
-bool Renderer::render(RenderQuerier& rq) const {
+bool Renderer::run() const {
     if(!initialized) {
         printf("ERROR: Renderer is not initialized (did you forget to call the initialize()-method?\n");
         return false;
@@ -384,8 +384,6 @@ bool Renderer::render(RenderQuerier& rq) const {
     addProgram(postprocessProgram);
     addProgram(depthProgram);
 
-    rq.rendererActive = true;
-
     //Sun should rotate around the x-axis through origo
     CelestialBody suncb({0.0, 0.0, 0.0}, {95.0, 0.0, 0.0}, 1.57079632679);
 
@@ -452,6 +450,19 @@ bool Renderer::render(RenderQuerier& rq) const {
             the renderer does not use anything from simulation when simulation is running.
             So whenever the simulation wants to render anything, signal the renderer that it
             should render. When the renderer is done, wake the simulation. That is all.
+
+            Disregard everything stated above. It is kept for historical reasons
+            (also kept incase I get confused, again). RenderQuerier-interface is
+            obsolete since a game copies a scene into memory owned by renderer.
+            The scene is copied from the game-thread into and only after
+            the copying took place the renderer is informed that there is a new
+            scene which should be rendered. This way, there is no shared data
+            so there is no need for any locking mechanisms. This change from
+            RenderQuerier to copying a scene was made since blocking the game-thread
+            whenever the renderer is not feasible since rendering might take 16ms,
+            or more if computer is slow. A 16ms block on the game thread is not ok.
+            A copy on the other hand is (or I think so, have not actually measured)
+            faster than 16ms so it is less of a penalty to copy than to block.
         **/
 
         glfwGetFramebufferSize(window, &width, &height);
@@ -589,35 +600,20 @@ bool Renderer::render(RenderQuerier& rq) const {
             return true;
         };
 
-        /** Critical section **/
-        if(rq.shouldRender) {
-            const RenderDatas& rds = rq.getRenderDatas(); //Shared data
-            const float sunRads = rq.getSunRadians();
-            const glm::mat4 view = rq.getView();
-
+        if(shouldRender) {
             /** In order to do shadow-mapping, I need to render to FBO. In order to render to FBO
                 I need to provide a view matrix for the sun. For now the sun will look at 0.0
                 This will only give shadows in the 0.0 region. Later on this can probably be improved
                 by letting the sun look at the point which is the foci of the camera, or something along
-                those lines (this corresponds to computing shadowmap only where player is looking).
-                The lookat point will probably depend on the camera (which is a shared resource)
-                and I dont want to introduce any race conditions by mistake later on, so keep this
-                code here **/
-            const glm::mat4 sunView = glm::lookAt(suncb.getPos(sunRads), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+                those lines (this corresponds to computing shadowmap only where player is looking). **/
+            const glm::mat4 sunView = glm::lookAt(suncb.getPos(scene.sunRadians), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
             const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
             const glm::mat4 sunvp = sunPerspective * sunView;
-            bool ok =
-                render2depth(rds, sunvp) &&
-                render2fbo(rds, sunRads, sunvp, view, projection, mainFBO) &&
-                render2screen();
-
-            rq.signalSimulation();
-            if(!ok) {
-                rq.rendererActive = false;
-                return false;
-            }
+            if(!(
+                render2depth(scene.renderDatas, sunvp) &&
+                render2fbo(scene.renderDatas, scene.sunRadians, sunvp, scene.view, projection, mainFBO) &&
+                render2screen())) return false;
         }
-        /** End of critical section **/
 
         glfwPollEvents();
         glfwSwapBuffers(window);
@@ -627,10 +623,12 @@ bool Renderer::render(RenderQuerier& rq) const {
             return false;
         }
     }
-    rq.rendererActive = false; //This one take care of all possible waits happening _later_ in time
-    rq.cv.notify_one(); //This one take care of all possible waits that happened _before_ in time
-    //So any wait is dealt with here!
     return true;
+}
+
+void Renderer::setScene(const Scene& scene) {
+    this->scene = scene;
+    shouldRender = true;
 }
 
 void Renderer::setPrintFrameTime(bool printFrameTime) {

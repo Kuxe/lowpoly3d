@@ -12,7 +12,6 @@ namespace lowpoly3d {
 struct Scene {
 	std::vector<RenderData> renderDatas;
 	glm::mat4 view;
-	float gametime;
 	float sunRadians;
 };
 

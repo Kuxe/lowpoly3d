@@ -36,11 +36,11 @@ struct Game : public ILowpolyInput {
 	void run(Renderer& renderer) {
 		using ms = duration<float, std::milli>;
 		const auto start = high_resolution_clock::now();
+		const auto gametime = [start] {
+			return duration_cast<ms>(high_resolution_clock::now() - start).count() / 1000.0f;
+		};
 		while(running) {
 			//Game logic here - handle input and make a sphere go round and round
-			const auto gametime = [start] {
-				return duration_cast<ms>(high_resolution_clock::now() - start).count() / 1000.0f;
-			};
 			const float gt = gametime();
 			for(const int key : heldKeys) {
 				switch(key) {
@@ -55,7 +55,7 @@ struct Game : public ILowpolyInput {
 			}
 			rds[2].modelMatrix[3] = 5.0f*glm::vec4(cosf(gt), 1.0f, sinf(gt), .2f);
 			rds[1].modelMatrix[3] = camera.eye;
-			renderer.setScene({rds, camera.get(), gt, .1f*gt}); //Construct and render a scene
+			renderer.setScene({rds, camera.get(), .1f*gt}); //Render a scene
 			std::this_thread::sleep_for(1ms); //Workaround to prevent dt=0.0f
 			dt = gametime() - gt;
 		}
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
 	lowpoly3d.initialize(&game, "../shaders/") &&
 	lowpoly3d.loadModels("sphere", sg.generate(), "terrain", tg.generate()) &&
 	lowpoly3d.run(); //Main-thread will remain in lowpoly3d.run() until lowpoly3d terminates
-	game.running = false; //lowpoly3d has quit, so terminate game and join game thread with main thread
+	game.running = false; //terminate game and join game thread with main thread
 	thread.join();
 	lowpoly3d.terminate();
 	return 0;
@@ -96,19 +96,18 @@ After building, run `make install` from within the build directory.
 Have not tried installing on OSX.
 
 # How do I use lowpoly3d?
-## Two important interfaces
-There are two interfaces which you must implement to use lowpoly3d. The RenderQuerier interface specifies what you must send to the renderer in order for it to render your game. The LowpolyInput interface specifies what the renderer might send back to you (keypresses for example).
 
-### The RenderQuerier interface
-RenderQuerier is the link between your game and lowpoly3d. RenderQuerier is a C++ interface which makes the renderer in lowpoly3d capable of rendering your scene. You must realize the RenderQuerier interface. The RenderQuerier interface should provide information about your scenery (=where are what objects) and other miscellaneous data such as position of the sun.
+## The LowpolyInput interface
+The LowpolyInput interface specifies what the renderer might send back to you (keypresses for example). The window created by lowpoly3d captures input from keyboard and mouse if the window is active. Therefore there must be some channel where data can move from the renderer to your game. The LowpolyInput interface serves as this channel. LowpolyInput is an interface which demands of you to implement some methods such as "onMouse" and "onKeyPress". These methods are called by lowpoly3d renderer whenver it receives whatever event you provoked.
 
-### The LowpolyInput interface
-The window created by lowpoly3d captures input from keyboard and mouse if the window is active. Therefore there must be some channel where data can move from the renderer to your game. The LowpolyInput interface serves as this channel. LowpolyInput is an interface which demands of you to implement some methods such as "onMouse" and "onKeyPress". These methods are called by lowpoly3d renderer whenver it receives whatever event you provoked.
+## Three important structs
+In addition there are three important structs which you should embrace to get going with lowpoly3d.
 
-## Two important structs
-In addition there are two important structs which you should embrace to get going with lowpoly3d.
+### Scene
+A lowpoly3d scene is a struct which contains all data which is required by the class `Renderer` when rendering a frame, such as a view-matrix or where the sun is located. In order to trigger lowpoly3d into rendering anything you must call `setScene(const Scene& scene)`.
+
 ### RenderData
-A RenderData is a wrapper around data which should answer the "where are what objects" question (posed under The RenderQuerier interface!). If your game has a hero, the lowpoly renderer only cares about the whereabouts of your hero (the `modelMatrix` member of RenderData) and what he looks like (the `model` member of RenderData).. and what shader he should be rendered with (the `shader` member of RenderData).
+If your game has a hero, the `Renderer` cares only about the whereabouts of your hero (the `modelMatrix` member of RenderData) and what he looks like (the `model` member of RenderData).. and what shader he should be rendered with (the `shader` member of RenderData). These are the three members of RenderData. The `Scene`-class has a member `std::vector<RenderData> renderDatas` which you should populate before rendering the scene. So anything you want to show in your scene should be represented by an instance of `Renderdata` within the `renderDatas` vector.
 
 ### Model
 Model represents a 3d model. It consists of a vector of N vertices, another vector of N vertex colors and a vector of M triangles, where a triangle in this context is three indices used for indexed drawing. A model is generated by a ModelGenerator.

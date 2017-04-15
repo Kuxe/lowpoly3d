@@ -26,11 +26,11 @@ struct Game : public ILowpolyInput {
 	void run(Renderer& renderer) {
 		using ms = duration<float, std::milli>;
 		const auto start = high_resolution_clock::now();
+		const auto gametime = [start] {
+			return duration_cast<ms>(high_resolution_clock::now() - start).count() / 1000.0f;
+		};
 		while(running) {
 			//Game logic here - handle input and make a sphere go round and round
-			const auto gametime = [start] {
-				return duration_cast<ms>(high_resolution_clock::now() - start).count() / 1000.0f;
-			};
 			const float gt = gametime();
 			for(const int key : heldKeys) {
 				switch(key) {
@@ -45,7 +45,7 @@ struct Game : public ILowpolyInput {
 			}
 			rds[2].modelMatrix[3] = 5.0f*glm::vec4(cosf(gt), 1.0f, sinf(gt), .2f);
 			rds[1].modelMatrix[3] = camera.eye;
-			renderer.setScene({rds, camera.get(), gt, .1f*gt}); //Construct and render a scene
+			renderer.setScene({rds, camera.get(), .1f*gt}); //Render a scene
 			std::this_thread::sleep_for(1ms); //Workaround to prevent dt=0.0f
 			dt = gametime() - gt;
 		}
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
 	lowpoly3d.initialize(&game, "../shaders/") &&
 	lowpoly3d.loadModels("sphere", sg.generate(), "terrain", tg.generate()) &&
 	lowpoly3d.run(); //Main-thread will remain in lowpoly3d.run() until lowpoly3d terminates
-	game.running = false; //lowpoly3d has quit, so terminate game and join game thread with main thread
+	game.running = false; //terminate game and join game thread with main thread
 	thread.join();
 	lowpoly3d.terminate();
 	return 0;

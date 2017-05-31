@@ -10,7 +10,6 @@
 #include "renderer.hpp"
 #include "model.hpp"
 #include "renderdata.hpp"
-#include "camera.hpp"
 #include "events.hpp"
 #include "shaderprogram.hpp"
 #include "framebuffer.hpp"
@@ -468,7 +467,7 @@ bool Renderer::run() const {
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
         const glm::vec2 windowResolution(width, height);
-        const glm::mat4 projection = glm::perspective(glm::radians(50.0f), 16.0f/9.0f, 0.1f, 1000.0f);
+        const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1920.0f/1080.0f, 0.1f, 1000.0f);
 
         //Linear interpolation
         const auto lerp = [](const auto& a, const auto& b, float t) { return a*(1.0f-t) + b*t; };
@@ -541,7 +540,7 @@ bool Renderer::run() const {
                 try {
                     programs.at(rd.shader).use();
                 } catch (const std::out_of_range& e) {
-                    printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%lu shaders)\n", rd.shader.c_str(), programs.size());
+                    printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%zu shaders)\n", rd.shader.c_str(), programs.size());
                     return false;
                 }
 

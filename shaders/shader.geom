@@ -30,7 +30,7 @@ void main() {
 		vec4 frag0world = vpi * gl_in[0].gl_Position;
 		vec4 frag1world = vpi * gl_in[1].gl_Position;
 		vec4 frag2world = vpi * gl_in[2].gl_Position;
-		geomOutNormal = normalize(cross(vec3(frag0world - frag1world), vec3(frag0world - frag2world)));
+		geomOutNormal = normalize(cross(vec3(frag1world - frag0world), vec3(frag2world - frag0world)));
 		EmitVertex();
 	}
 	EndPrimitive();

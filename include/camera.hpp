@@ -17,12 +17,12 @@ namespace lowpoly3d {
 
 class Camera {
 private:
-	glm::vec4 side, up, forward;
-	float yaw;
+	glm::vec3 side, up, forward;
+	float yaw, pitch;
 	glm::vec2 lastMouseCoord = {0.0f, 0.0f};
 	glm::mat4 m() const;
 public:
-	glm::vec4 eye;
+	glm::vec3 eye;
 	Camera(const glm::mat4& origin = glm::mat4());
 	void tilt(const float f);
 	void pan(const float f);
@@ -31,7 +31,14 @@ public:
 	void dolly(const float f);
 	void truck(const float f);
 	void look(const glm::vec2& mouse, float dt);
-	const glm::mat4 get() const;
+
+	/** Gets the transform matrix of the camera.
+		Not to be confused with the view-matrix! **/
+	const glm::mat4 transform() const;
+
+	/** Gets the view matrix which takes objects from
+		model-space to view-space**/
+	const glm::mat4 view() const;
 };
 
 }

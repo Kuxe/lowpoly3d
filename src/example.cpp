@@ -34,9 +34,9 @@ struct Game : public ILowpolyInput {
 			const float gt = gametime();
 			for(const int key : heldKeys) {
 				switch(key) {
-					case GLFW_KEY_W: camera.dolly(-3.0f * dt); break;
+					case GLFW_KEY_W: camera.dolly(+3.0f * dt); break;
 					case GLFW_KEY_A: camera.truck(-3.0f * dt); break;
-					case GLFW_KEY_S: camera.dolly(+3.0f * dt); break;
+					case GLFW_KEY_S: camera.dolly(-3.0f * dt); break;
 					case GLFW_KEY_D: camera.truck(+3.0f * dt); break;
 					case GLFW_KEY_Q: camera.pedestal(-3.0f * dt); break;
 					case GLFW_KEY_E: camera.pedestal(+3.0f * dt); break;
@@ -44,8 +44,8 @@ struct Game : public ILowpolyInput {
 				}
 			}
 			rds[2].modelMatrix[3] = 5.0f*glm::vec4(cosf(gt), 1.0f, sinf(gt), .2f);
-			rds[1].modelMatrix[3] = camera.eye;
-			renderer.setScene({rds, camera.get(), .1f*gt}); //Render a scene
+			rds[1].modelMatrix[3] = glm::vec4(camera.eye, 1.0f);
+			renderer.setScene({rds, camera.view(), .1f*gt}); //Render a scene
 			std::this_thread::sleep_for(1ms); //Workaround to prevent dt=0.0f
 			dt = gametime() - gt;
 		}

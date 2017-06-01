@@ -23,8 +23,9 @@ matrix:
     compiler: clang
 
 script:
-- cd build
-- cmake ..
+  mkdir release
+- cd release
+- cmake .. -DCMAKE_BUILD_TYPE=Release
 - cmake --build . -- -j4
 - cmake --build . --target package -- -j4
 - mv lowpoly3d*.tar.gz ..

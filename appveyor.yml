@@ -14,8 +14,9 @@ before_build:
   - set PATH=C:\tools\mingw64\bin;%PATH%
 
 build_script:
-  - cd build
-  - cmake -G "MinGW Makefiles" ..
+  - mkdir release
+  - cd release
+  - cmake -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE=Release
   - cmake --build . -- -j4
   - cmake --build . --target package -- -j4
   - move lowpoly3d*.zip ..

@@ -30,3 +30,6 @@
 
 # Contribs
 contrib/
+
+# Windows bloat
+desktop.ini

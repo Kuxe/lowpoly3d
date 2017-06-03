@@ -59,12 +59,21 @@ ExternalProject_Add(subber
 	INSTALL_COMMAND ""
 )
 
+ExternalProject_Add(queue
+	GIT_REPOSITORY https://gist.github.com/6bdd5b748b5f11b303a5cccbb8c8a731.git
+	${UPDATE_DISCONNECTED_IF_AVAILABLE}
+	BUILD_IN_SOURCE 1
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""
+	INSTALL_COMMAND ""
+)
+
 add_dependencies(glbinding_project glfw)
 
 #Run "make conf" to download dependencies
 #This must be done atleast once before running "make example" or "make dev"
 add_custom_target(configure
-    DEPENDS glm glfw glbinding_project subber
+    DEPENDS glm glfw glbinding_project subber queue
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
@@ -84,6 +93,7 @@ set(LOWPOLY3D_INCLUDE_DIRS
 	${CONTRIB_DIR}/Source/glm
 	${CONTRIB_DIR}/Source/glbinding_project/source/glbinding/include
 	${CONTRIB_DIR}/Source/subber
+	${CONTRIB_DIR}/Source/queue
 )
 include_directories(${LOWPOLY3D_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -s -O3 -Wall -std=c++14 -fomit-frame-pointer") #CPack needs this for some reason unknown

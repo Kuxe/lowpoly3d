@@ -1,4 +1,4 @@
-#version 410
+#version 330
 
 out vec3 color;
 
@@ -23,20 +23,6 @@ float edge() {
 	return dot(sobel(), vec3(1.0)) / 3.0;
 }
 
-vec3 sumNeighbours(int n) {
-	vec3 sum = vec3(0.0);
-	for(int x = 0; x < n; x++) {
-		for(int y = 0; y < n; y++) {
-			sum += texture(renderedTexture, (gl_FragCoord.xy + vec2(x, y))/resolution).xyz;
-		}
-	}
-	return sum;
-}
-
-vec3 avgNeighborus(int n) {
-	return sumNeighbours(n) / pow(n, 2.0);
-}
-
 vec3 screenspaceAA() {
 	return (
 		1.0/18.0*texture(renderedTexture, (gl_FragCoord.xy + vec2(1, 0))/resolution).xyz +
@@ -54,5 +40,5 @@ vec3 screenspaceAA() {
 //TODO: Toy around with post-processing effects
 void main(void) {
 	color = texture(renderedTexture, gl_FragCoord.xy/resolution).xyz;
-	color = 0.6*avgNeighborus(5) * color + 0.6*pow(color, vec3(2.0));
+	color = 0.7*color + pow(color, vec3(5.0));
 }

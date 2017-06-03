@@ -93,11 +93,11 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     }
 
     //Ensure that 3.0 context is used
-    const GLubyte requiredMajorVersion('4'), requiredMinorVersion('1');
+    const GLubyte requiredMajorVersion('3'), requiredMinorVersion('1');
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredMajorVersion-'0');
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredMinorVersion-'0');
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(480, 270, "Lowpoly3D", NULL, NULL);
     if(!window) {

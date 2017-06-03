@@ -69,6 +69,8 @@ bool ShaderProgram::remove(gl::GLenum shaderType) {
 	} catch (const std::out_of_range& e) {
 		printf("ERROR: Could not detach shader (was shadertype %i ever created?)\n", static_cast<int>(shaderType));
 		return false;
+	} catch (const std::exception& e) {
+		printf("ERROR: Could not detach shader (%s)\n", e.what());
 	}
 	return true;
 }

@@ -267,7 +267,7 @@ bool Renderer::loadModel(const std::string& name, const Model& model) {
     return true;
 }
 
-bool Renderer::run() const {
+bool Renderer::run() {
     if(!initialized) {
         printf("ERROR: Renderer is not initialized (did you forget to call the initialize()-method?\n");
         return false;
@@ -495,6 +495,8 @@ bool Renderer::run() const {
             } catch(const std::out_of_range& oor) {
                 printf("ERROR: Could not lookup vertex array given by render data \"%s\"!\n", rd.model.c_str());
                 return false;
+            } catch(const std::exception& e) {
+                printf("Error: Could not draw render data %s", e.what());
             }
 
             if(glGetError() != GL_NO_ERROR) {
@@ -542,6 +544,8 @@ bool Renderer::run() const {
                 } catch (const std::out_of_range& e) {
                     printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%zu shaders)\n", rd.shader.c_str(), programs.size());
                     return false;
+                } catch (const std::exception& e) {
+                    printf("ERROR: Could not draw RenderData %s\n", e.what());
                 }
 
                 modelUBO.use<ModelUniformData>({rd.modelMatrix, vp * rd.modelMatrix, sunvp * rd.modelMatrix});
@@ -605,13 +609,18 @@ bool Renderer::run() const {
                 This will only give shadows in the 0.0 region. Later on this can probably be improved
                 by letting the sun look at the point which is the foci of the camera, or something along
                 those lines (this corresponds to computing shadowmap only where player is looking). **/
+            const Scene& scene = scenes.front(); //This assignment to Scene& scene assumes that scenes.front() is only modified by this thread
             const glm::mat4 sunView = glm::lookAt(suncb.getPos(scene.sunRadians), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
             const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
             const glm::mat4 sunvp = sunPerspective * sunView;
             if(!(
                 render2depth(scene.renderDatas, sunvp) &&
                 render2fbo(scene.renderDatas, scene.sunRadians, sunvp, scene.view, projection, mainFBO) &&
-                render2screen())) return false;
+                render2screen())) {
+                    scenes.pop();
+                    return false;
+            }
+            scenes.pop();
         }
 
         glfwPollEvents();
@@ -625,9 +634,11 @@ bool Renderer::run() const {
     return true;
 }
 
-void Renderer::setScene(const Scene& scene) {
-    this->scene = scene;
-    shouldRender = true;
+void Renderer::offer(const Scene& scene) {
+    //If a scene fits into the scene-queue, then insert it and tell renderer that it should render a scene in the queue
+    if(scenes.offer(scene)) {
+        shouldRender = true;
+    }
 }
 
 void Renderer::setPrintFrameTime(bool printFrameTime) {

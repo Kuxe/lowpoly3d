@@ -5,6 +5,7 @@
 #include <string>
 #include <atomic>
 #include "scene.hpp"
+#include "queue.hpp" //For buffering scenes during setScene()
 
 struct GLFWwindow;
 
@@ -26,9 +27,24 @@ private:
 	std::unordered_map<std::string, int> triangles, models;
 
 	//Current scene which the renderer should renderer. Set scene via "setScene()"-method.
-	Scene scene;
 	std::atomic<bool> shouldRender;
+
+	/** QUEUE_SIZE determines how many scenes may be buffered, that is, how many scenes
+		the producer may produce before scenes will be discarded if queue is full.
+		In practice a large buffer result in more memory usage and possible input-delay
+		(since the rendered scene is a function of input received several milliseconds earlier)
+		but a large buffer may also provide a smoother experience since if the producer
+		sporadically lag behind and stop producing, the renderer will still have scenes to
+		render so thus the visible lag observed by a sporadically slow producer will be mitigated.
+		An opportunity with using a large scene buffer is that scenes whom are not at the front of
+		the queue may be subject to culling algorithms in parallell, so a large buffer will
+		allow for more parallell culling (still at expense of input lag, so it's really a
+		trade-off between input lag and render lag) **/
+	static constexpr size_t QUEUE_SIZE = 4;
+	Queue<Scene> scenes;
 public:
+
+	Renderer() : scenes(QUEUE_SIZE) { }
 
 	/** Initializes renderer (create window and get ready for rendering)
 		First argument "li" is the class to which the renderer will forward
@@ -42,7 +58,7 @@ public:
 	void terminate();
 
 	//Run the renderer. Remember to set the scene, otherwise nothing is rendered.
-	bool run() const;
+	bool run();
 
 	//Load a 3D-model to GPU memory, returns a handle to the model
 	bool loadModel(const std::string& name, const Model& model);
@@ -52,11 +68,11 @@ public:
 		return loadModel(t, s) && loadModels(pack...);
 	}
 
-	/** Set the scene which should be rendered. A call to this method triggers a rendering
-		so setScene should be called frequently (typically 60 times per second!).
-		Under the hood, the scene is copied into renderer such that no thread needs to be
-		blocked while rendering (since the 'shared' data is copied) **/
-	void setScene(const Scene& scene);
+	/** Offer a scene which may be rendered. A call to offer places the scene
+		in a queue if the scene fits, otherwise the scene is discarded.
+		The offer method can therefore (sloppily) be thought of as
+		the "render" method which renders a scene **/
+	void offer(const Scene& scene);
 
 	void setPrintFrameTime(bool printFrameTime);
 	void setMultisamples(int msaa);

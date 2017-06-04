@@ -45,7 +45,7 @@ struct Game : public ILowpolyInput {
 			}
 			rds[2].modelMatrix[3] = 5.0f*glm::vec4(cosf(gt), 1.0f, sinf(gt), .2f);
 			rds[1].modelMatrix[3] = glm::vec4(camera.eye, 1.0f);
-			renderer.setScene({rds, camera.view(), .1f*gt}); //Render a scene
+			renderer.offer({rds, camera.view(), .1f*gt}); //Render a scene
 			std::this_thread::sleep_for(1ms); //Workaround to prevent dt=0.0f
 			dt = gametime() - gt;
 		}

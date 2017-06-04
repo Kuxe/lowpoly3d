@@ -49,7 +49,8 @@ bool ShaderProgram::add(GLenum shaderType, const std::string& path) {
 		return false;
     }
 
-    shaderHandles[shaderType] = shaderHandle;
+    //Save metadata of shader. This must be done if this shader program should support live-reloading.
+    shaders[shaderType] = {shaderHandle, path};
 
 	//Finally attach shader to program
     glAttachShader(programHandle, shaderHandle);
@@ -64,8 +65,8 @@ bool ShaderProgram::add(GLenum shaderType, const std::string& path) {
 
 bool ShaderProgram::remove(gl::GLenum shaderType) {
 	try {
-		glDetachShader(programHandle, shaderHandles.at(shaderType));
-		shaderHandles.erase(shaderType);
+		glDetachShader(programHandle, shaders.at(shaderType).handle);
+		shaders.erase(shaderType);
 	} catch (const std::out_of_range& e) {
 		printf("ERROR: Could not detach shader (was shadertype %i ever created?)\n", static_cast<int>(shaderType));
 		return false;
@@ -206,21 +207,33 @@ bool ShaderProgram::setUBO(const std::string& blockName, const UniformBuffer& ub
 
 
 void ShaderProgram::notify(const rPress& event) {
-	for(const auto& pair : shaderHandles) {
-		const auto& key = pair.first;
-		if(!remove(key)) {
-			printf("ERROR: Could not remove shader \"%s\" during live-reload\n", name.c_str());
+	/** Iterate over all attached shaders, remove them and re-add them and finally link them.
+		A copy of shaders is created since we are about to remove each shader attached
+		to this shader program but we do not wan't to forget what shaders are attached since
+		they must be re-attached **/
+	printf("Live-reloading shader %s...\n", name.c_str());
+	decltype(shaders) shaderscpy = shaders;
+
+	//Remove shaders
+	for(const auto& pair : shaders) {
+		if(!remove(pair.first)) {
+			printf("ERROR: Could not remove shader from shader program \"%s\" during live-reload\n", name.c_str());
 			return;
 		}
 	}
 
-	if(!(
-		add(GL_VERTEX_SHADER, "../shaders/shader.vert") &&
-		add(GL_FRAGMENT_SHADER, "../shaders/shader.frag") &&
-		add(GL_GEOMETRY_SHADER, "../shaders/shader.geom") &&
-		link())) {
-		printf("ERROR: Can not live-reload shader program\n");
-    }
+	//Re-add shaders
+	for(const auto& pair : shaderscpy) {
+		if(!add(pair.first, pair.second.path)) {
+			printf("ERROR: Could not re-add shader to shader program \"%s\" during live-reload\n", name.c_str());
+			return;
+		}
+	}
+
+	//Re-link shaders
+	if(!link()) {
+		printf("ERROR: Could not link shader program \"%s\" during live-reload\n", name.c_str());
+	}
 }
 
-}
+} //namespace lowpoly3d

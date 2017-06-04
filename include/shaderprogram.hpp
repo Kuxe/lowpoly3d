@@ -16,7 +16,15 @@ struct UniformBuffer;
 class ShaderProgram : public Subber<rPress> {
 private:
 	const gl::GLuint programHandle;
-	std::unordered_map<gl::GLenum, gl::GLuint> shaderHandles;
+
+	/** Each shader metdata in this shaderprogram is stored "shaders".
+		These metadata are needed when live-recompiling shaders **/
+	struct ShaderMetadata {
+		gl::GLuint handle;
+		std::string path;
+	};
+
+	std::unordered_map<gl::GLenum, ShaderMetadata> shaders;
 public:
 	const std::string name;
 

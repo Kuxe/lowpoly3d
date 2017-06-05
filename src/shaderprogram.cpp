@@ -202,6 +202,13 @@ bool ShaderProgram::setUBO(const std::string& blockName, const UniformBuffer& ub
 		printf("ERROR: Could not set uniform buffer object in %s\n", name.c_str());
 		return false;
 	}
+
+	/** Finally save ptr to UBO such that we can re-set it during a live-reload.
+		This assumes that the UniformBuffer objects life-time is equal to or greater
+		than that of this ShaderProgram. While a dangerous assumption, I don't see why
+		that would _not_ be the case **/
+	ubos[blockName] = &ubo;
+
 	return true;
 }
 
@@ -211,7 +218,6 @@ void ShaderProgram::notify(const rPress& event) {
 		A copy of shaders is created since we are about to remove each shader attached
 		to this shader program but we do not wan't to forget what shaders are attached since
 		they must be re-attached **/
-	printf("Live-reloading shader %s...\n", name.c_str());
 	decltype(shaders) shaderscpy = shaders;
 
 	//Remove shaders
@@ -233,6 +239,15 @@ void ShaderProgram::notify(const rPress& event) {
 	//Re-link shaders
 	if(!link()) {
 		printf("ERROR: Could not link shader program \"%s\" during live-reload\n", name.c_str());
+	}
+
+	//Re-set UBOs
+	for(const auto& pair : ubos) {
+		/** If crash here it's likely because, for some reason, the UniformBuffer object went out of scope
+			or got deallocated for some reason. If that's the case (and neccesarily so) I need to reconsider
+			how to deal with Uniform Buffers and live-reloading because clearly pointers to UniformBuffers
+			cannot be stored any longer given that UniformBuffers are deallocated before ShaderProgram is **/
+		setUBO(pair.first, *pair.second);
 	}
 }
 

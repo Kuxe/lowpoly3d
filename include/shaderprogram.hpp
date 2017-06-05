@@ -25,6 +25,7 @@ private:
 	};
 
 	std::unordered_map<gl::GLenum, ShaderMetadata> shaders;
+	std::unordered_map<std::string, const UniformBuffer*> ubos;
 public:
 	const std::string name;
 

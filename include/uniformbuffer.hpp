@@ -6,14 +6,26 @@
 
 namespace lowpoly3d {
 
+/** UniformBuffer represents an uniform buffer. The uniformbuffer
+	can be use some arbitrary data of type T, which means that
+	the data is sent to GPU memory with "name" as uniform name. 
+	All it's member are effectively constant throughout life-time,
+	except ubo which cannot be initialized using initializer-list due
+	to how OpenGLs glGenBuffer work **/
 struct UniformBuffer {
 	const std::string name;
-	gl::GLuint ubo, bindingPoint;
+	const gl::GLuint bindingPoint;
+	gl::GLuint ubo;
 	UniformBuffer(const std::string& name, const gl::GLuint bindingPoint);
-	~UniformBuffer();
+
+	/** It's unsafe to copy UniformBuffer since on destruction glDeleteBuffers, so if a copy
+		is destroyed before the "original" UniformBuffer is, the OpenGL buffer will be prematurely
+		deleted and then bad things are bound to happen **/
+	UniformBuffer(const UniformBuffer& other) = delete;
+	virtual ~UniformBuffer();
 
 	template<typename T>
-	bool use(const T& data) {
+	bool use(const T& data) const {
 		gl::glBindBuffer(gl::GL_UNIFORM_BUFFER, ubo);
 		gl::glBindBufferBase(gl::GL_UNIFORM_BUFFER, bindingPoint, ubo);
 		gl::glBufferData(gl::GL_UNIFORM_BUFFER, sizeof(T), static_cast<const void*>(&data), gl::GL_DYNAMIC_DRAW);

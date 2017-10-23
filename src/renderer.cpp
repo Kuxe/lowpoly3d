@@ -395,6 +395,8 @@ bool Renderer::run() {
     //Sun should rotate around the x-axis through origo
     CelestialBody suncb({0.0, 0.0, 0.0}, {95.0, 0.0, 0.0}, 1.57079632679);
 
+    auto startTime = std::chrono::high_resolution_clock::now();
+
     while(!glfwWindowShouldClose(window)) {
 
         /** Explanation of threading in renderer (why and how):
@@ -477,6 +479,9 @@ bool Renderer::run() {
         glViewport(0, 0, width, height);
         const glm::vec2 windowResolution(width, height);
         const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1920.0f/1080.0f, 0.1f, 1000.0f);
+
+        const auto currentTime = std::chrono::high_resolution_clock::now();
+        const uint32_t time32 = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count(); //Used for creating effects as function of time in shaders
 
         //Linear interpolation
         const auto lerp = [](const auto& a, const auto& b, float t) { return a*(1.0f-t) + b*t; };
@@ -582,7 +587,8 @@ bool Renderer::run() {
             /** Render quad filling the screen using postfx shaders, where postfx shader got multisampled texture from mainFBO **/
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             postprocessProgram.use();
-            if(!postprocessProgram.setUniform("resolution", windowResolution)) return false; 
+            if(!postprocessProgram.setUniform("resolution", windowResolution)) return false;
+            if(!postprocessProgram.setUniform("time", time32)) return false; 
             if(!postprocessProgram.setTexture("renderedTexture", postfxFBO.getTexture())) return false;
             glBindVertexArray(quadVA);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -70,6 +70,7 @@ public:
 	bool setUniform(const std::string& uniformName, const glm::vec3& v) const;
 	bool setUniform(const std::string& uniformName, const glm::vec2& v) const;
 	bool setUniform(const std::string& uniformName, const gl::GLfloat& f) const;
+	bool setUniform(const std::string& uniformName, const gl::GLuint& n) const;
 	bool setTexture(const std::string& uniformName, const gl::GLuint& id, const gl::GLenum& target = gl::GL_TEXTURE_2D) const;
 	bool setTextureMultisample(const std::string& uniformName, const gl::GLuint& id) const;
 

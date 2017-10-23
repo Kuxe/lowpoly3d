@@ -165,6 +165,22 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLfloat
 	return true;
 }
 
+bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLuint& n) const {
+	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
+	if(uniformLocation == -1) {
+		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
+		return false;
+	}
+
+	glUniform1ui(uniformLocation, n);
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Could not set uniform %s\n", uniformName.c_str());
+		return false;
+	}
+
+	return true;
+}
+
 bool ShaderProgram::setTexture(const std::string& uniformName, const GLuint& id, const GLenum& target) const {
 	if(!glIsTexture(id)) {
 		printf("ERROR: ShaderProgram could not set texture with id %u because %u is not a texture\n", id, id);

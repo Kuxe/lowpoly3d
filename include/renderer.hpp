@@ -40,7 +40,7 @@ private:
 		the queue may be subject to culling algorithms in parallell, so a large buffer will
 		allow for more parallell culling (still at expense of input lag, so it's really a
 		trade-off between input lag and render lag) **/
-	static constexpr size_t QUEUE_SIZE = 4;
+	static constexpr size_t QUEUE_SIZE = 2;
 	Queue<Scene> scenes;
 public:
 

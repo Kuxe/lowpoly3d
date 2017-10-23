@@ -48,15 +48,35 @@ vec3 screenspaceAA() {
 	;
 }
 
-vec3 filmgrain(float strength, float seed) {
-	return strength * vec3(unitrand(sin(time) * gl_FragCoord.xy), unitrand(sin(time+100u) * gl_FragCoord.xy), unitrand(sin(time+200u) * gl_FragCoord.xy));
+vec3 filmgrain(vec3 color, float strength, float seed) {
+	return color + strength * vec3(unitrand(sin(time) * gl_FragCoord.xy), unitrand(sin(time+100u) * gl_FragCoord.xy), unitrand(sin(time+200u) * gl_FragCoord.xy));
 }
+
+const float piroot = 1.772f; 
+float bell(float f) {
+	return exp(-f*f) / piroot;
+}
+vec3 bell3(vec3 v) {
+	return vec3(bell(v.x), bell(v.y), bell(v.z));
+}
+
+float sigmoid(float x) {
+	return 1.0f/(1.0f+exp(-x));
+}
+
+vec3 sigmoid3(vec3 v) {
+	return vec3(sigmoid(v.x), sigmoid(v.y), sigmoid(v.z));
+}
+
+vec3 contrast(vec3 color, float strength, float shift) {
+	return pow(color + shift, vec3(strength)) - shift;
+} 
 
 //TODO: Toy around with post-processing effects
 void main(void) {
 	color = texture(renderedTexture, gl_FragCoord.xy/resolution).xyz;
-	color = 0.7*color + pow(color, vec3(5.0));
-	color = color + filmgrain(0.05f, time);
+	color = contrast(color, 2.0f, 0.2f);
+	color = filmgrain(color, 0.05f, time);
 
 
 }

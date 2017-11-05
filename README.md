@@ -19,9 +19,9 @@ struct Game : public ILowpolyInput {
 	Camera camera;
 	std::unordered_set<int> heldKeys;
 	std::vector<RenderData> rds = {
-		{translate(glm::mat4(), -100.0f*glm::vec3(1.0f, 0.0, 1.0f)), "terrain", "default"},
-		{scale(glm::mat4(), glm::vec3(-150.f)), "sphere", "skybox"},
-		{glm::mat4(), "sphere", "default"}
+		{translate(glm::mat4(1.0f), -100.0f*glm::vec3(1.0f, 0.0, 1.0f)), "terrain", "default"},
+		{scale(glm::mat4(1.0f), glm::vec3(-150.f)), "sphere", "skybox"},
+		{glm::mat4(1.0f), "sphere", "default"}
 	};
 
 	void onKey(int key, int scancode, int action, int mods) {

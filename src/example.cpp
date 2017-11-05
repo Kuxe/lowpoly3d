@@ -9,9 +9,9 @@ struct Game : public ILowpolyInput {
 	Camera camera;
 	std::unordered_set<int> heldKeys;
 	std::vector<RenderData> rds = {
-		{translate(glm::mat4(), -100.0f*glm::vec3(1.0f, 0.0, 1.0f)), "terrain", "default"},
-		{scale(glm::mat4(), glm::vec3(-150.f)), "sphere", "skybox"},
-		{glm::mat4(), "sphere", "default"}
+		{translate(glm::mat4(1.0f), -100.0f*glm::vec3(1.0f, 0.0, 1.0f)), "terrain", "default"},
+		{scale(glm::mat4(1.0f), glm::vec3(-150.f)), "sphere", "skybox"},
+		{glm::mat4(1.0f), "sphere", "default"}
 	};
 
 	void onKey(int key, int scancode, int action, int mods) {
@@ -59,12 +59,6 @@ int main(int argc, char** argv) {
 	Game game;
 	Renderer lowpoly3d;
 	std::thread thread([&] { game.run(lowpoly3d); });
-
-	using namespace lsys;
-	/*Rule r1 = {'A', "[AB]", [](Params p) -> Params { return {0.5f*p[0], 0.5f*p[0]}; }, 1.0f};
-	Rule r2 = {'B', "A", [](Params p) -> Params { return {2.0f*p[0]}; }, 1.0f};
-	Lsystem lsystem = {{{'A', {1.0f}}}, {r1, r2}, 'A', 1, 'B', 1};
-	lsystem.next(4);*/
 
 	/** Create some 3d-model generators and initialize lowpoly3d with generated model **/
 	SphereGenerator sg({125.0f, 125.0f, 125.0f}, 3);

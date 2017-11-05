@@ -101,12 +101,10 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
         return false;
     }
 
-    //Ensure that 3.0 context is used
-    const GLubyte requiredMajorVersion('3'), requiredMinorVersion('1');
+    //Ensure that 3.2 context is used
+    const GLubyte requiredMajorVersion('3'), requiredMinorVersion('2');
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredMajorVersion-'0');
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredMinorVersion-'0');
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(480, 270, "Lowpoly3D", NULL, NULL);
     if(!window) {
@@ -303,8 +301,7 @@ bool Renderer::run() {
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    const auto error = glGetError();
-    if(error != GL_NO_ERROR) {
+    if(glGetError() != GL_NO_ERROR) {
         printf("ERROR: Could not load quad for postprocessing\n");
         return false;
     }

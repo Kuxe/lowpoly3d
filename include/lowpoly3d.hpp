@@ -13,7 +13,7 @@
 #include "renderer.hpp"
 #include "ilowpolyinput.hpp"
 #include "celestialbody.hpp"
-#include "lsys.hpp"
+//#include "lsys.hpp"
 
 
 #endif //LOWPOLY3D_HPP

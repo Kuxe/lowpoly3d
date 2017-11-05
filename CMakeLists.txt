@@ -68,17 +68,24 @@ ExternalProject_Add(queue
 	INSTALL_COMMAND ""
 )
 
+ExternalProject_Add(lsys_project
+	GIT_REPOSITORY https://github.com/Kuxe/lsys.git
+	${UPDATE_DISCONNECTED_IF_AVAILABLE}
+	BUILD_IN_SOURCE 1
+)
+
 add_dependencies(glbinding_project glfw)
 
 #Run "make conf" to download dependencies
 #This must be done atleast once before running "make example" or "make dev"
 add_custom_target(configure
-    DEPENDS glm glfw glbinding_project subber queue
+    DEPENDS glm glfw glbinding_project subber queue lsys_project
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
 link_directories(${CONTRIB_DIR}/Source/glfw/src)
 link_directories(${CONTRIB_DIR}/Source/glbinding_project)
+link_directories(${CONTRIB_DIR}/Source/lsys_project)
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
@@ -94,6 +101,7 @@ set(LOWPOLY3D_INCLUDE_DIRS
 	${CONTRIB_DIR}/Source/glbinding_project/source/glbinding/include
 	${CONTRIB_DIR}/Source/subber
 	${CONTRIB_DIR}/Source/queue
+	${CONTRIB_DIR}/Source/lsys_project
 )
 include_directories(${LOWPOLY3D_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O3 -Wall -std=c++14 -fomit-frame-pointer") #CPack needs this for some reason unknown
@@ -124,16 +132,21 @@ add_library(lowpoly3d SHARED
 	src/perlin.cpp
 )
 
+#Thanks to https://stackoverflow.com/questions/13429656/cmake-how-to-copy-contents-of-a-directory-into-build-directory-after-make/13429998
+add_custom_command(TARGET lowpoly3d POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${CONTRIB_DIR}/Source/lsys_project/install/bin $<TARGET_FILE_DIR:lowpoly3d>)
+
 if(WIN32)
-	target_link_libraries(lowpoly3d glbinding glfw3 opengl32)
+	target_link_libraries(lowpoly3d lsys glbinding glfw3 opengl32)
 elseif(UNIX AND NOT APPLE)
-    target_link_libraries(lowpoly3d glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
+    target_link_libraries(lowpoly3d lsys glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
 elseif(APPLE)
 	find_package(OpenGL REQUIRED)
 	find_library(COCOA_LIBRARY Cocoa)
 	find_library(IOKIT_LIBRARY IOKit)
 	find_library(COREVIDEO CoreVideo)
-	target_link_libraries(lowpoly3d glbinding glfw3 dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO})
+	target_link_libraries(lowpoly3d lsys glbinding glfw3 dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO})
 endif(WIN32)
 
 add_dependencies(lowpoly3d configure)

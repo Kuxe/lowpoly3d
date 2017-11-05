@@ -60,6 +60,12 @@ int main(int argc, char** argv) {
 	Renderer lowpoly3d;
 	std::thread thread([&] { game.run(lowpoly3d); });
 
+	using namespace lsys;
+	/*Rule r1 = {'A', "[AB]", [](Params p) -> Params { return {0.5f*p[0], 0.5f*p[0]}; }, 1.0f};
+	Rule r2 = {'B', "A", [](Params p) -> Params { return {2.0f*p[0]}; }, 1.0f};
+	Lsystem lsystem = {{{'A', {1.0f}}}, {r1, r2}, 'A', 1, 'B', 1};
+	lsystem.next(4);*/
+
 	/** Create some 3d-model generators and initialize lowpoly3d with generated model **/
 	SphereGenerator sg({125.0f, 125.0f, 125.0f}, 3);
 	TerrainGenerator tg;

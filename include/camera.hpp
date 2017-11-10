@@ -4,6 +4,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/ext.hpp>
 
 namespace lowpoly3d {
 
@@ -23,7 +24,7 @@ private:
 	glm::mat4 m() const;
 public:
 	glm::vec3 eye;
-	Camera(const glm::mat4& origin = glm::mat4());
+	Camera(const glm::mat4& origin = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f)), glm::vec3(0.0f, 5.0f, 0.0f)));
 	void tilt(const float f);
 	void pan(const float f);
 	void zoom(const float f);

@@ -1,12 +1,11 @@
 #include "camera.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/ext.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
 namespace lowpoly3d {
 
 Camera::Camera(const glm::mat4& origin) :
-	side(1.0, 0.0, 0.0), up(0.0, 1.0, 0.0), forward(0.0, 0.0, -1.0), yaw(0.0f), pitch(0.0f), eye(0.0, 0.707/2.0, 2.0) {
+	side(glm::column(origin, 0)), up(glm::column(origin, 1)), forward(glm::column(origin, 2)), yaw(0.0f), pitch(0.0f), eye(glm::column(origin, 3)) {
 
 }
 

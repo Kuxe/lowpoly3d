@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include "model.hpp"
 
 namespace lowpoly3d {
@@ -36,6 +36,10 @@ Model::Model(
 	}
 }
 
+Model::Model(const Model& model) : Model(model.vertices, model.colors, model.triangles) { }
+
+Model::Model() : Model({}, {}, {}) { }
+
 
 void Model::subdivide(int i) {
 	if(i <= 0) return;
@@ -70,6 +74,34 @@ void Model::subdivide(int i) {
 		colors.push_back(colors[triangle.y]/uint8_t(2) + colors[triangle.z]/uint8_t(2));
 	}
 	subdivide(i-1);
+}
+
+void Model::append(const Model& model) {
+	vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.end());
+	colors.insert(colors.end(), model.colors.begin(), model.colors.end());
+	triangles.insert(triangles.end(), model.triangles.begin(), model.triangles.end());
+}
+
+//Transforms all vertices of model by transform
+Model& transform(Model& m, const glm::mat4& t) {
+	//TODO: This can be done in parallell
+	std::transform(m.vertices.begin(), m.vertices.end(), m.vertices.begin(), [&t](const glm::vec3& v) {
+		return glm::vec3(t * glm::vec4(v, 1.0f));
+	});
+	return m;
+}
+
+Model join(const std::vector<Model>& models, const std::vector<glm::mat4>& transforms) {
+	if(models.size() != transforms.size()) {
+		std::cout << "ERROR: The number of models " << models.size() << " is not the same as the number of transforms " << transforms.size() << ", can not join models" << std::endl;
+	}
+	Model output;
+	for(size_t i = 0; i < models.size(); i++) {
+		Model cpy = models[i];
+		transform(cpy, transforms[i]);
+		output.append(cpy);
+	}
+	return output;
 }
 
 }

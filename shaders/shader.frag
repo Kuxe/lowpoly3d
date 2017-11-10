@@ -47,7 +47,7 @@ void main(void) {
 
 	vec4 fragworld = screen2world();
 	vec3 ambient = vec3(0.15, 0.15, 0.15);
-	float diffuse = max(dot(geomOutNormal, normalize(vec3(sunPos) - vec3(fragworld))), 0.1) * sigmoid(sunPos.y, 1);
+	float diffuse = max(dot(geomOutNormal, normalize(vec3(sunPos) - vec3(fragworld))), 0.2) * sigmoid(sunPos.y, 1);
 	color = mix((diffuse * geomOutColor + geomOutColor * ambient), vec3(timeOfDayColor), 0.05) * shadowed(shadowcoord);
 	color = fog(color);
 }

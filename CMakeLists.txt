@@ -130,6 +130,7 @@ add_library(lowpoly3d SHARED
 	src/depthframebuffer.cpp
 	src/uniformbuffer.cpp
 	src/perlin.cpp
+	src/cylindergenerator.cpp
 )
 
 #Thanks to https://stackoverflow.com/questions/13429656/cmake-how-to-copy-contents-of-a-directory-into-build-directory-after-make/13429998

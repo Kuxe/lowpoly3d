@@ -77,9 +77,13 @@ void Model::subdivide(int i) {
 }
 
 void Model::append(const Model& model) {
+	const Triangle increment {vertices.size()}; //Need to increment indices by the number of indices in original model
 	vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.end());
 	colors.insert(colors.end(), model.colors.begin(), model.colors.end());
-	triangles.insert(triangles.end(), model.triangles.begin(), model.triangles.end());
+
+	for(const Triangle& triangle : model.triangles) {
+		triangles.push_back(triangle + increment);
+	} 
 }
 
 //Transforms all vertices of model by transform

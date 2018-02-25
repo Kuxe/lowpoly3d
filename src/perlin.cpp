@@ -6,9 +6,14 @@
 
 namespace lowpoly3d {
 
-void Perlin::addOctave(float amplitude, float frequency, std::mt19937& gen, std::uniform_real_distribution<>& dis) {
+void Perlin::addOctave(float amplitude, float frequency) {
 	std::vector<glm::vec2> noisemap(imageSize*imageSize);
-	std::generate(noisemap.begin(), noisemap.end(), [&] { return glm::vec2(dis(gen), dis(gen)); });
+
+	auto nextr = [this] { return seed = (seed * 0xB105) % 233; };
+
+	std::generate(noisemap.begin(), noisemap.end(), [&nextr] {
+		return glm::vec2(nextr(), nextr());
+	});
 
 	//Loop through perlin image and compute value at each pixel
 	for(size_t i = 0; i < imageSize*imageSize; i++) {
@@ -34,25 +39,15 @@ void Perlin::addOctave(float amplitude, float frequency, std::mt19937& gen, std:
 	}
 }
 
-Perlin::Perlin(size_t imageSize, float amplitude, float frequency, int seed) : imageSize(imageSize), image(imageSize*imageSize) {
-	//Initialize random number generator and use it to create a noisemap
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	gen.seed(seed);
-	std::uniform_real_distribution<> dis(0, 1);
-	addOctave(amplitude, frequency, gen, dis);
+Perlin::Perlin(size_t imageSize, float amplitude, float frequency, int seed) : imageSize(imageSize), image(imageSize*imageSize), seed(seed) {
+	addOctave(amplitude, frequency);
 }
 
-Perlin::Perlin(const Perlin& perlin) : imageSize(perlin.imageSize), image(perlin.image), max(perlin.max) { }
+Perlin::Perlin(const Perlin& perlin) : imageSize(perlin.imageSize), image(perlin.image), max(perlin.max), seed(perlin.seed) { }
 
-Perlin::Perlin(size_t size, size_t start, size_t end, int seed) : imageSize(size), image(size*size) {
-	//Initialize random number generator and use it to create a noisemap
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	gen.seed(seed);
-	std::uniform_real_distribution<> dis(0, 1);
+Perlin::Perlin(size_t size, size_t start, size_t end, int seed) : imageSize(size), image(size*size), seed(seed) {
 	for(size_t i = start; i < end; i++) {
-		addOctave(powf(2.0f, i), powf(2.0f, end-i), gen, dis);
+		addOctave(powf(2.0f, i), powf(2.0f, end-i));
 	}
 }
 

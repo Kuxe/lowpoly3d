@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <vector>
-#include <random>
 #include <functional>
 
 namespace lowpoly3d {
@@ -14,7 +13,8 @@ private:
 	size_t imageSize;
 	std::vector<float> image;
 	float max = 0.0f;
-	void addOctave(float amplitude, float frequecy, std::mt19937& gen, std::uniform_real_distribution<>& dis);
+	uint8_t seed = 0xB1A5EDD1CE; //Default seed
+	void addOctave(float amplitude, float frequecy);
 public:
 	explicit Perlin(size_t imageSize, float amplitude, float frequecy, int seed);
 	Perlin(const Perlin& perlin);

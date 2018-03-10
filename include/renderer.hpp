@@ -3,14 +3,15 @@
 
 #include <unordered_map>
 #include <string>
-#include <atomic>
 #include "scene.hpp"
 #include "queue.hpp" //For buffering scenes during setScene()
+#include "debugrenderer.hpp"
 
 struct GLFWwindow;
 
 namespace lowpoly3d {
 
+/** Forward declarations **/
 struct Model;
 struct ILowpolyInput;
 
@@ -26,9 +27,6 @@ private:
 	//Keep track of triangles count per model and what vertex array is associated with what name
 	std::unordered_map<std::string, int> triangles, models;
 
-	//Current scene which the renderer should renderer. Set scene via "setScene()"-method.
-	std::atomic<bool> shouldRender;
-
 	/** QUEUE_SIZE determines how many scenes may be buffered, that is, how many scenes
 		the producer may produce before scenes will be discarded if queue is full.
 		In practice a large buffer result in more memory usage and possible input-delay
@@ -42,6 +40,10 @@ private:
 		trade-off between input lag and render lag) **/
 	static constexpr size_t QUEUE_SIZE = 2;
 	Queue<Scene> scenes;
+
+	//Debug renderer draws various debug primitives useful for debugging
+	DebugRenderer debugRenderer;
+
 public:
 
 	Renderer() : scenes(QUEUE_SIZE) { }

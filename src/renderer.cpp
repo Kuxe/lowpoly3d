@@ -142,6 +142,11 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
         return false;
     }
 
+    if(!debugRenderer.init()) {
+        printf("ERROR: Renderer could not initialize debug renderer\n");
+        return false;
+    }
+
     initialized = true;
     return true;
 }
@@ -354,6 +359,13 @@ bool Renderer::run() {
         return false;
     }
 
+    ShaderProgram debugProgram("debug");
+    if(!debugProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "debug.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "debug.frag")) {
+        return false;
+    }
+
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
 
@@ -366,6 +378,7 @@ bool Renderer::run() {
     constexpr uint16_t SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     Framebuffer mainFBO("Main FBO", width, height, numMultisamples);
     Framebuffer postfxFBO("PostFX FBO", width, height);
+    Framebuffer debugFBO("Debug FBO", width, height);
     DepthFramebuffer depthFBO(SHADOW_WIDTH, SHADOW_HEIGHT);
 
     /** Create two UBOs. World UBO is an Uniform Buffer Object which contains data that is constant
@@ -388,6 +401,7 @@ bool Renderer::run() {
     addProgram(waterProgram);
     addProgram(postprocessProgram);
     addProgram(depthProgram);
+    addProgram(debugProgram);
 
     //Sun should rotate around the x-axis through origo
     CelestialBody suncb({0.0, 0.0, 0.0}, {95.0, 0.0, 0.0}, 1.57079632679);
@@ -572,7 +586,10 @@ bool Renderer::run() {
         /** Blit content of mainFBO to postfxFBO and finally draw postfxFBO to default FBO **/
         auto render2screen = [&] {
             /** Blit mainFBO onto postfxFBO **/
-            mainFBO.use(GL_READ_FRAMEBUFFER);
+            if(!mainFBO.use(GL_READ_FRAMEBUFFER)) {
+                printf("ERROR: Could not use mainFBO with GL_READ_FRAMEBUFFER target!\n");
+                return false;
+            }
             postfxFBO.use(GL_DRAW_FRAMEBUFFER);
             glViewport(0, 0, width, height);
             glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
@@ -615,7 +632,7 @@ bool Renderer::run() {
             return true;
         };
 
-        if(shouldRender) {
+        if(!scenes.empty()) {
             /** In order to do shadow-mapping, I need to render to FBO. In order to render to FBO
                 I need to provide a view matrix for the sun. For now the sun will look at 0.0
                 This will only give shadows in the 0.0 region. Later on this can probably be improved
@@ -648,9 +665,7 @@ bool Renderer::run() {
 
 void Renderer::offer(const Scene& scene) {
     //If a scene fits into the scene-queue, then insert it and tell renderer that it should render a scene in the queue
-    if(scenes.offer(scene)) {
-        shouldRender = true;
-    }
+    scenes.offer(scene);
 }
 
 void Renderer::setPrintFrameTime(bool printFrameTime) {

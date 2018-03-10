@@ -49,6 +49,29 @@ Framebuffer::Framebuffer(const std::string& framebufferName, const gl::GLsizei w
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureTarget, texture, 0); //Bind texture to binded fbo
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
+	ok();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Unknown error in framebuffer  %s constructor during texture initialization!\n", framebufferName.c_str());
+	}
+}
+
+Framebuffer::~Framebuffer() {
+	glDeleteTextures(1, &texture);
+	glDeleteRenderbuffers(1, &renderbuffer);
+	glDeleteFramebuffers(1, &fbo);
+}
+
+bool Framebuffer::use(const gl::GLenum target) const {
+	glBindFramebuffer(target, fbo);
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Could not use framebuffer %s!\n", framebufferName.c_str());
+		return false;
+	}
+	return true;
+}
+
+bool Framebuffer::ok() const {
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status != GL_FRAMEBUFFER_COMPLETE) {
 		printf("ERROR: Couldn't create framebuffer %s, got ", framebufferName.c_str());
@@ -75,23 +98,6 @@ Framebuffer::Framebuffer(const std::string& framebufferName, const gl::GLsizei w
 				break;
 			}
 		}
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Unknown error in framebuffer  %s constructor during texture initialization!\n", framebufferName.c_str());
-	}
-}
-
-Framebuffer::~Framebuffer() {
-	glDeleteTextures(1, &texture);
-	glDeleteRenderbuffers(1, &renderbuffer);
-	glDeleteFramebuffers(1, &fbo);
-}
-
-bool Framebuffer::use(const gl::GLenum target) const {
-	glBindFramebuffer(target, fbo);
-	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not use framebuffer %s!\n", framebufferName.c_str());
 		return false;
 	}
 	return true;

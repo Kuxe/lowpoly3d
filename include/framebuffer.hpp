@@ -25,6 +25,7 @@ public:
 	Framebuffer(const std::string& framebufferName, const gl::GLsizei width, const gl::GLsizei height, const gl::GLsizei samples = 0);
 	~Framebuffer();
 	bool use(const gl::GLenum target = gl::GL_FRAMEBUFFER) const;
+	bool ok() const;
 	gl::GLuint getTexture() const;
 	void notify(const OnResize& evt);
 };

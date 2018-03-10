@@ -33,3 +33,7 @@ contrib/
 
 # Windows bloat
 desktop.ini
+
+# Sublime-project
+*.sublime-project
+*.sublime-workspace

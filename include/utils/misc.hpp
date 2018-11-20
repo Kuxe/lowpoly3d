@@ -2,12 +2,11 @@
 #define MISC_HPP
 
 #include <functional>
+#include <cmath>
 
-/** misc.hpp contains miscellaneous reusable functions inspired from functional programming **/
+/** misc.hpp contains miscellaneous reusable functions **/
 
 namespace lowpoly3d {
-
-/** misc.hpp contains miscellaneous reusable functions inspired from functional programming **/
 
 /** zip is a function which given two containers, iterates through the pairs given by
 		(a1, b1), (a2, b2), ..., (an, bn)
@@ -34,7 +33,7 @@ A zip(const A& a, const B& b, const std::function<A(typename A::value_type, type
 	return c;
 }
 
-}
+} // End of namespace lowpoly3d
 
 
 #endif //MISC_HPP

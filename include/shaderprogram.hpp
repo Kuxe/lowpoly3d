@@ -13,7 +13,7 @@
 namespace lowpoly3d {
 
 struct UniformBuffer;
-class ShaderProgram : public Subber<rPress> {
+class ShaderProgram : public subber::Subber<rPress> {
 private:
 	const gl::GLuint programHandle;
 
@@ -77,7 +77,7 @@ public:
 	bool setUBO(const std::string& blockName, const UniformBuffer& ubo);
 
 	//If r is pressed to a live-reload of the shaderprogram
-	void notify(const rPress& event);
+	void notified(const rPress& event) override;
 };
 
 }

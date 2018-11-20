@@ -16,7 +16,7 @@ namespace lowpoly3d {
 	and you can use getTexture() which returns a handle to
 	a texture with scene rendered onto it. Useful for
 	post-processing **/
-class Framebuffer final : Subber<OnResize> {
+class Framebuffer final : public subber::Subber<OnResize> {
 	const std::string framebufferName;
 	gl::GLuint fbo, renderbuffer, texture;
 	const gl::GLsizei samples;
@@ -27,7 +27,7 @@ public:
 	bool use(const gl::GLenum target = gl::GL_FRAMEBUFFER) const;
 	bool ok() const;
 	gl::GLuint getTexture() const;
-	void notify(const OnResize& evt);
+	void notified(const OnResize& evt) override;
 };
 
 }

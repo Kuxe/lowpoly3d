@@ -103,7 +103,7 @@ bool Framebuffer::ok() const {
 	return true;
 }
 
-void Framebuffer::notify(const OnResize& evt) {
+void Framebuffer::notified(const OnResize& evt) {
 	const GLenum textureTarget = samples > 0 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 	glBindTexture(textureTarget, texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);

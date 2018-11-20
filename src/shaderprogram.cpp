@@ -229,7 +229,7 @@ bool ShaderProgram::setUBO(const std::string& blockName, const UniformBuffer& ub
 }
 
 
-void ShaderProgram::notify(const rPress& event) {
+void ShaderProgram::notified(const rPress& event) {
 	/** Iterate over all attached shaders, remove them and re-add them and finally link them.
 		A copy of shaders is created since we are about to remove each shader attached
 		to this shader program but we do not wan't to forget what shaders are attached since

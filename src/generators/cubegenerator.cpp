@@ -1,4 +1,4 @@
-#include "cubegenerator.hpp"
+#include "generators/cubegenerator.hpp"
 #include <complex>
 #include <vector>
 

@@ -1,5 +1,5 @@
-#include "spheregenerator.hpp"
-#include "cubegenerator.hpp"
+#include "generators/spheregenerator.hpp"
+#include "generators/cubegenerator.hpp"
 #include <glm/ext.hpp>
 
 namespace lowpoly3d {
@@ -14,6 +14,14 @@ Model SphereGenerator::generate() {
 		vertex = vertex / glm::length(vertex);
 	}
 	return sphere;
+}
+
+Model SphereGenerator::generate(const Sphere& sphere) {
+	Model ret = generate();
+	ret.subdivide(subdivides);
+	ret.scale(sphere.r);
+	ret.translate(sphere.p);
+	return ret;
 }
 
 }

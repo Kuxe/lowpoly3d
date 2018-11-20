@@ -1,4 +1,4 @@
-#include "circlegenerator.hpp"
+#include "generators/circlegenerator.hpp"
 #include "model.hpp"
 
 namespace lowpoly3d {

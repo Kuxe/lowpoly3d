@@ -1,4 +1,4 @@
-#include "terraingenerator.hpp"
+#include "generators/terraingenerator.hpp"
 #include "model.hpp"
 #include <random>
 #include "perlin.hpp"

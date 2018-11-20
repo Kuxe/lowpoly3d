@@ -1,4 +1,4 @@
-#include "planegenerator.hpp"
+#include "generators/planegenerator.hpp"
 #include "model.hpp"
 #include <glm/ext.hpp>
 

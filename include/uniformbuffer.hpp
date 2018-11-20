@@ -35,6 +35,11 @@ struct UniformBuffer {
 		}
 		return true;
 	}
+
+	template<typename T, typename ...Args>
+	bool use(Args&& ...args) {
+		return use(T{std::forward<Args>(args)...});
+	}
 };
 
 }

@@ -76,19 +76,31 @@ void Model::subdivide(int i) {
 	subdivide(i-1);
 }
 
-void Model::append(const Model& model) {
-	const Triangle increment {vertices.size()}; //Need to increment indices by the number of indices in original model
+bool Model::append(const Model& model) {
+	if(triangles.size() + model.triangles.size() >= std::numeric_limits<Triangle::value_type>::max()) {
+		return false;
+	}
+	const Triangle increment { static_cast<Triangle::value_type>(vertices.size()) }; //Need to increment indices by the number of indices in original model
 	vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.end());
 	colors.insert(colors.end(), model.colors.begin(), model.colors.end());
 
 	for(const Triangle& triangle : model.triangles) {
 		triangles.push_back(triangle + increment);
 	} 
+
+	return true;
+}
+
+void Model::translate(const glm::vec3& translation) {
+	std::transform(std::begin(vertices), std::end(vertices), std::begin(vertices), [&translation](Vertex v) { return v + translation; });
+}
+
+void Model::scale(float factor) {
+	std::transform(std::begin(vertices), std::end(vertices), std::begin(vertices), [&factor](Vertex v) { return factor * v; });
 }
 
 //Transforms all vertices of model by transform
 Model& transform(Model& m, const glm::mat4& t) {
-	//TODO: This can be done in parallell
 	std::transform(m.vertices.begin(), m.vertices.end(), m.vertices.begin(), [&t](const glm::vec3& v) {
 		return glm::vec3(t * glm::vec4(v, 1.0f));
 	});
@@ -106,6 +118,50 @@ Model join(const std::vector<Model>& models, const std::vector<glm::mat4>& trans
 		output.append(cpy);
 	}
 	return output;
+}
+
+// Returns a model consisting of a single triangle {(0,0,0), (1,0,0), (0,1,0)}
+Model getSingleTriangleModel() {
+	const std::vector<Vertex> vertices {
+		Vertex
+		{0.0, 0.0, 0.0},
+		{1.0, 0.0, 0.0},
+		{0.0, 1.0, 0.0},
+	};
+
+	std::vector<Color> colors(vertices.size());
+	std::fill(std::begin(colors), std::end(colors), Color{0, 0, 0});
+
+	const std::vector<Triangle> triangles {
+		Triangle
+		{0, 1, 2}
+	};
+
+	return Model(vertices, colors, triangles);
+}
+
+Model getTwoTriangleModel() {
+	const std::vector<Vertex> vertices {
+		Vertex
+		{0.0, 0.0, 0.0},
+		{1.0, 0.0, 0.0},
+		{0.0, 1.0, 0.0},
+
+		{2.0, 0.0, 0.0},
+		{3.0, 0.0, 0.0},
+		{2.0, 1.0, 0.0},
+	};
+
+	std::vector<Color> colors(vertices.size());
+	std::fill(std::begin(colors), std::end(colors), Color{0, 0, 0});
+
+	const std::vector<Triangle> triangles {
+		Triangle
+		{0, 1, 2},
+		{3, 4, 5},
+	};
+
+	return Model(vertices, colors, triangles);
 }
 
 }

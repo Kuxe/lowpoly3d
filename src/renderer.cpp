@@ -17,9 +17,12 @@
 #include "uniformbuffer.hpp"
 #include "worlduniformdata.hpp"
 #include "modeluniformdata.hpp"
+#include "mvpuniformdata.hpp"
 #include "ilowpolyinput.hpp"
 #include "celestialbody.hpp"
 #include "scene.hpp"
+#include "geometric_primitives/line.hpp"
+#include "glframe.hpp"
 
 using namespace gl;
 
@@ -51,7 +54,7 @@ static void error_callback(int error, const char* description) {
 static void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
     lowpolyInput->onFramebufferResize(w, h);
-    publish<OnResize>({w, h});
+    subber::publish<OnResize>({w, h});
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -63,7 +66,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         happen. This is not fine for release-build but its not to worrysome in a debug-build **/
     #ifdef DEBUG
     if(key == GLFW_KEY_R) {
-        publish<rPress>({});
+        subber::publish<rPress>({});
     }
     #endif //DEBUG
 }
@@ -91,6 +94,13 @@ static void mouse_callback(GLFWwindow* window, double x, double y) {
 /*********************/
 /** Public methods **/
 /*********************/
+
+Renderer::Renderer()
+	: scenes(QUEUE_SIZE) {}
+
+// Destructor must be defined when using std::unique_ptr with forward declarations
+// I don't know why though.
+Renderer::~Renderer() = default;
 
 bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory) {
     lowpolyInput = li;
@@ -121,7 +131,9 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     glfwSwapInterval(1);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    glbinding::Binding::initialize();
+    glbinding::Binding::initialize([](const char * name) {
+        return glfwGetProcAddress(name);
+    }, false);
 
     /** Check that required OpenGL version 3.0 is met.
         glGetIntegerv(GL_MAJOR_VERSION) not supported on OpenGL <=3.0 hence this approach **/
@@ -146,6 +158,8 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
         printf("ERROR: Renderer could not initialize debug renderer\n");
         return false;
     }
+
+	worldAxes = std::make_unique<GLFrame>();
 
     initialized = true;
     return true;
@@ -352,6 +366,20 @@ bool Renderer::run() {
         return false;
     }
 
+	ShaderProgram passthroughProgram("passthrough");
+    if(!passthroughProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "passthrough.frag")) {
+        return false;
+    }
+
+	ShaderProgram simpleProgram("simple");
+    if(!simpleProgram.link(
+        GL_VERTEX_SHADER, shaderDirectory + "simple.vert",
+        GL_FRAGMENT_SHADER, shaderDirectory + "simple.frag")) {
+        return false;
+    }
+
     ShaderProgram depthProgram("depth");
     if(!depthProgram.link(
         GL_VERTEX_SHADER, shaderDirectory + "depth.vert",
@@ -387,11 +415,13 @@ bool Renderer::run() {
         is updated once per RenderData. It contains data provided by RenderData such as the model matrix **/
     UniformBuffer worldUBO("World UBO", 1);
     UniformBuffer modelUBO("Model UBO", 2);
+	UniformBuffer mvpUBO("MVP UBO", 3);
     if(!program.setUBO("WorldUniformData", worldUBO)) return false;
     if(!program.setUBO("ModelUniformData", modelUBO)) return false;
     if(!skyboxProgram.setUBO("WorldUniformData", worldUBO)) return false;
     if(!skyboxProgram.setUBO("ModelUniformData", modelUBO)) return false;
     if(!depthProgram.setUBO("ModelUniformData", modelUBO)) return false;
+	if(!simpleProgram.setUBO("MVPUniformData", mvpUBO)) return false;
 
     std::unordered_map<std::string, const ShaderProgram&> programs;
     auto addProgram = [&](const ShaderProgram& p) { programs.insert({p.name, p}); };
@@ -549,7 +579,7 @@ bool Renderer::run() {
             const float t = clippedcos(sunRadians, 5.0f);
             const glm::vec3 timeOfDayColor = timeOfDayColorLambda(t);
 
-            worldUBO.use<WorldUniformData>({view, projection, glm::vec4(suncb.getPos(sunRadians), 1.0), glm::vec4(timeOfDayColor, 0.0), windowResolution});
+            worldUBO.use<WorldUniformData>(view, projection, glm::vec4(suncb.getPos(sunRadians), 1.0), glm::vec4(timeOfDayColor, 0.0), windowResolution);
 
             if(!program.use()) {
                 printf("ERROR: Could not use shader program\n");
@@ -559,6 +589,8 @@ bool Renderer::run() {
                 printf("ERROR: Could not set shadowmap\n");
                 return false;
             }
+
+			wireframes(showWireframes);
 
             /** vp is the view-projection matrix. Model matrix is provided per renderdata,
                 so later on vp will be multiplied with model matrix once per renderdata **/
@@ -572,13 +604,23 @@ bool Renderer::run() {
                 } catch (const std::exception& e) {
                     printf("ERROR: Could not draw RenderData %s\n", e.what());
                 }
-
-                modelUBO.use<ModelUniformData>({rd.modelMatrix, vp * rd.modelMatrix, sunvp * rd.modelMatrix});
+                modelUBO.use<ModelUniformData>(rd.modelMatrix, vp * rd.modelMatrix, sunvp * rd.modelMatrix);
                 if(!drawRenderData(rd)) {
                     printf("ERROR: Could not draw a renderdata\n");
                     return false;
                 };
             }
+
+			wireframes(false);
+
+			// Lets trick the MVP-ubo into rendering into
+			// screen-space by not passing a MVP matrix
+			worldAxes->draw([&view]() {
+				const float worldAxesSize = 0.1f;
+				glm::mat4 frame = glm::scale(view, glm::vec3(worldAxesSize));
+				frame[3] = glm::vec4(-1.0f + worldAxesSize, -1.0f + worldAxesSize, 0.0f, 1.0f);
+				return frame;
+			}(), simpleProgram, mvpUBO, 1.0f);
 
             return true;
         }; //End of render2fbo
@@ -623,7 +665,7 @@ bool Renderer::run() {
             glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             glClear(GL_DEPTH_BUFFER_BIT);
             for(const auto& rd : rds) {
-                modelUBO.use<ModelUniformData>({rd.modelMatrix, viewproj * rd.modelMatrix, viewproj * rd.modelMatrix});
+                modelUBO.use<ModelUniformData>(rd.modelMatrix, viewproj * rd.modelMatrix, viewproj * rd.modelMatrix);
                 if(!drawRenderData(rd)) {
                     printf("ERROR: Could not draw a renderdata to depthFBO\n");
                     return false;
@@ -642,6 +684,10 @@ bool Renderer::run() {
             const glm::mat4 sunView = glm::lookAt(suncb.getPos(scene.sunRadians), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
             const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
             const glm::mat4 sunvp = sunPerspective * sunView;
+            debugRenderer.render(scene.view * projection, debugFBO, debugProgram);
+
+			showWireframes = scene.showWireframes;
+
             if(!(
                 render2depth(scene.renderDatas, sunvp) &&
                 render2fbo(scene.renderDatas, scene.sunRadians, sunvp, scene.view, projection, mainFBO) &&
@@ -666,6 +712,15 @@ bool Renderer::run() {
 void Renderer::offer(const Scene& scene) {
     //If a scene fits into the scene-queue, then insert it and tell renderer that it should render a scene in the queue
     scenes.offer(scene);
+}
+
+void Renderer::wireframes(bool enable) {
+	showWireframes = enable;
+	glPolygonMode(GL_FRONT_AND_BACK, showWireframes ? GL_LINE : GL_FILL);
+}
+
+bool Renderer::wireframes() const {
+	return showWireframes;
 }
 
 void Renderer::setPrintFrameTime(bool printFrameTime) {

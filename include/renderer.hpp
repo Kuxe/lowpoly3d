@@ -6,6 +6,9 @@
 #include "scene.hpp"
 #include "queue.hpp" //For buffering scenes during setScene()
 #include "debugrenderer.hpp"
+#include <memory> //std::unique_ptr
+
+#include "geometric_primitives/line.hpp"
 
 struct GLFWwindow;
 
@@ -14,6 +17,11 @@ namespace lowpoly3d {
 /** Forward declarations **/
 struct Model;
 struct ILowpolyInput;
+struct GLFrame;
+
+template<typename floating_point_type, std::size_t dimension>
+struct TLine;
+using Line = TLine<float, 3>;
 
 /** Renderer can render a scene, set via the setScene()-method. Intended use is to first
 	load a set of models via the loadModels-method. The loadModels-method return a set of integer
@@ -44,9 +52,14 @@ private:
 	//Debug renderer draws various debug primitives useful for debugging
 	DebugRenderer debugRenderer;
 
+	std::unique_ptr<GLFrame> worldAxes;
+
+	bool showWireframes = false;
+
 public:
 
-	Renderer() : scenes(QUEUE_SIZE) { }
+	Renderer();
+	~Renderer();
 
 	/** Initializes renderer (create window and get ready for rendering)
 		First argument "li" is the class to which the renderer will forward
@@ -75,6 +88,11 @@ public:
 		The offer method can therefore (sloppily) be thought of as
 		the "render" method which renders a scene **/
 	void offer(const Scene& scene);
+
+	// Enable to show wireframes for all triangle models
+	void wireframes(bool enable);
+	// Returns true if wireframes are shown, otherwise false
+	bool wireframes() const;
 
 	void setPrintFrameTime(bool printFrameTime);
 	void setMultisamples(int msaa);

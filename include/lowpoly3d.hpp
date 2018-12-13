@@ -8,13 +8,16 @@
 #include <GLFW/glfw3.h>
 #include "camera.hpp"
 #include "renderdata.hpp"
-#include "spheregenerator.hpp"
-#include "terraingenerator.hpp"
 #include "renderer.hpp"
 #include "ilowpolyinput.hpp"
 #include "celestialbody.hpp"
 #include "lsys.hpp"
-#include "treegenerator.hpp"
+#include "bounding_volume_hierarchy.hpp"
+#include "keymanager.hpp"
+
+#include "generators/spheregenerator.hpp"
+#include "generators/terraingenerator.hpp"
+#include "generators/treegenerator.hpp"
 
 
 #endif //LOWPOLY3D_HPP

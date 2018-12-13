@@ -18,28 +18,28 @@ namespace lowpoly3d {
 
 class Camera {
 private:
-	glm::vec3 side, up, forward;
-	float yaw, pitch;
-	glm::vec2 lastMouseCoord = {0.0f, 0.0f};
-	glm::mat4 m() const;
+	glm::dvec3 side, up, forward;
+	double yaw, pitch;
+	glm::dvec2 lastMouseCoord = {0.0, 0.0};
+	glm::dmat4 m() const;
 public:
-	glm::vec3 eye;
-	Camera(const glm::mat4& origin = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f)), glm::vec3(0.0f, 5.0f, 0.0f)));
-	void tilt(const float f);
-	void pan(const float f);
-	void zoom(const float f);
-	void pedestal(const float f);
-	void dolly(const float f);
-	void truck(const float f);
-	void look(const glm::vec2& mouse, float dt);
+	glm::dvec3 eye;
+	Camera(const glm::dmat4& origin = glm::translate(glm::scale(glm::dmat4(1.0), glm::dvec3(1.0, 1.0, -1.0)), glm::dvec3(0.0, 5.0, 0.0)));
+	void tilt(const double f);
+	void pan(const double f);
+	void zoom(const double f);
+	void pedestal(const double f);
+	void dolly(const double f);
+	void truck(const double f);
+	void look(const glm::dvec2& mouse, double dt);
 
 	/** Gets the transform matrix of the camera.
 		Not to be confused with the view-matrix! **/
-	const glm::mat4 transform() const;
+	const glm::dmat4 transform() const;
 
 	/** Gets the view matrix which takes objects from
 		model-space to view-space**/
-	const glm::mat4 view() const;
+	const glm::dmat4 view() const;
 };
 
 }

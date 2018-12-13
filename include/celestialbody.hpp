@@ -1,12 +1,9 @@
 #ifndef CELESTIALBODY_HPP
 #define CELESTIALBODY_HPP
 
-#include "cereal/archives/json.hpp"
-#include "cereal/types/vector.hpp"
 #include <math.h>
 #include <glm/vec3.hpp>
 #include <glm/ext.hpp>
-#include "renderdata.hpp" //For specialized serializers for glm::vec3
 
 namespace lowpoly3d {
 
@@ -25,15 +22,6 @@ public:
 		glm::vec3 basez = glm::cross(basey, basex);
 		//Rotate a vector around y-axis in some basis, then convert rotated vector from that basis to standard basis
 		return magnitude * glm::transpose(glm::mat3{basex, basey, basez}) * (glm::vec3{sinf(t + omega0), 0.0, cosf(t + omega0)}) + center;
-	}
-
-	template<class Archive>
-	void serialize(Archive& archive) {
-		archive(
-			CEREAL_NVP(center),
-			CEREAL_NVP(axis),
-			CEREAL_NVP(omega0)
-		); 
 	}
 };
 

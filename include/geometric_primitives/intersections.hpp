@@ -117,12 +117,14 @@ TLine<floating_point_type, dimension> intersection(
 	 * So two dot-products in 4D equal zero => a solution v=(x, y, z, 1)
 	 * satisfies v_|_(a,b,c,d) and v_|_(e,f,g,h).
 	 * So just pick an arbitrary third 4D-vector, for instance (0, 0, 0, 1)
-	 * and find a vector v thats orthogonal to these three vectors. */
+	 * and find a vector v thats orthogonal to these three vectors.
+	 * Then vx, vy, vz will be a solution to the original equation
+	 * TODO: Figure out if I need to divide by w */
 
 
 	using vec4_type = glm::vec<4, floating_point_type>;
-	const vec4_type v1 = {n1.x, n1.y, n1.z, plane1.getD()};
-	const vec4_type v2 = {n2.x, n2.y, n2.z, plane2.getD()};
+	const vec4_type v1 = {n1.x, n1.y, n1.z, -plane1.getD()};
+	const vec4_type v2 = {n2.x, n2.y, n2.z, -plane2.getD()};
 	const vec4_type v3 = {0.0f, 0.0f, 0.0f, 1.0f};
 
 	using mat3_type = glm::tmat3x3<floating_point_type>;
@@ -156,7 +158,7 @@ TLine<floating_point_type, dimension> intersection(
 	// line uniquely
 	assert(glm::length(n1) == 1.0f);
 	assert(glm::length(n2) == 1.0f);
-	return {direction, vec3_type(v4[0], v4[1], v4[2])};
+	return {direction, floating_point_type(1.0)/v4[3] * vec3_type(v4[0], v4[1], v4[2])};
 }
 
 /* Returns the point of intersection between given plane and line.

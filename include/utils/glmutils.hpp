@@ -39,7 +39,7 @@ std::vector<glm::vec<dimension, floating_point_type>> gramschmidt(
 		return glm::dot(u, v) / glm::dot(u, u) * u;
 	};
 
-	if(vectors.size() <= 1) return vectors;
+	if(v.size() <= 1) return v;
 
 	std::vector<glm::vec<dimension, floating_point_type>> u;
 	u.reserve(v.size());
@@ -51,7 +51,7 @@ std::vector<glm::vec<dimension, floating_point_type>> gramschmidt(
 			u[i] -= proj(u[j-1], v[i]);
 		}
 	}
-	return basis;
+	return u;
 }
 
 }

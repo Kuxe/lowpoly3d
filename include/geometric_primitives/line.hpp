@@ -4,6 +4,8 @@
 #include <cstddef> // std::size_t
 #include <type_traits>
 
+#include "utils/glmutils.hpp"
+
 #include "geometric_primitives/point.hpp"
 
 namespace lowpoly3d {
@@ -25,6 +27,18 @@ private:
 	vec_type d;
 	point_type p;
 };
+
+// Returns true if l1 and l2 represent the same undirected line
+template<typename floating_point_type, std::size_t dimension>
+bool almostEqual(
+	const TLine<floating_point_type, dimension>& l1,
+	const TLine<floating_point_type, dimension>& l2) {
+	
+	if(!areParallel<floating_point_type, 3>(l1.getDirection(), l2.getDirection())) return false;
+
+	// TODO: They are parallel but must also ensure that they intersect same point
+	return false;
+}
 
 using Line = TLine<float, 3>;
 

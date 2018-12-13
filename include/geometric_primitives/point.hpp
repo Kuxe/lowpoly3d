@@ -2,6 +2,7 @@
 #define POINT_HPP
 
 #include <array>
+#include <numeric>
 #include <glm/glm.hpp>
 
 namespace lowpoly3d {
@@ -16,6 +17,16 @@ TPoint<value_type, dimension> midpoint(
 
 	return value_type(0.5)*(point1 + point2);
 };
+
+// Returns true if ||p1-p2|| <= eps
+template<typename value_type, std::size_t dimension>
+bool almostEqual(
+	const TPoint<value_type, dimension>& p1,
+	const TPoint<value_type, dimension>& p2,
+	value_type eps = std::numeric_limits<value_type>::epsilon()) {
+
+	return glm::distance(p1, p2) <= eps;
+}
 
 using Pointf = TPoint<float, 3>;
 using Pointd = TPoint<double, 3>;

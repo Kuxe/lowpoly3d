@@ -12,7 +12,7 @@ namespace lowpoly3d {
 struct Scene {
 	std::vector<RenderData> renderDatas;
 	glm::mat4 view;
-	float sunRadians;
+	double sunRadians;
 	bool showWireframes;
 };
 

@@ -17,6 +17,7 @@ class TPlane {
 
 public:
 	TPlane(const point_type& point, const point_type& normal) : p(point), n(normal) { }
+	TPlane(const point_type& normal, floating_point_type d) : p(normal * d / glm::dot(normal, normal)), n(normal) { }
 	TPlane(const TPlane& other) : TPlane(other.p, other.n) { }
 	TPlane(TPlane&& other) : p(std::move(other.p)), n(std::move(other.n)) { }
 	virtual ~TPlane() { }
@@ -55,6 +56,12 @@ public:
 	// Returns true if point lies on the plane, otherwise false
 	bool contains(const point_type& point) const {
 		return glm::dot(n, point - p) == 0.0f;
+	}
+
+	// Returns the distance to origo
+	floating_point_type distance2origo() const {
+		TPlane<floating_point_type, dimension> tmp(getNormal(), getD());
+		return glm::length(tmp.getPoint());
 	}
 };
 

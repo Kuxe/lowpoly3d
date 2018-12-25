@@ -3,6 +3,7 @@
 
 #include <numeric>
 #include <glm/glm.hpp> // TODO: Narrow this include to just glm::vec
+#include <glm/gtc/matrix_access.hpp> // glm::column
 #include <vector>
 
 namespace lowpoly3d {

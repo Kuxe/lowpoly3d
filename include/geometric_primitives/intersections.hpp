@@ -2,6 +2,7 @@
 #define INTERSECTIONS_HPP
 
 #include <cmath> // NAN
+#include <sstream>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
@@ -103,53 +104,7 @@ TLine<floating_point_type, dimension> intersection(
 	}
 
 	const auto direction = glm::cross(n1, n2);
-
-	/* ax + by + cz = d and
-	 * ex + fy + gz = h
-	 * 
-	 * with n1=(a,b,c), n2=(e,f,g)
-	 * is equivalent to solving
-	 * 
-	 * ax + by + cz - d = 0 and
-	 * ex + fy + gz - h = 0
-	 * 
-	 * same as two dot-products in 4D.
-	 * So two dot-products in 4D equal zero => a solution v=(x, y, z, 1)
-	 * satisfies v_|_(a,b,c,d) and v_|_(e,f,g,h).
-	 * So just pick an arbitrary third 4D-vector, for instance (0, 0, 0, 1)
-	 * and find a vector v thats orthogonal to these three vectors.
-	 * Then vx, vy, vz will be a solution to the original equation
-	 * TODO: Figure out if I need to divide by w */
-
-
-	using vec4_type = glm::vec<4, floating_point_type>;
-	const vec4_type v1 = {n1.x, n1.y, n1.z, -plane1.getD()};
-	const vec4_type v2 = {n2.x, n2.y, n2.z, -plane2.getD()};
-	const vec4_type v3 = {0.0f, 0.0f, 0.0f, 1.0f};
-
-	using mat3_type = glm::tmat3x3<floating_point_type>;
-	
-	vec4_type v4 = {
-		+glm::determinant(mat3_type {
-			{v1[1], v1[2], v1[3]},
-			{v2[1], v2[2], v2[3]},
-			{v3[1], v3[2], v3[3]}
-		}),
-		-glm::determinant(mat3_type {
-			{v1[0], v1[2], v1[3]},
-			{v2[0], v2[2], v2[3]},
-			{v3[0], v3[2], v3[3]}
-		}),
-		+glm::determinant(mat3_type {
-			{v1[0], v1[1], v1[3]},
-			{v2[0], v2[1], v2[3]},
-			{v3[0], v3[1], v3[3]}
-		}),
-		-glm::determinant(mat3_type {
-			{v1[0], v1[1], v1[2]},
-			{v2[0], v2[1], v2[2]},
-			{v3[0], v3[1], v3[2]}
-		})};
+	const auto pointOnLine = cramer(plane1, plane2, TPlane<floating_point_type, 3>(direction, 0));
 
 
 	// A vector that is orthogonal to n1 and n2 lies on both planes => a line
@@ -158,7 +113,7 @@ TLine<floating_point_type, dimension> intersection(
 	// line uniquely
 	assert(glm::length(n1) == 1.0f);
 	assert(glm::length(n2) == 1.0f);
-	return {direction, floating_point_type(1.0)/v4[3] * vec3_type(v4[0], v4[1], v4[2])};
+	return {direction, pointOnLine};
 }
 
 /* Returns the point of intersection between given plane and line.
@@ -203,6 +158,47 @@ TPoint<floating_point_type, dimension> intersection(
 	const TPlane<floating_point_type, dimension>& p2,
 	const TPlane<floating_point_type, dimension>& p3) {
 		return intersection(intersection(p1, p2), p3);
+}
+
+/* Solves a system of three linear equations by (naively) using Cramer's rule.
+ * Precondition: n1, n2 and n3 are mutually non-parallel.
+ * If this condition is not satisfied, than a division by zero will happen,
+ * this is why this method is unsafe. */
+template<typename floating_point_type>
+glm::tvec3<floating_point_type> cramer(
+	TPlane<floating_point_type, 3> p1,
+	TPlane<floating_point_type, 3> p2,
+	TPlane<floating_point_type, 3> p3)
+{
+	const auto& n1 = p1.getNormal();
+	const auto& n2 = p2.getNormal();
+	const auto& n3 = p3.getNormal();
+
+	glm::tmat3x3<floating_point_type> A(n1, n2, n3);
+	const glm::tvec3<floating_point_type> b {-p1.getD(), -p2.getD(), -p3.getD()};
+
+	const auto det = glm::determinant(A);
+	if(std::abs(det) <= std::numeric_limits<floating_point_type>::epsilon()) {
+		std::ostringstream oss;
+		oss << "Determinant is zero, division by zero follows (";
+		oss << "[" << n1.x << "," << n1.y << "," << n1.z << "],";
+		oss << "[" << n2.x << "," << n2.y << "," << n2.z << "],";
+		oss << "[" << n3.x << "," << n3.y << "," << n3.z << "]), ";
+		oss << "A=" << glm::to_string(A);
+		throw std::runtime_error(oss.str());
+	}
+
+	A = glm::column(A, 0, b);
+	const auto detX = glm::determinant(A);
+
+	A = glm::column(A, 1, p1.getNormal());
+	const auto detY = glm::determinant(A);
+
+	A = glm::column(A, 1, p2.getNormal());
+	A = glm::column(A, 2, -p1.getNormal());
+	const auto detZ = glm::determinant(A);
+
+	return {detX / det, detY / det, detZ / det};
 }
 
 template<typename floating_point_type, std::size_t dimension>

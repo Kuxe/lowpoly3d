@@ -38,6 +38,19 @@ SCENARIO("Intersection tests") {
 		std::cout << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")\n";
 	};
 
+	GIVEN("The XY-plane, XZ-pplane and YZ-plane") {
+		WHEN("Computing their common point with cramer-function") {
+			THEN("The reported intersection point is the zero-point") {
+				REQUIRE(glm::all(glm::epsilonEqual(cramer(xyplane, xzplane, yzplane), zerovec, eps)));
+				REQUIRE(glm::all(glm::epsilonEqual(cramer(xyplane, yzplane, xzplane), zerovec, eps)));
+				REQUIRE(glm::all(glm::epsilonEqual(cramer(xzplane, xyplane, yzplane), zerovec, eps)));
+				REQUIRE(glm::all(glm::epsilonEqual(cramer(xzplane, yzplane, xyplane), zerovec, eps)));
+				REQUIRE(glm::all(glm::epsilonEqual(cramer(yzplane, xyplane, xzplane), zerovec, eps)));
+				REQUIRE(glm::all(glm::epsilonEqual(cramer(yzplane, xzplane, xyplane), zerovec, eps)));
+			}
+		}
+	}
+
 	GIVEN("The XY-plane and XZ-plane") {
 		WHEN("Computing the their line of intersection") {
 			const auto line = intersection(xyplane, xzplane);

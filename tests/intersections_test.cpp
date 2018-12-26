@@ -171,9 +171,48 @@ SCENARIO("Intersection tests") {
 		}
 	}
 
+	GIVEN("A bulk of random planes constructed given a point P and a normal") {
+		const std::size_t N_SAMPLES = 100;
+		for(std::size_t i = 0; i < N_SAMPLES; i++) {
+			const Point p = glm::ballRand(1.0f);
+			const Plane	plane {p, glm::sphericalRand(1.0f)};
+			WHEN("Checking that P is contained within the plane") {
+				const bool isContainedWithinPlane = plane.contains(p);
+				THEN("P is reportedly contained within the plane") {
+					REQUIRE(isContainedWithinPlane);
+				}
+			}
+		}
+	}
+
+	GIVEN("A bulk of random plane-triplets constructed with with the same point P but random normals") {
+		const std::size_t N_SAMPLES = 100;
+		for(std::size_t i = 0; i < N_SAMPLES; i++) {
+			const Point p = glm::ballRand(1.0f);
+			const Plane
+				p1 {p, glm::sphericalRand(1.0f)},
+				p2 {p, glm::sphericalRand(1.0f)},
+				p3 {p, glm::sphericalRand(1.0f)};
+			WHEN("Computing common points for each triplet") {
+				const Point reportedPoint = intersection(p1, p2, p3);
+
+				THEN("P is reportedly contained within all planes") {
+					REQUIRE(p1.contains(reportedPoint));
+					REQUIRE(p2.contains(reportedPoint));
+					REQUIRE(p3.contains(reportedPoint));
+				}
+
+				THEN("The common point is P") {
+					REQUIRE(p == reportedPoint);
+				}
+			}
+		}
+	}
+
 	GIVEN("A bulk of random plane-triplets") {
 
-		for(std::size_t i = 0; i < 100; i++) {
+		const std::size_t N_SAMPLES = 100;
+		for(std::size_t i = 0; i < N_SAMPLES; i++) {
 			const Plane
 				p1 {glm::ballRand(1.0f), glm::sphericalRand(1.0f)},
 				p2 {glm::ballRand(1.0f), glm::sphericalRand(1.0f)},

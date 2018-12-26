@@ -23,6 +23,12 @@ struct TLine {
 	const vec_type& getDirection() const { return d; }
 	const point_type& getPoint() const { return p; }
 
+	// Return true if "point" lies on this line
+	bool contains(const point_type& point) const {
+		const auto crossed = glm::cross(point - p, d);
+		return glm::dot(crossed, crossed) <= std::numeric_limits<floating_point_type>::epsilon();
+	}
+
 private:
 	vec_type d;
 	point_type p;

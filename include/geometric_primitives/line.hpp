@@ -2,6 +2,11 @@
 #define LINE_HPP
 
 #include <cstddef> // std::size_t
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
+#include <iostream>
 #include <type_traits>
 
 #include "utils/glmutils.hpp"
@@ -37,16 +42,25 @@ private:
 // Returns true if l1 and l2 represent the same undirected line
 template<typename floating_point_type, std::size_t dimension>
 bool almostEqual(
-	const TLine<floating_point_type, dimension>& l1,
-	const TLine<floating_point_type, dimension>& l2) {
+	TLine<floating_point_type, dimension> l1,
+	TLine<floating_point_type, dimension> l2) {
 	
-	if(!areParallel<floating_point_type, 3>(l1.getDirection(), l2.getDirection())) return false;
-
-	// TODO: They are parallel but must also ensure that they intersect same point
-	return false;
+	// Translate lines to origin and create positioned difference vectors at
+	// both points. If these positioned difference vectors are parallel, then
+	// l1 and l2 are parallel. Check if parallel using cross product.
+	const auto crossed = glm::cross(l1.getDirection(), l2.getDirection() - l2.getPoint() - l1.getPoint());
+	return glm::dot(crossed, crossed) <= std::numeric_limits<floating_point_type>::epsilon();
 }
 
 using Line = TLine<float, 3>;
+
+template<typename floating_point_type, std::size_t dimension>
+std::ostream& operator<<(std::ostream& out, const TLine<floating_point_type, dimension>& line) {
+	const auto& d = line.getDirection();
+	const auto& p = line.getPoint();
+	out << "(d=" << glm::to_string(d).c_str() << ", p=" << glm::to_string(p).c_str() << ")";
+	return out;
+}
 
 } // End of namespace lowpoly3d
 

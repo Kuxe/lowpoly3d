@@ -194,6 +194,7 @@ add_library(lowpoly3d SHARED
 	include/utils/lerp.hpp
 	include/utils/misc.hpp
 	include/utils/not_implemented_exception.hpp	src/utils/not_implemented_exception.cpp
+	include/utils/strong_type.hpp
 )
 
 target_compile_options(lowpoly3d 

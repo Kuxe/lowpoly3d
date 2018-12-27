@@ -23,7 +23,7 @@ struct TLine {
 	using point_type = TPoint<floating_point_type, dimension>;
 	using vec_type = glm::vec<dimension, floating_point_type>;
 
-	constexpr TLine(const vec_type& d, const point_type& p) : d(d), p(p) { }
+	constexpr TLine(const point_type& p, const vec_type& d) : p(p), d(d) { }
 
 	const vec_type& getDirection() const { return d; }
 	const point_type& getPoint() const { return p; }
@@ -35,8 +35,8 @@ struct TLine {
 	}
 
 private:
-	vec_type d;
 	point_type p;
+	vec_type d;
 };
 
 // Returns true if l1 and l2 represent the same undirected line
@@ -56,9 +56,9 @@ using Line = TLine<float, 3>;
 
 template<typename floating_point_type, std::size_t dimension>
 std::ostream& operator<<(std::ostream& out, const TLine<floating_point_type, dimension>& line) {
-	const auto& d = line.getDirection();
 	const auto& p = line.getPoint();
-	out << "(d=" << glm::to_string(d).c_str() << ", p=" << glm::to_string(p).c_str() << ")";
+	const auto& d = line.getDirection();
+	out << "(p=" << glm::to_string(p).c_str() << ", d=" << glm::to_string(d).c_str() << ")";
 	return out;
 }
 

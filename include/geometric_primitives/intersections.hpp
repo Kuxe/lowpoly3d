@@ -94,13 +94,14 @@ TLine<floating_point_type, dimension> intersection(
 	static_assert(dimension == 3, "Plane-plane intersection only implemented for dim=3");
 	using vec3_type = glm::vec<dimension, floating_point_type>;
 	const auto zerovec = vec3_type(0.0f, 0.0f, 0.0f);
+	const auto zeropoint = Point(0.0f, 0.0f, 0.0f);
 
 	const auto& n1 = plane1.getNormal();
 	const auto& n2 = plane2.getNormal();
 
 	static constexpr auto eps = std::numeric_limits<floating_point_type>::epsilon();
 	if(glm::areCollinear(n1, n2, eps)) {
-		return {zerovec, zerovec};
+		return {zeropoint, zerovec};
 	}
 
 	const auto direction = glm::cross(n1, n2);
@@ -113,7 +114,7 @@ TLine<floating_point_type, dimension> intersection(
 	// line uniquely
 	assert(glm::length(n1) == 1.0f);
 	assert(glm::length(n2) == 1.0f);
-	return {direction, pointOnLine};
+	return {pointOnLine, direction};
 }
 
 /* Returns the point of intersection between given plane and line.

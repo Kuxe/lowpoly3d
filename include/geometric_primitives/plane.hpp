@@ -5,6 +5,7 @@
 
 #include "geometric_primitives/point.hpp"
 
+#include "utils/strong_type.hpp"
 #include "utils/not_implemented_exception.hpp"
 
 namespace lowpoly3d {
@@ -70,8 +71,8 @@ public:
 	is undefined if ||point1 - point2|| = 0. */
 template<typename floating_point_type, std::size_t dimension>
 TPlane<floating_point_type, dimension> getEquidistantPlane(
-	const glm::vec<dimension, floating_point_type>& point1,
-	const glm::vec<dimension, floating_point_type>& point2) {
+	const TPoint<floating_point_type, dimension>& point1,
+	const TPoint<floating_point_type, dimension>& point2) {
 	const glm::vec3 diff = point2 - point1;
 	
 	return {midpoint<floating_point_type, dimension>(point1, point2), glm::normalize(diff)};

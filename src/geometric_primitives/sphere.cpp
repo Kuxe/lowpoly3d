@@ -36,7 +36,7 @@ bool TSphere<floating_point_type, dimension>::enclosed(
 
 template<typename floating_point_type, std::size_t dimension>
 bool TSphere<floating_point_type, dimension>::isMBSof(
-	const std::vector<vec_type>& points) const {
+	const std::vector<point_type>& points) const {
 	return *this == mbsNaive<floating_point_type, dimension>(points);
 }
 
@@ -73,9 +73,9 @@ bool colliding(const Sphere& a, const Sphere& b, const ::glm::mat4& a_transform,
 // Returns a minimum bounding sphere over a triangle defined by vertices a, b and c
 template<typename floating_point_type, std::size_t dimension>
 TSphere<floating_point_type, dimension> mbs(
-	const typename TSphere<floating_point_type, dimension>::vec_type& a,
-	const typename TSphere<floating_point_type, dimension>::vec_type& b,
-	const typename TSphere<floating_point_type, dimension>::vec_type& c) {
+	const typename TSphere<floating_point_type, dimension>::point_type& a,
+	const typename TSphere<floating_point_type, dimension>::point_type& b,
+	const typename TSphere<floating_point_type, dimension>::point_type& c) {
 
 	/* Let t=(p1,p2,3), then the center and radius of its MBS is given by:
 	 * 
@@ -118,13 +118,13 @@ template struct TSphere<float, 3>;
 template struct TSphere<double, 3>;
 
 template TSphere<float, 3> mbs(
-	const typename TSphere<float, 3>::vec_type& a,
-	const typename TSphere<float, 3>::vec_type& b,
-	const typename TSphere<float, 3>::vec_type& c);
+	const typename TSphere<float, 3>::point_type& a,
+	const typename TSphere<float, 3>::point_type& b,
+	const typename TSphere<float, 3>::point_type& c);
 
 template TSphere<double, 3> mbs(
-	const typename TSphere<double, 3>::vec_type& a,
-	const typename TSphere<double, 3>::vec_type& b,
-	const typename TSphere<double, 3>::vec_type& c);
+	const typename TSphere<double, 3>::point_type& a,
+	const typename TSphere<double, 3>::point_type& b,
+	const typename TSphere<double, 3>::point_type& c);
 	
 }; //End of namespace lowpoly3d

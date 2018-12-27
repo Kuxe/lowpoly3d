@@ -18,6 +18,7 @@ struct TSphere {
 	using floating_point_type = TFloatingPointType;
 	static constexpr std::size_t dimension = TDimension;
 	using vec_type = ::glm::vec<dimension, floating_point_type>;
+	using point_type = TPoint<floating_point_type, dimension>;
 	vec_type p;
 	floating_point_type r;
 
@@ -46,7 +47,7 @@ struct TSphere {
 	bool enclosed(const TSphere& other) const;
 
 	// Returns true if this sphere is the MBS over the provided set of points
-	bool isMBSof(const std::vector<vec_type>& points) const;
+	bool isMBSof(const std::vector<point_type>& points) const;
 
 	constexpr TSphere(const TSphere& s) = default;
 
@@ -88,9 +89,9 @@ bool colliding(const Sphere& a, const Sphere& b, const ::glm::mat4& a_transform,
 // Returns a minimum bounding sphere over a triangle defined by vertices a, b and c
 template<typename floating_point_type, std::size_t dimension>
 TSphere<floating_point_type, dimension> mbs(
-	const typename TSphere<floating_point_type, dimension>::vec_type& a,
-	const typename TSphere<floating_point_type, dimension>::vec_type& b,
-	const typename TSphere<floating_point_type, dimension>::vec_type& c);
+	const typename TSphere<floating_point_type, dimension>::point_type& a,
+	const typename TSphere<floating_point_type, dimension>::point_type& b,
+	const typename TSphere<floating_point_type, dimension>::point_type& c);
 
 // Returns a minimum bounding sphere over a triangle
 template<typename floating_point_type, std::size_t dimension>
@@ -133,7 +134,7 @@ TSphere<floating_point_type, dimension> mbs(
 // Computes the minimum bounding sphere over a set of points in O(n^2)-time
 template<typename floating_point_type, std::size_t dimension>
 TSphere<floating_point_type, dimension> mbsNaive(
-	const std::vector<typename TSphere<floating_point_type, dimension>::vec_type>& points) {
+	const std::vector<typename TSphere<floating_point_type, dimension>::point_type>& points) {
 
 	throw NotImplementedException();
 }

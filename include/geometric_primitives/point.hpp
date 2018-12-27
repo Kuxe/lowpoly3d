@@ -5,10 +5,13 @@
 #include <numeric>
 #include <glm/glm.hpp>
 
+#include "utils/strong_type.hpp"
+
 namespace lowpoly3d {
 
+struct strong_point_type;
 template<typename value_type, std::size_t dimension>
-using TPoint = glm::vec<dimension, value_type>;
+using TPoint = glm::vec<dimension, value_type>;// TODO: Use this instead StrongType<glm::vec<dimension, value_type>, strong_point_type>;
 
 template<typename value_type, std::size_t dimension>
 TPoint<value_type, dimension> midpoint(

@@ -22,15 +22,16 @@ SCENARIO("Intersection tests") {
 	using namespace lowpoly3d;
 
 	const glm::vec3 zerovec = {0.0f, 0.0f, 0.0f};
+	const Point zeropoint = {0.0f, 0.0f, 0.0f};
 	const glm::vec3 xaxis = {1.0f, 0.0f, 0.0f};
 	const glm::vec3 yaxis = {0.0f, 1.0f, 0.0};
 	const glm::vec3 zaxis = {0.0f, 0.0f, 1.0f};
 	const glm::vec3 nxaxis = -xaxis;
 	const glm::vec3 nyaxis = -yaxis;
 	const glm::vec3 nzaxis = -zaxis;
-	const Plane xyplane = {zerovec, {0.0f, 0.0f, 1.0f}};
-	const Plane xzplane = {zerovec, {0.0f, 1.0f, 0.0f}};
-	const Plane yzplane = {zerovec, {1.0f, 0.0f, 0.0f}};
+	const Plane xyplane = {zeropoint, {0.0f, 0.0f, 1.0f}};
+	const Plane xzplane = {zeropoint, {0.0f, 1.0f, 0.0f}};
+	const Plane yzplane = {zeropoint, {1.0f, 0.0f, 0.0f}};
 
 	static constexpr auto eps = std::numeric_limits<float>::epsilon();
 
@@ -111,25 +112,60 @@ SCENARIO("Intersection tests") {
 	}
 
 	GIVEN("Line through y-axis and xz-plane") {
-		const Line lineThroughY {yaxis, zerovec};
+		const Line lineThroughY {zeropoint, yaxis};
 		
 		WHEN("Computing the point of intersection") {
 			const Point intersectionPoint = intersection(lineThroughY, xzplane);
 
 			THEN("Zero-point is returned") {
-				REQUIRE(glm::all(glm::epsilonEqual(intersectionPoint, zerovec, eps)));
+				REQUIRE(glm::all(glm::epsilonEqual(intersectionPoint, zeropoint, eps)));
 			}
 		}
 	}
 
 	GIVEN("Line through x-axis and xz-plane") {
-		const Line lineThroughX {zerovec, xaxis};
+		const Line lineThroughX {zeropoint, xaxis};
 		
 		WHEN("Computing the point of intersection") {
 			const Point intersectionPoint = intersection(lineThroughX, xzplane);
 
 			THEN("NaN-point is returned") {
-				REQUIRE(intersectionPoint == glm::vec3(NAN, NAN, NAN));
+				REQUIRE(intersectionPoint == Point(NAN, NAN, NAN));
+			}
+		}
+	}
+
+	GIVEN("The same line along X-axis with different defining points") {
+		std::vector<Line> lines {
+			Line{zeropoint, xaxis},
+			{glm::vec3(0.1, 0.0, 0.0), xaxis},
+			{glm::vec3(-0.1, 0.0, 0.0), xaxis},
+			{glm::vec3(100000, 0.0, 0.0), xaxis},
+			{glm::vec3(-100000, 0.0, 0.0), xaxis},
+			{glm::vec3(-1337, 0.0, 0.0), xaxis},
+			{glm::vec3(-1337, 0.0, 0.0), xaxis},
+		};
+		
+		WHEN("Checking if the lines are equal") {
+			THEN("All linesa are reported as almost equal") {
+				REQUIRE(std::adjacent_find(lines.begin(), lines.end(), [](auto& lhs, auto& rhs) {
+					return !almostEqual<float, 3>(lhs, rhs);
+				}) == lines.end());
+			}
+		}
+	}
+
+	GIVEN("The same line along X-axis and another line pointing in the reverse direction") {
+		std::vector<Line> lines {
+			{glm::vec3(1.0, 1.0, 1.0), xaxis},
+			{glm::vec3(-1.0, -1.0, -1.0), xaxis},
+		};
+		
+		WHEN("Checking if the lines are equal") {
+			THEN("All linesa are reported as almost equal") {
+				REQUIRE(std::adjacent_find(lines.begin(), lines.end(), [](auto& lhs, auto& rhs) {
+					return !almostEqual<float, 3>(lhs, rhs);
+				}) == lines.end());
 			}
 		}
 	}
@@ -157,6 +193,9 @@ SCENARIO("Intersection tests") {
 			THEN("Ordering of pair members as arguments does not matter") {
 				const Line plane1plane2 = intersection(plane1, plane2);
 				const Line plane2plane1 = intersection(plane2, plane1);
+				INFO("plane1plane2=" << plane1plane2);
+				INFO("plane2plane1=" << plane2plane1);
+				INFO("If this test fails with only point being wrong, then cramer-function is probably broke");
 				REQUIRE(almostEqual<float, 3>(plane1plane2, plane2plane1));
 			}
 		}

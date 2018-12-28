@@ -39,6 +39,29 @@ SCENARIO("Intersection tests") {
 		std::cout << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")\n";
 	};
 
+	/* Here be lambdas */
+	auto const commuter = [](auto f) {
+		return [f](auto const& arg1, auto const& arg2) {
+			return f(arg2, arg1);
+		};
+	};
+
+	auto getCommutativeTester = [commuter](auto f) {
+		return [commuter, f](auto const& arg1, auto const& arg2, auto const& binary_prediate) {
+			REQUIRE(binary_prediate(f(arg1, arg2), commuter(f)(arg1, arg2)));
+		};
+	};
+
+	auto const commutativeTest = [getCommutativeTester](auto const& f, auto const& arg1, auto const& arg2, auto const& binary_prediate){
+		getCommutativeTester(f)(arg1, arg2, binary_prediate);
+	};
+
+	auto intersectionCommutativeTest = [getCommutativeTester](auto const& arg1, auto const& arg2) {
+		getCommutativeTester([](auto const& a, auto const& b) { return intersection(a, b); })
+			(arg1, arg2, [](auto const& a, auto const&b) { return almostEqual<float, 3>(a, b); }
+		);
+	};
+
 	GIVEN("The XY-plane, XZ-pplane and YZ-plane") {
 		WHEN("Computing their common point with cramer-function") {
 			THEN("The reported intersection point is the zero-point") {
@@ -64,6 +87,12 @@ SCENARIO("Intersection tests") {
 			}
 			THEN("The point of the line is reportedly on the line") {
 				REQUIRE(line.contains(line.getPoint()));
+			}
+		}
+
+		WHEN("Reordering arguments to intersection") {
+			THEN("The two returned lines are equal (intersection should commute)") {
+				intersectionCommutativeTest(xyplane, xzplane);
 			}
 		}
 	}
@@ -186,9 +215,7 @@ SCENARIO("Intersection tests") {
 			const Plane plane {glm::ballRand(1.0f), glm::sphericalRand(1.0f)};
 
 			THEN("Ordering of pair members as arguments does not matter") {
-				const Point linePlaneIntersection = intersection(line, plane);
-				const Point planeLineIntersection = intersection(plane, line);
-				REQUIRE(linePlaneIntersection == planeLineIntersection);
+				intersectionCommutativeTest(line, plane);
 			}
 		}
 	}
@@ -199,13 +226,13 @@ SCENARIO("Intersection tests") {
 			const Plane plane1 {glm::ballRand(1.0f), glm::sphericalRand(1.0f)};
 			const Plane plane2 {glm::ballRand(1.0f), glm::sphericalRand(1.0f)};
 
-			THEN("Ordering of pair members as arguments does not matter") {
+			THEN("Intersection function is commutative") {
 				const Line plane1plane2 = intersection(plane1, plane2);
 				const Line plane2plane1 = intersection(plane2, plane1);
 				INFO("plane1plane2=" << plane1plane2);
 				INFO("plane2plane1=" << plane2plane1);
 				INFO("If this test fails with only point being wrong, then cramer-function is probably broke");
-				REQUIRE(almostEqual<float, 3>(plane1plane2, plane2plane1));
+				intersectionCommutativeTest(plane1, plane2);
 			}
 		}
 	}

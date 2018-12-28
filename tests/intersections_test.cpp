@@ -62,6 +62,9 @@ SCENARIO("Intersection tests") {
 				REQUIRE(line.getPoint().y == 0.0f);
 				REQUIRE(line.getPoint().z == 0.0f);
 			}
+			THEN("The point of the line is reportedly on the line") {
+				REQUIRE(line.contains(line.getPoint()));
+			}
 		}
 	}
 
@@ -75,6 +78,9 @@ SCENARIO("Intersection tests") {
 				REQUIRE(line.getPoint().x == 0.0f);
 				REQUIRE(line.getPoint().z == 0.0f);
 			}
+			THEN("The point of the line is reportedly on the line") {
+				REQUIRE(line.contains(line.getPoint()));
+			}
 		}
 	}
 
@@ -87,6 +93,9 @@ SCENARIO("Intersection tests") {
 			THEN("The line only intersects the xaxis") {
 				REQUIRE(line.getPoint().x == 0.0f);
 				REQUIRE(line.getPoint().y == 0.0f);
+			}
+			THEN("The point of the line is reportedly on the line") {
+				REQUIRE(line.contains(line.getPoint()));
 			}
 		}
 	}

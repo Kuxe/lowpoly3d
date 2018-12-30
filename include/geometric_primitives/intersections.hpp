@@ -161,7 +161,62 @@ TPoint<floating_point_type, dimension> intersection(
 		return intersection(intersection(p1, p2), p3);
 }
 
-/* Solves a system of three linear equations by (naively) using Cramer's rule.
+/* Solves a system of three linear equations by (naively) using Cramer's rule. */
+template<typename floating_point_type>
+glm::tvec3<floating_point_type> cramer(
+	const glm::tmat3x3<floating_point_type>& A,
+	const glm::tvec3<floating_point_type>& b)
+{
+	const auto det = glm::determinant(A);
+	if(std::abs(det) <= std::numeric_limits<floating_point_type>::epsilon()) {
+		std::ostringstream oss;
+		oss << "Determinant is zero, division by zero follows ";
+		oss << glm::to_string(glm::column(A, 0)) << ",";
+		oss << glm::to_string(glm::column(A, 1)) << ",";
+		oss << glm::to_string(glm::column(A, 2)) << ", ";
+		oss << "A=" << glm::to_string(A);
+		throw std::runtime_error(oss.str());
+	}
+
+	/* *** Cramers *** *
+
+		a1 b1 c1  x    d1
+		a2 b2 c2  y    d2
+		a3 b3 c3  z    d3
+
+		a1 b1 c1  x 0 0    d1 0 0
+		a2 b2 c2  y 0 0    d2 0 0
+		a3 b3 c3  z 0 0    d3 0 0
+
+		a1 b1 c1  x 0 0    d1 b1 c1
+		a2 b2 c2  y 1 0    d2 b2 c2
+		a3 b3 c3  z 0 1    d3 b3 c3
+
+		a1 b1 c1  x 1 0    d1 a1 c1
+		a2 b2 c2  y 0 0    d2 a2 c2
+		a3 b3 c3  z 0 1    d3 a3 c3
+
+		a1 b1 c1  x 0 1    d1 -b1 a1
+		a2 b2 c2  y -1 0   d2 -b2 a2
+		a3 b3 c3  z 0 0    d3 -b3 a3
+
+	* *** ******* *** */
+
+	glm::tmat3x3<floating_point_type> tmp = A;
+	tmp = glm::column(tmp, 0, b);
+	const auto detX = glm::determinant(tmp);
+
+	tmp = glm::column(tmp, 1, glm::column(A, 0));
+	const auto detY = glm::determinant(tmp);
+
+	tmp = glm::column(tmp, 1, -glm::column(A, 1));
+	tmp = glm::column(tmp, 2, glm::column(A, 0));
+	const auto detZ = glm::determinant(tmp);
+
+	return {detX / det, -detY / det, detZ / det};
+}
+
+/* Finds an intersection of three planes using Cramer's rule.
  * Precondition: n1, n2 and n3 are mutually non-parallel.
  * If this condition is not satisfied, than a division by zero will happen,
  * this is why this method is unsafe. */
@@ -175,31 +230,10 @@ glm::tvec3<floating_point_type> cramer(
 	const auto& n2 = p2.getNormal();
 	const auto& n3 = p3.getNormal();
 
-	glm::tmat3x3<floating_point_type> A(n1, n2, n3);
+	const glm::tmat3x3<floating_point_type> A(n1, n2, n3);
 	const glm::tvec3<floating_point_type> b {-p1.getD(), -p2.getD(), -p3.getD()};
 
-	const auto det = glm::determinant(A);
-	if(std::abs(det) <= std::numeric_limits<floating_point_type>::epsilon()) {
-		std::ostringstream oss;
-		oss << "Determinant is zero, division by zero follows (";
-		oss << "[" << n1.x << "," << n1.y << "," << n1.z << "],";
-		oss << "[" << n2.x << "," << n2.y << "," << n2.z << "],";
-		oss << "[" << n3.x << "," << n3.y << "," << n3.z << "]), ";
-		oss << "A=" << glm::to_string(A);
-		throw std::runtime_error(oss.str());
-	}
-
-	A = glm::column(A, 0, b);
-	const auto detX = glm::determinant(A);
-
-	A = glm::column(A, 1, p1.getNormal());
-	const auto detY = glm::determinant(A);
-
-	A = glm::column(A, 1, p2.getNormal());
-	A = glm::column(A, 2, -p1.getNormal());
-	const auto detZ = glm::determinant(A);
-
-	return {detX / det, detY / det, detZ / det};
+	return cramer(A, b);
 }
 
 template<typename floating_point_type, std::size_t dimension>

@@ -25,24 +25,24 @@ struct TLine {
 
 	constexpr TLine(const point_type& p, const vec_type& d) : p(p), d(d) { }
 
-	const vec_type& getDirection() const { return d; }
-	const point_type& getPoint() const { return p; }
+	[[nodiscard]] const vec_type& getDirection() const { return d; }
+	[[nodiscard]] const point_type& getPoint() const { return p; }
 
 	// Return true if "point" lies on this line
-	bool contains(const point_type& point) const {
+	[[nodiscard]] bool contains(const point_type& point) const {
 		const auto crossed = glm::cross(point - p, d);
 		return glm::dot(crossed, crossed) <= std::numeric_limits<floating_point_type>::epsilon();
 	}
 
 	// Returns true if "direction" is parallel to this line
-	bool isParallelTo(const vec_type& direction) const {
+	[[nodiscard]] bool isParallelTo(const vec_type& direction) const {
 		return
 			glm::length(glm::cross(getDirection(), direction)) <=
 			std::numeric_limits<floating_point_type>::epsilon();
 	}
 
 	// Returns true if "line" is parallel to this line
-	bool isParallelTo(const line_type& line) const {
+	[[nodiscard]] bool isParallelTo(const line_type& line) const {
 		return isParallelTo(line.getDirection());
 	}
 

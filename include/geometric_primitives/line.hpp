@@ -23,7 +23,7 @@ struct TLine {
 	using point_type = TPoint<floating_point_type, dimension>;
 	using vec_type = glm::vec<dimension, floating_point_type>;
 
-	constexpr TLine(const point_type& p, const vec_type& d) : p(p), d(d) { }
+	constexpr TLine(const point_type& p, const vec_type& d) : p(p), d(glm::normalize(d)) { }
 
 	[[nodiscard]] const vec_type& getDirection() const { return d; }
 	[[nodiscard]] const point_type& getPoint() const { return p; }

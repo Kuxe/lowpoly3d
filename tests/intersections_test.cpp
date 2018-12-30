@@ -220,6 +220,79 @@ SCENARIO("Intersection tests") {
 		}
 	}
 
+	auto testSystemOfLinearEquations = [](
+		float x1, float y1, float z1, float b1,
+		float x2, float y2, float z2, float b2,
+		float x3, float y3, float z3, float b3,
+		float s1, float s2, float s3
+	) {
+		const glm::vec3
+			v1 {x1, y1, z1},
+			v2 {x2, y2, z2},
+			v3 {x3, y3, z3};
+
+		glm::mat3x3 A;
+		A = glm::row(A, 0, v1);
+		A = glm::row(A, 1, v2);
+		A = glm::row(A, 2, v3);
+		glm::vec3 b = {b1, b2, b3};
+
+		std::ostringstream oss;
+		oss << "A system of linear equations";
+		oss << "\nA=" << glm::to_string(A) << "\nb=" << glm::to_string(b);
+		GIVEN(oss.str()) {
+			WHEN("Computing a solution using Cramer's rule") {
+				const glm::vec3 solution = cramer(A, b);
+				const glm::vec3 expectedSolution = glm::vec3(s1, s2, s3);
+				std::ostringstream solutionStr;
+				solutionStr << "The solution should be (x,y,z)=" << glm::to_string(expectedSolution);
+				THEN(solutionStr.str()) {
+					REQUIRE(solution == expectedSolution);
+				}
+			}
+		}
+	};
+
+	/* This system means:
+		1x + 0y + 0z = 1
+		0x + 1y + 0z = 1
+		0x + 0y + 1z = 1
+	 * which obviously has (x,y,z)=(1,1,1) as the solution */
+	testSystemOfLinearEquations(
+		1, 0, 0, 1,
+		0, 1, 0, 1,
+		0, 0, 1, 1,
+		1, 1, 1
+	);
+
+	testSystemOfLinearEquations(
+		-1, 0, 0, 1,
+		0, 1, 0, 1,
+		0, 0, 1, 1,
+		-1, 1, 1
+	);
+
+	testSystemOfLinearEquations(
+		1, 0, 0, 1,
+		0, -1, 0, 1,
+		0, 0, 1, 1,
+		1, -1, 1
+	);
+
+	testSystemOfLinearEquations(
+		1, 0, 0, 1,
+		0, 1, 0, 1,
+		0, 0, -1, 1,
+		1, 1, -1
+	);
+
+	testSystemOfLinearEquations(
+		1, 0, 0, 1,
+		0, 1, 0, 1,
+		1, 1, 1, 3,
+		1, 1, 1
+	);
+
 	GIVEN("A bulk of random (plane,plane)-pairs") {
 
 		for(std::size_t i = 0; i < 100; i++) {

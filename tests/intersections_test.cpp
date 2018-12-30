@@ -293,6 +293,36 @@ SCENARIO("Intersection tests") {
 		1, 1, 1
 	);
 
+	testSystemOfLinearEquations(
+		1.0f/sqrtf(2.0f), 1.0f/sqrtf(2.0f), 0, 1.0f/sqrtf(2.0f),
+		0, 1, 0, 0,
+		0, 0, -1, 0,
+		1, 0, 0
+	);
+
+
+	GIVEN("XZ-plane and XZ-plane that is rotated 45degrees CW about +Z and translated +1 along +Y") {
+		const glm::vec3 direction = {1.0f / sqrtf(2), 1.0f / sqrtf(2.0f), 0.0f};
+		const Point point = {0.0f, 1.0f, 0.0};
+		const Plane xzTransformedPlane = {point, direction};
+
+		WHEN("Computing their line of intersection") {
+			const Line intersectionLine = intersection(xzplane, xzTransformedPlane);
+
+			THEN("Computed line should be parallel to Z-axis") {
+				REQUIRE(intersectionLine.isParallelTo(zaxis));
+			}
+			THEN("Computed line should intersect the point (1, 0, 0)") {
+				INFO("intersectionLine=" << intersectionLine);
+				REQUIRE(intersectionLine.contains({1.0f, 0.0f, 0.0f}));
+			}
+		}
+	}
+
+
+
+
+
 	GIVEN("A bulk of random (plane,plane)-pairs") {
 
 		for(std::size_t i = 0; i < 100; i++) {

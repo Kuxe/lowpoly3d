@@ -34,6 +34,18 @@ struct TLine {
 		return glm::dot(crossed, crossed) <= std::numeric_limits<floating_point_type>::epsilon();
 	}
 
+	// Returns true if "direction" is parallel to this line
+	bool isParallelTo(const vec_type& direction) const {
+		return
+			glm::length(glm::cross(getDirection(), direction)) <=
+			std::numeric_limits<floating_point_type>::epsilon();
+	}
+
+	// Returns true if "line" is parallel to this line
+	bool isParallelTo(const line_type& line) const {
+		return isParallelTo(line.getDirection());
+	}
+
 private:
 	point_type p;
 	vec_type d;

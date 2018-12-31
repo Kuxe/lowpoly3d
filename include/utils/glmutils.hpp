@@ -1,6 +1,7 @@
 #ifndef GLMUTILS_HPP
 #define GLMUTILS_HPP
 
+#include <functional>
 #include <numeric>
 #include <glm/glm.hpp> // TODO: Narrow this include to just glm::vec
 #include <glm/gtc/matrix_access.hpp> // glm::column
@@ -54,6 +55,14 @@ std::vector<glm::vec<dimension, floating_point_type>> gramschmidt(
 	}
 	return u;
 }
+
+// Returns a function that applies f per component
+template<typename in_type, typename out_type>
+std::function<glm::tvec3<out_type>(glm::tvec3<in_type> const&)> componentwise(std::function<out_type(in_type)> f) {
+	return [f](glm::tvec3<in_type> const& v) {
+		return glm::tvec3<out_type>(f(v.x), f(v.y), f(v.z));
+	};
+};
 
 }
 

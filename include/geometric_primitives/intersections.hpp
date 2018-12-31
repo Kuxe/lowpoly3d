@@ -233,7 +233,21 @@ glm::tvec3<floating_point_type> cramer(
 	const glm::tmat3x3<floating_point_type> A(n1, n2, n3);
 	const glm::tvec3<floating_point_type> b {-p1.getD(), -p2.getD(), -p3.getD()};
 
-	return cramer(A, b);
+	/* A is constructed with n1 as first base, n2 as second base etc. However,
+	 * when solving using cramer we expect the matrix A and vector b to look like:
+	 * 
+	 * n1x n1y n1z   x = d1
+	 * n2x n2y n2z * y = d2
+	 * n3x n3y n3z   z = d3
+	 * 
+	 * instead of 
+	 * 
+	 * n1x n2x n3x   x = d1
+	 * n1y n2y n3y * y = d2
+	 * n1z n2z n3z   z = d3
+	 * 
+	 * so transpose it. */
+	return cramer(glm::transpose(A), b);
 }
 
 template<typename floating_point_type, std::size_t dimension>

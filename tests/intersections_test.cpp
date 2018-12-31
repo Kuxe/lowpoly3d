@@ -440,6 +440,8 @@ SCENARIO("Intersection tests") {
 				THEN("P is reportedly contained within all planes") {
 					INFO("Reported point is " << glm::to_string(reportedPoint));
 					INFO("Expected point is " << glm::to_string(p));
+					INFO("If this test fails, then the line-plane intersection may be broke")
+					INFO("Note that intersection of three planes can be done with cramer(p1, p2, p3) too!");
 					REQUIRE(p1.contains(reportedPoint));
 					REQUIRE(p2.contains(reportedPoint));
 					REQUIRE(p3.contains(reportedPoint));
@@ -447,6 +449,13 @@ SCENARIO("Intersection tests") {
 
 				THEN("The common point is P") {
 					REQUIRE(almostEqual<float, 3>(p, reportedPoint));
+				}
+
+				THEN("The common point is equal to that of using cramers rule for three planes") {
+					Point const cramerPoint = cramer(p1, p2, p3);
+					REQUIRE(almostEqual<float, 3>(reportedPoint, cramerPoint));
+					INFO("Cramer point = " << glm::to_string(cramerPoint));
+					INFO("Reported point = " << glm::to_string(reportedPoint));
 				}
 			}
 		}

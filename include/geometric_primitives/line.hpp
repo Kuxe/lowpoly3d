@@ -56,12 +56,7 @@ template<typename floating_point_type, std::size_t dimension>
 bool almostEqual(
 	TLine<floating_point_type, dimension> l1,
 	TLine<floating_point_type, dimension> l2) {
-	
-	// Translate lines to origin and create positioned difference vectors at
-	// both points. If these positioned difference vectors are parallel, then
-	// l1 and l2 are parallel. Check if parallel using cross product.
-	const auto crossed = glm::cross(l1.getDirection(), l2.getDirection() - l2.getPoint() - l1.getPoint());
-	return glm::dot(crossed, crossed) <= std::numeric_limits<floating_point_type>::epsilon();
+	return l1.isParallelTo(l2) && l1.contains(l2.getPoint());
 }
 
 using Line = TLine<float, 3>;

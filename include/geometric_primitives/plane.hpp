@@ -85,6 +85,11 @@ public:
 		 * it follows trivially that 'd' is also the shortest distance to origo */
 		return std::abs(getD());
 	}
+
+	// Returns true if "plane" is parallel to this plane
+	[[nodiscard]] bool isParallelTo(const TPlane<floating_point_type, dimension>& plane) const {
+		return std::abs(glm::dot(getNormal(), plane.getNormal())) - floating_point_type(1) <= std::numeric_limits<floating_point_type>::epsilon();
+	}
 };
 
 /* 	Returns a plane P s.t ||point1-c|| = ||point2-c|| for all c in P

@@ -76,6 +76,51 @@ SCENARIO("Intersection tests") {
 		return glm::all(fun(v));
 	};
 
+	GIVEN("Two equal lines represented with antipodal points") {
+		Point const point = {1.0f, 0.0f, 0.0f};
+		glm::vec3 const direction = {1.0f, 0.0f, 0.0f};
+		Line const l1 {point, direction};
+		Line const l2 {-point, direction};
+
+		WHEN("Checking if they are equal") {
+			bool const equal = almostEqual<float, 3>(l1, l2);
+			THEN("They are reported as equal since they represent the same lines") {
+				REQUIRE(equal);
+			}
+		}
+	}
+
+	GIVEN("Two equal lines (along x-axis) represented with opposite directions") {
+		Point const point = {1.0f, 0.0f, 0.0f};
+		glm::vec3 const direction = {1.0f, 0.0f, 0.0f};
+		Line const l1 {point, direction};
+		Line const l2 {point, -direction};
+
+		WHEN("Checking if they are equal") {
+			bool const equal = almostEqual<float, 3>(l1, l2);
+			THEN("They are reported as equal since they represent the same lines") {
+				REQUIRE(equal);
+			}
+		}
+	}
+
+	GIVEN("Two equal lines represented with opposite directions") {
+		// This test is written to test a bug hypothesis
+		Point const point = {0.546397f, -0.032761f, -0.202956f};
+		glm::vec3 const direction = {-0.236391f, 0.631614f, -0.738365f};
+		Line const l1 {point, direction};
+		Line const l2 {point, -direction};
+
+		WHEN("Checking if they are equal") {
+			bool const equal = almostEqual<float, 3>(l1, l2);
+			THEN("They are reported as equal since they represent the same lines") {
+				INFO("l1=" << l1);
+				INFO("l2=" << l2);
+				REQUIRE(equal);
+			}
+		}
+	}
+
 	GIVEN("The XY-plane, XZ-pplane and YZ-plane") {
 		WHEN("Computing their common point with cramer-function") {
 			THEN("The reported intersection point is the zero-point") {
@@ -192,16 +237,16 @@ SCENARIO("Intersection tests") {
 	GIVEN("The same line along X-axis with different defining points") {
 		std::vector<Line> lines {
 			Line{zeropoint, xaxis},
-			{glm::vec3(0.1, 0.0, 0.0), xaxis},
-			{glm::vec3(-0.1, 0.0, 0.0), xaxis},
-			{glm::vec3(100000, 0.0, 0.0), xaxis},
-			{glm::vec3(-100000, 0.0, 0.0), xaxis},
-			{glm::vec3(-1337, 0.0, 0.0), xaxis},
-			{glm::vec3(-1337, 0.0, 0.0), xaxis},
+			{Point(0.1, 0.0, 0.0), xaxis},
+			{Point(-0.1, 0.0, 0.0), xaxis},
+			{Point(100000, 0.0, 0.0), xaxis},
+			{Point(-100000, 0.0, 0.0), xaxis},
+			{Point(1337, 0.0, 0.0), xaxis},
+			{Point(-1337, 0.0, 0.0), xaxis},
 		};
 		
 		WHEN("Checking if the lines are equal") {
-			THEN("All linesa are reported as almost equal") {
+			THEN("All lines are reported as almost equal") {
 				REQUIRE(std::adjacent_find(lines.begin(), lines.end(), [](auto& lhs, auto& rhs) {
 					return !almostEqual<float, 3>(lhs, rhs);
 				}) == lines.end());

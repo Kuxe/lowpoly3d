@@ -255,16 +255,14 @@ SCENARIO("Intersection tests") {
 	}
 
 	GIVEN("The same line along X-axis and another line pointing in the reverse direction") {
-		std::vector<Line> lines {
-			{glm::vec3(1.0, 1.0, 1.0), xaxis},
-			{glm::vec3(-1.0, -1.0, -1.0), xaxis},
-		};
+		Point const point {1.0, 1.0, 1.0};
+		Line
+			l1 {point, xaxis},
+			l2 {point, -xaxis};
 		
 		WHEN("Checking if the lines are equal") {
 			THEN("All linesa are reported as almost equal") {
-				REQUIRE(std::adjacent_find(lines.begin(), lines.end(), [](auto& lhs, auto& rhs) {
-					return !almostEqual<float, 3>(lhs, rhs);
-				}) == lines.end());
+				REQUIRE(almostEqual<float, 3>(l1, l2));
 			}
 		}
 	}
@@ -272,7 +270,7 @@ SCENARIO("Intersection tests") {
 	GIVEN("A bulk of random (line,plane)-pairs") {
 
 		for(std::size_t i = 0; i < 100; i++) {
-			const Line line {glm::sphericalRand(1.0f), glm::ballRand(1.0f)};
+			const Line line {glm::ballRand(1.0f), glm::sphericalRand(1.0f)};
 			const Plane plane {glm::ballRand(1.0f), glm::sphericalRand(1.0f)};
 
 			THEN("Ordering of pair members as arguments does not matter") {

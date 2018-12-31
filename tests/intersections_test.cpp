@@ -318,7 +318,7 @@ SCENARIO("Intersection tests") {
 
 
 	GIVEN("XZ-plane and XZ-plane that is rotated 45degrees CW about +Z and translated +1 along +Y") {
-		const glm::vec3 direction = {1.0f / sqrtf(2), 1.0f / sqrtf(2.0f), 0.0f};
+		const glm::vec3 direction = {1.0f / sqrtf(2.0f), 1.0f / sqrtf(2.0f), 0.0f};
 		const Point point = {0.0f, 1.0f, 0.0};
 		const Plane xzTransformedPlane = {point, direction};
 

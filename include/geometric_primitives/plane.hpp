@@ -10,15 +10,33 @@
 
 namespace lowpoly3d {
 
-// A mathematical plane represented by its normal and a point on the plane
+/* A mathematical plane represented by its unit-length normal
+ * and a point on said plane */
 template<typename floating_point_type, std::size_t dimension>
 class TPlane {
 	using point_type = glm::vec<dimension, floating_point_type>;
 	point_type p, n;
 
 public:
-	TPlane(const point_type& point, const point_type& normal) : p(point), n(normal) { }
-	TPlane(const point_type& normal, floating_point_type d) : p(normal * d / glm::dot(normal, normal)), n(normal) { }
+
+	static point_type getPointOnPlane(const point_type& normalizedNormal, floating_point_type d) {
+		/*
+			n1*x + n2*y + n3*z = d, chose a point (x,y,z) = s*(n1,n2,n3) s.t equation is satisfied =>
+			s(n1*n1 + n2*n2 + n3*n3) = d =>
+			s*dot(n, n) = d, n normalized =>
+			s = d
+
+			Hence dn is a point on the plane.
+			dn is clearly the point with the shortest distance to origo. This is geometrically
+			intuitive. If you're a point at origo and want to reach the plane as quickly as possible,
+			then obviously you would move along the normal of the plane --- moving in some slightly different
+			direction would be like moving along a hypotenuse of a triangle instead of moving along a cathetus.
+		*/
+		return d * normalizedNormal;
+	}
+
+	TPlane(const point_type& point, const point_type& normal) : p(point), n(glm::normalize(normal)) { }
+	TPlane(const point_type& normal, floating_point_type d) : p(getPointOnPlane(glm::normalize(normal), d)), n(glm::normalize(normal)) { }
 	TPlane(const TPlane& other) : TPlane(other.p, other.n) { }
 	TPlane(TPlane&& other) : p(std::move(other.p)), n(std::move(other.n)) { }
 	virtual ~TPlane() { }
@@ -61,8 +79,9 @@ public:
 
 	// Returns the distance to origo
 	floating_point_type distance2origo() const {
-		TPlane<floating_point_type, dimension> tmp(getNormal(), getD());
-		return glm::length(tmp.getPoint());
+		/* See "proof" within getPointOnPlane(). Since normal is of unit length,
+		 * it follows trivially that 'd' is also the shortest distance to origo */
+		return std::abs(getD());
 	}
 };
 

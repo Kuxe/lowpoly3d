@@ -84,24 +84,24 @@ bool intersects(
 }
 
 /* Plane-plane intersection yields a line. If the two planes are parallell,
- * then no line of intersection exists. In that case, the direction of the
- * returned line is the zero vector */
+ * then no line of intersection exists. In that case, return a NaN-line consisting
+ * of a NaN-point and a NaN-direction */
 template<typename floating_point_type, std::size_t dimension>
 TLine<floating_point_type, dimension> intersection(
 	const TPlane<floating_point_type, dimension>& plane1,
 	const TPlane<floating_point_type, dimension>& plane2) {
 
 	static_assert(dimension == 3, "Plane-plane intersection only implemented for dim=3");
-	using vec3_type = glm::vec<dimension, floating_point_type>;
-	const auto zerovec = vec3_type(0.0f, 0.0f, 0.0f);
-	const auto zeropoint = Point(0.0f, 0.0f, 0.0f);
 
 	const auto& n1 = plane1.getNormal();
 	const auto& n2 = plane2.getNormal();
 
 	static constexpr auto eps = std::numeric_limits<floating_point_type>::epsilon();
 	if(glm::areCollinear(n1, n2, eps)) {
-		return {zeropoint, zerovec};
+		const auto NaN = std::numeric_limits<floating_point_type>::quiet_NaN();
+		const auto nandirection = glm::vec3{NaN, NaN, NaN};
+		const auto nanpoint = Point(NaN, NaN, NaN);
+		return {nanpoint, nandirection};
 	}
 
 	const auto direction = glm::cross(n1, n2);

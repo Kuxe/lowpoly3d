@@ -21,6 +21,7 @@ namespace Catch {
 SCENARIO("Intersection tests") {
 	using namespace lowpoly3d;
 
+	const float NaN = std::numeric_limits<float>::quiet_NaN();
 	const glm::vec3 zerovec = {0.0f, 0.0f, 0.0f};
 	const Point zeropoint = {0.0f, 0.0f, 0.0f};
 	const glm::vec3 xaxis = {1.0f, 0.0f, 0.0f};
@@ -29,6 +30,7 @@ SCENARIO("Intersection tests") {
 	const glm::vec3 nxaxis = -xaxis;
 	const glm::vec3 nyaxis = -yaxis;
 	const glm::vec3 nzaxis = -zaxis;
+	const glm::vec3 nanvec = {NaN, NaN, NaN};
 	const Plane xyplane = {zeropoint, {0.0f, 0.0f, 1.0f}};
 	const Plane xzplane = {zeropoint, {0.0f, 1.0f, 0.0f}};
 	const Plane yzplane = {zeropoint, {1.0f, 0.0f, 0.0f}};
@@ -60,6 +62,12 @@ SCENARIO("Intersection tests") {
 		getCommutativeTester([](auto const& a, auto const& b) { return intersection(a, b); })
 			(arg1, arg2, [](auto const& a, auto const&b) { return almostEqual<float, 3>(a, b); }
 		);
+	};
+
+	auto isNaN = [](glm::vec3 const& v) {
+		auto isNan = [](float number) -> bool { return std::isnan(number); };
+		auto fun = componentwise<float, bool>(isNan);
+		return glm::all(fun(v));
 	};
 
 	GIVEN("The XY-plane, XZ-pplane and YZ-plane") {
@@ -142,8 +150,10 @@ SCENARIO("Intersection tests") {
 
 			WHEN("Computing the line of intersection of a randomly generated plane-pair") {
 				const auto line = intersection(plane1, plane2);
-				THEN("The reported line of intersection has the zero-vector as direction (as indicated by intesection(plane,plane) documentation)") {
-					REQUIRE(glm::all(glm::epsilonEqual(line.getDirection(), zerovec, eps)));
+				THEN("The reported line of intersection has the Nan-point as point and NaN-vector as direction (as indicated by intesection(plane,plane) documentation)") {
+					const glm::tvec3<bool> boolvec = componentwise<float, bool>([](float number) { return std::isnan(number); })(line.getDirection());
+					const bool allNaN = glm::all(boolvec);
+					REQUIRE(allNaN);
 				}
 			}
 		}

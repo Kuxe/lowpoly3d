@@ -18,6 +18,12 @@ namespace Catch {
     };
 }
 
+/* TODO: Understand the, to my knowledge, "correct" way of doing this
+ * (using ulp, see example of https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon) */
+bool almostEqual(float a, float b) {
+	return std::abs(a-b) <= std::numeric_limits<float>::epsilon();
+};
+
 SCENARIO("Intersection tests") {
 	using namespace lowpoly3d;
 
@@ -90,8 +96,8 @@ SCENARIO("Intersection tests") {
 				REQUIRE(glm::all(glm::epsilonEqual(line.getDirection(), nxaxis, eps)));
 			}
 			THEN("The line only intersects the xaxis") {
-				REQUIRE(line.getPoint().y == 0.0f);
-				REQUIRE(line.getPoint().z == 0.0f);
+				REQUIRE(almostEqual(line.getPoint().y, 0.0f));
+				REQUIRE(almostEqual(line.getPoint().z, 0.0f));
 			}
 			THEN("The point of the line is reportedly on the line") {
 				REQUIRE(line.contains(line.getPoint()));
@@ -112,8 +118,8 @@ SCENARIO("Intersection tests") {
 				REQUIRE(glm::all(glm::epsilonEqual(line.getDirection(), yaxis, eps)));
 			}
 			THEN("The line only intersects the yaxis") {
-				REQUIRE(line.getPoint().x == 0.0f);
-				REQUIRE(line.getPoint().z == 0.0f);
+				REQUIRE(almostEqual(line.getPoint().x, 0.0f));
+				REQUIRE(almostEqual(line.getPoint().z, 0.0f));
 			}
 			THEN("The point of the line is reportedly on the line") {
 				REQUIRE(line.contains(line.getPoint()));
@@ -128,8 +134,8 @@ SCENARIO("Intersection tests") {
 				REQUIRE(glm::all(glm::epsilonEqual(line.getDirection(), nzaxis, eps)));
 			}
 			THEN("The line only intersects the xaxis") {
-				REQUIRE(line.getPoint().x == 0.0f);
-				REQUIRE(line.getPoint().y == 0.0f);
+				REQUIRE(almostEqual(line.getPoint().x, 0.0f));
+				REQUIRE(almostEqual(line.getPoint().y, 0.0f));
 			}
 			THEN("The point of the line is reportedly on the line") {
 				REQUIRE(line.contains(line.getPoint()));
@@ -178,7 +184,7 @@ SCENARIO("Intersection tests") {
 			const Point intersectionPoint = intersection(lineThroughX, xzplane);
 
 			THEN("NaN-point is returned") {
-				REQUIRE(intersectionPoint == Point(NAN, NAN, NAN));
+				REQUIRE(isNaN(intersectionPoint));
 			}
 		}
 	}
@@ -257,7 +263,7 @@ SCENARIO("Intersection tests") {
 				std::ostringstream solutionStr;
 				solutionStr << "The solution should be (x,y,z)=" << glm::to_string(expectedSolution);
 				THEN(solutionStr.str()) {
-					REQUIRE(solution == expectedSolution);
+					REQUIRE(almostEqual<float, 3>(solution, expectedSolution));
 				}
 			}
 		}
@@ -391,7 +397,7 @@ SCENARIO("Intersection tests") {
 				}
 
 				THEN("The common point is P") {
-					REQUIRE(p == reportedPoint);
+					REQUIRE(almostEqual<float, 3>(p, reportedPoint));
 				}
 			}
 		}
@@ -417,12 +423,12 @@ SCENARIO("Intersection tests") {
 					common321 = intersection(p3, p2, p1);
 
 				THEN("Ordering of triplet members as arguments does not matter") {
-					REQUIRE(common123 == common132);
-					REQUIRE(common132 == common213);
-					REQUIRE(common213 == common231);
-					REQUIRE(common231 == common312);
-					REQUIRE(common312 == common321);
-					REQUIRE(common321 == common123);
+					REQUIRE(almostEqual<float, 3>(common123, common132));
+					REQUIRE(almostEqual<float, 3>(common132, common213));
+					REQUIRE(almostEqual<float, 3>(common213, common231));
+					REQUIRE(almostEqual<float, 3>(common231, common312));
+					REQUIRE(almostEqual<float, 3>(common312, common321));
+					REQUIRE(almostEqual<float, 3>(common321, common123));
 				}
 			}
 		}

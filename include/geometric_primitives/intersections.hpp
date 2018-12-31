@@ -117,7 +117,7 @@ TLine<floating_point_type, dimension> intersection(
 	return {pointOnLine, direction};
 }
 
-/* Returns the point of intersection between given plane and line.
+/* Line-plane intersection that returns the point of intersection.
  * Returns (NaN) if either:
  * 		1. No intersection exists
  * 		2. Infinite many intersections exists */
@@ -144,6 +144,7 @@ TPoint<floating_point_type, dimension> intersection(
 	return line.getPoint() + t * line.getDirection();
 }
 
+/* Line-plane intersection that returns the point of intersection */
 template<typename floating_point_type, std::size_t dimension>
 TPoint<floating_point_type, dimension> intersection(
 	const TLine<floating_point_type, dimension>& line,

@@ -57,7 +57,8 @@ public:
 	const point_type& getPoint() const { return p; }
 	const point_type& getNormal() const { return n; }
 
-	/* Returns the parameter d typically found in the plane equation */
+	/* Returns the parameter d typically found in the plane equation, 
+	 * i.e ax + by + cz + d = 0 */
 	floating_point_type getD() const {
 		return -glm::dot(n, p);
 	}
@@ -74,7 +75,8 @@ public:
 
 	// Returns true if point lies on the plane, otherwise false
 	bool contains(const point_type& point) const {
-		return glm::dot(n, point - p) == 0.0f;
+		// It should really be + since we want to check the difference between negative d and dot-product.
+		return std::abs(glm::dot(n, point) + getD()) <= std::numeric_limits<floating_point_type>::epsilon();
 	}
 
 	// Returns the distance to origo

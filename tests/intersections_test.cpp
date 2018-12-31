@@ -430,10 +430,16 @@ SCENARIO("Intersection tests") {
 				p1 {p, glm::sphericalRand(1.0f)},
 				p2 {p, glm::sphericalRand(1.0f)},
 				p3 {p, glm::sphericalRand(1.0f)};
+
+			// Disregard if samples normals happen to be parallel
+			if(p1.isParallelTo(p2) || p1.isParallelTo(p3) || p2.isParallelTo(p3)) continue;
+
 			WHEN("Computing common points for each triplet") {
 				const Point reportedPoint = intersection(p1, p2, p3);
 
 				THEN("P is reportedly contained within all planes") {
+					INFO("Reported point is " << glm::to_string(reportedPoint));
+					INFO("Expected point is " << glm::to_string(p));
 					REQUIRE(p1.contains(reportedPoint));
 					REQUIRE(p2.contains(reportedPoint));
 					REQUIRE(p3.contains(reportedPoint));

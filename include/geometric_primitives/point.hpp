@@ -29,10 +29,9 @@ bool almostEqual(
 	int ulp = 2) {
 
 	// Source: https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
-	auto almostEqual = [&ulp](auto x, auto y) {
-		auto const ulp = 2;
-		return std::abs(x-y) <= std::numeric_limits<decltype(x)>::epsilon() * std::abs(x+y) * ulp
-			|| std::abs(x-y) < std::numeric_limits<decltype(x)>::min();
+	auto almostEqual = [&ulp](value_type x, value_type y) {
+		return std::abs(x-y) <= std::numeric_limits<value_type>::epsilon() * std::abs(x+y) * ulp
+			|| std::abs(x-y) < std::numeric_limits<value_type>::min();
 	};
 	return almostEqual(p1.x, p2.x) && almostEqual(p1.y, p2.y) && almostEqual(p1.z, p2.z);
 }

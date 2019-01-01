@@ -117,6 +117,10 @@ TLine<floating_point_type, dimension> intersection(
 	return {pointOnLine, direction};
 }
 
+/* Returns a plane of points that satisfy dot(a, p) = b, where a,b is given
+ * and p is any point on the returned plane. */
+
+
 /* Line-plane intersection that returns the point of intersection.
  * Returns (NaN) if either:
  * 		1. No intersection exists
@@ -132,16 +136,21 @@ TPoint<floating_point_type, dimension> intersection(
 	 * So solve:
 	 * n dot (P+t*d1) = d2 for t in order to find time t of intersection
 	 * 
+	 * d2 	= n dot (P+t*d1)
+	 * 		= n dot P + n dot t*d1
+	 * 		= n dot P + t(n dot d1) 
+	 * 		=> t = (d2 - n dot P) / n dot d1
+	 * 
 	 * Then plug t back into line equation to get the point. Done. */
 
 	const auto dot = glm::dot(plane.getNormal(), line.getDirection());
-	if(std::abs(dot) < std::numeric_limits<floating_point_type>::epsilon()) {
+	if(std::abs(dot) <= std::numeric_limits<floating_point_type>::epsilon()) {
 		return TPoint<floating_point_type, dimension>(NAN);
 	}
 
 	// t can be interpreted as time until intersection assuming unit speed in some unit (such as m/s)
-	const auto t = plane.getD() - glm::dot(plane.getNormal(), line.getPoint()) / dot;
-	return line.getPoint() + t * line.getDirection();
+	const auto t = (-plane.getD() - glm::dot(plane.getNormal(), line.getPoint())) / dot;
+	return line.parametrization(t);
 }
 
 /* Line-plane intersection that returns the point of intersection */

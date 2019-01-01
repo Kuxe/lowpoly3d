@@ -273,6 +273,19 @@ SCENARIO("Intersection tests") {
 			const Line line {glm::ballRand(1.0f), glm::sphericalRand(1.0f)};
 			const Plane plane {glm::ballRand(1.0f), glm::sphericalRand(1.0f)};
 
+			WHEN("Computing the point of intersection") {
+
+				const Point point = intersection(line, plane);
+
+				THEN("The point is contained in the line and the plane") {
+					INFO("line=" << line);
+					INFO("plane=" << plane);
+					INFO("point=" << glm::to_string(point));
+					CHECK(line.contains(point));
+					CHECK(plane.contains(point));
+				}
+			}
+
 			THEN("Ordering of pair members as arguments does not matter") {
 				intersectionCommutativeTest(line, plane);
 			}

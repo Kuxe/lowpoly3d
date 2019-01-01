@@ -1,7 +1,9 @@
 #ifndef PLANE_HPP
 #define PLANE_HPP
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp> // glm::to_string
 
 #include "geometric_primitives/point.hpp"
 
@@ -105,6 +107,14 @@ TPlane<floating_point_type, dimension> getEquidistantPlane(
 }
 
 using Plane = TPlane<float, 3>;
+
+template<typename floating_point_type, std::size_t dimension>
+std::ostream& operator<<(std::ostream& out, const TPlane<floating_point_type, dimension>& plane) {
+	const auto& p = plane.getPoint();
+	const auto& n = plane.getNormal();
+	out << "(p=" << glm::to_string(p).c_str() << ", n=" << glm::to_string(n).c_str() << ")";
+	return out;
+}
 
 } // End of namespace lowpoly3d
 

@@ -500,12 +500,12 @@ SCENARIO("Intersection tests") {
 					INFO("common 231 = " << glm::to_string(common231));
 					INFO("common 312 = " << glm::to_string(common312));
 					INFO("common 321 = " << glm::to_string(common321));
-					REQUIRE(almostEqual<float, 3>(common123, common132));
-					REQUIRE(almostEqual<float, 3>(common132, common213));
-					REQUIRE(almostEqual<float, 3>(common213, common231));
-					REQUIRE(almostEqual<float, 3>(common231, common312));
-					REQUIRE(almostEqual<float, 3>(common312, common321));
-					REQUIRE(almostEqual<float, 3>(common321, common123));
+					REQUIRE(almostEqual<float, 3>(common123, common132, 4));
+					REQUIRE(almostEqual<float, 3>(common132, common213, 4));
+					REQUIRE(almostEqual<float, 3>(common213, common231, 4));
+					REQUIRE(almostEqual<float, 3>(common231, common312, 4));
+					REQUIRE(almostEqual<float, 3>(common312, common321, 4));
+					REQUIRE(almostEqual<float, 3>(common321, common123, 4));
 				}
 			}
 		}

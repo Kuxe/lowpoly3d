@@ -46,6 +46,18 @@ struct TLine {
 		return isParallelTo(line.getDirection());
 	}
 
+	// Returns a parametrization of this line
+	[[nodiscard]] std::function<TPoint<floating_point_type, dimension>(floating_point_type)> parametrization() const {
+		auto const point = getPoint();
+		auto const direction = getDirection();
+		return [point, direction](floating_point_type t) { return point + t * direction; };
+	}
+
+	// Returns the point at time t of the parametrization of this line
+	[[nodiscard]] TPoint<floating_point_type, dimension> parametrization(floating_point_type t) const {
+		return parametrization()(t);
+	}
+
 private:
 	point_type p;
 	vec_type d;

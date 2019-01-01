@@ -137,6 +137,7 @@ SCENARIO("Lots of sphere tests (todo: TDD:ify or BDD:ify these)") {
 				// ||p_i - c|| = r, i=1,2,3 is satisfied iff a ball of radius r positioned at c is
 				// a mbs over a triangle
 				for(const auto& p : triangle) {
+					INFO("triangleMbs=" << triangleMbs);
 					REQUIRE(glm::distance(p, triangleMbs.p) == triangleMbs.r);
 				}
 			}

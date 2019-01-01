@@ -481,6 +481,12 @@ SCENARIO("Intersection tests") {
 					common321 = intersection(p3, p2, p1);
 
 				THEN("Ordering of triplet members as arguments does not matter") {
+					INFO("common 123 = " << glm::to_string(common123));
+					INFO("common 132 = " << glm::to_string(common132));
+					INFO("common 213 = " << glm::to_string(common213));
+					INFO("common 231 = " << glm::to_string(common231));
+					INFO("common 312 = " << glm::to_string(common312));
+					INFO("common 321 = " << glm::to_string(common321));
 					REQUIRE(almostEqual<float, 3>(common123, common132));
 					REQUIRE(almostEqual<float, 3>(common132, common213));
 					REQUIRE(almostEqual<float, 3>(common213, common231));

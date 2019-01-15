@@ -181,6 +181,7 @@ add_library(lowpoly3d SHARED
 	include/generators/terraingenerator.hpp		src/generators/terraingenerator.cpp
 	include/generators/treegenerator.hpp
 
+	include/geometric_primitives/cylinder.hpp
 	include/geometric_primitives/intersections.hpp
 	include/geometric_primitives/line.hpp
 	include/geometric_primitives/linesegment.hpp

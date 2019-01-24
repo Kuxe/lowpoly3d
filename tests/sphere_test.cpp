@@ -1,6 +1,7 @@
 #include "geometric_primitives/sphere.hpp"
 #include <iostream>
 #include <catch.hpp>
+#include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <catch.hpp>
 
@@ -133,9 +134,17 @@ SCENARIO("Lots of sphere tests (todo: TDD:ify or BDD:ify these)") {
 		WHEN("Computing the minimum bounding sphere over that triangle") {
 			const Sphere triangleMbs = mbs<float, 3>(triangle);
 
+			THEN("It's center is is at (0.5, 0.5, 0.0)") {
+				REQUIRE(glm::all(glm::epsilonEqual(triangleMbs.p, glm::vec3(0.5f, 0.5f, 0.0f), std::numeric_limits<float>::epsilon())));
+			}
+
+			THEN("It's radius 1/sqrt(2)") {
+				REQUIRE(triangleMbs.r == 1.0f/sqrtf(2.0f));
+			}
+
 			THEN("The reported minimum bounding sphere is minimal") {
-				// ||p_i - c|| = r, i=1,2,3 is satisfied iff a ball of radius r positioned at c is
-				// a mbs over a triangle
+				// We have that ||p_i - c|| <= r, i=1,2,3 with atleast two vertices
+				// satisfying ||p_i -c || = r.
 				for(const auto& p : triangle) {
 					INFO("triangleMbs=" << triangleMbs);
 					REQUIRE(glm::distance(p, triangleMbs.p) == triangleMbs.r);

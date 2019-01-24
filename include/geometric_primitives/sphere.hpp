@@ -46,6 +46,9 @@ struct TSphere {
 	bool encloses(const TSphere& other) const;
 	bool enclosed(const TSphere& other) const;
 
+	// Returns true if point is within this (closed) sphere
+	bool contains(const point_type& point) const;
+
 	// Returns true if this sphere is the MBS over the provided set of points
 	bool isMBSof(const std::vector<point_type>& points) const;
 

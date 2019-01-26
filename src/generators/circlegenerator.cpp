@@ -9,8 +9,8 @@ Model CircleGenerator::generate() {
 	//TODO: IMPLEMENT
 	std::vector<Vertex> vertices;
 	std::vector<Color> colors(vertices.size(), color);
-	std::vector<Triangle> triangles;
-	return {vertices, colors, triangles};
+	std::vector<TriangleIndices> triangleIndices;
+	return {vertices, colors, triangleIndices};
 }
 
 }

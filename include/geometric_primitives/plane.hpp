@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp> // glm::to_string
 
+#include <ostream>
+
 #include "geometric_primitives/point.hpp"
 
 #include "utils/strong_type.hpp"
@@ -16,10 +18,8 @@ namespace lowpoly3d {
  * and a point on said plane */
 template<typename floating_point_type, std::size_t dimension>
 class TPlane {
-	using point_type = glm::vec<dimension, floating_point_type>;
-	point_type p, n;
-
 public:
+	using point_type = glm::vec<dimension, floating_point_type>;
 
 	static point_type getPointOnPlane(const point_type& normalizedNormal, floating_point_type d) {
 		/*
@@ -92,6 +92,9 @@ public:
 	[[nodiscard]] bool isParallelTo(const TPlane<floating_point_type, dimension>& plane) const {
 		return std::abs(glm::dot(getNormal(), plane.getNormal())) - floating_point_type(1) <= std::numeric_limits<floating_point_type>::epsilon();
 	}
+
+private:
+	point_type p, n;
 };
 
 /* 	Returns a plane P s.t ||point1-c|| = ||point2-c|| for all c in P
@@ -112,8 +115,7 @@ template<typename floating_point_type, std::size_t dimension>
 std::ostream& operator<<(std::ostream& out, const TPlane<floating_point_type, dimension>& plane) {
 	const auto& p = plane.getPoint();
 	const auto& n = plane.getNormal();
-	out << "(p=" << glm::to_string(p).c_str() << ", n=" << glm::to_string(n).c_str() << ")";
-	return out;
+	return out << "(p=" << glm::to_string(p).c_str() << ", n=" << glm::to_string(n).c_str() << ")";
 }
 
 } // End of namespace lowpoly3d

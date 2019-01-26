@@ -4,15 +4,15 @@
 namespace lowpoly3d {
 
 Model::Model(
-	const std::vector<Vertex>& vertices,
-	const std::vector<Color>& colors,
-	const std::vector<Triangle>& triangles) : 
+	const std::vector<vertex_type>& vertices,
+	const std::vector<color_type>& colors,
+	const std::vector<triangle_indices_type>& triangleIndices) : 
 	vertices(vertices),
 	colors(colors),
-	triangles(triangles) {
+	triangleIndices(triangleIndices) {
 
 	//Make sanity check, it should always be the case that max index in triangles is <= than number of vertices
-	for(const auto& triangle : triangles) {
+	for(const auto& triangle : triangleIndices) {
 		uint16_t maxIndex = 0;
 		maxIndex = std::max(triangle.x, maxIndex);
 		maxIndex = std::max(triangle.y, maxIndex);
@@ -36,7 +36,7 @@ Model::Model(
 	}
 }
 
-Model::Model(const Model& model) : Model(model.vertices, model.colors, model.triangles) { }
+Model::Model(const Model& model) : Model(model.vertices, model.colors, model.triangleIndices) { }
 
 Model::Model() : Model({}, {}, {}) { }
 
@@ -47,15 +47,16 @@ void Model::subdivide(int i) {
 	//and then make sure no vertex is stored twice or thrice
 
 	//1. Given three indices, get the three vertices
-	size_t size = triangles.size();
+	size_t size = getNumTriangles();
 	for(size_t i = 0; i < size; i++) {
-		const glm::uvec3 triangle = triangles[i];
-		const Vertex v1 = vertices[triangle.x];
-		const Vertex v2 = vertices[triangle.y];
-		const Vertex v3 = vertices[triangle.z];
-		const Vertex v4 = 0.5f*(v1+v3);
-		const Vertex v5 = 0.5f*(v1+v2);
-		const Vertex v6 = 0.5f*(v2+v3);
+		const glm::uvec3 triangle = triangleIndices[i];
+		const vertex_type
+			v1 = vertices[triangle.x],
+			v2 = vertices[triangle.y],
+			v3 = vertices[triangle.z],
+			v4 = 0.5f*(v1+v3),
+			v5 = 0.5f*(v1+v2),
+			v6 = 0.5f*(v2+v3);
 		uint16_t i4 = vertices.size();
 		vertices.push_back(v4);
 		uint16_t i5 = vertices.size();
@@ -63,10 +64,10 @@ void Model::subdivide(int i) {
 		uint16_t i6 = vertices.size();
 		vertices.push_back(v6);
 
-		triangles.push_back({i5, triangle.y, i6});
-		triangles.push_back({triangle.z, i4, i6});
-		triangles.push_back({i4, i5, i6});
-		triangles[i] = {triangle.x, i5, i4};
+		triangleIndices.push_back({i5, triangle.y, i6});
+		triangleIndices.push_back({triangle.z, i4, i6});
+		triangleIndices.push_back({i4, i5, i6});
+		triangleIndices[i] = {triangle.x, i5, i4};
 
 		//Don't forget to add color aswell! (50% lerp)
 		colors.push_back(colors[triangle.x]/uint8_t(2) + colors[triangle.z]/uint8_t(2));
@@ -77,18 +78,34 @@ void Model::subdivide(int i) {
 }
 
 bool Model::append(const Model& model) {
-	if(triangles.size() + model.triangles.size() >= std::numeric_limits<Triangle::value_type>::max()) {
+	if(triangleIndices.size() + model.getNumTriangles() >= std::numeric_limits<triangle_index_type>::max()) {
 		return false;
 	}
-	const Triangle increment { static_cast<Triangle::value_type>(vertices.size()) }; //Need to increment indices by the number of indices in original model
+	const triangle_indices_type increment { static_cast<triangle_index_type>(vertices.size()) }; //Need to increment indices by the number of indices in original model
 	vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.end());
 	colors.insert(colors.end(), model.colors.begin(), model.colors.end());
 
-	for(const Triangle& triangle : model.triangles) {
-		triangles.push_back(triangle + increment);
+	for(const auto& triangle : model.triangleIndices) {
+		triangleIndices.push_back(triangle + increment);
 	} 
 
 	return true;
+}
+
+glm::vec3 Model::triangle_midpoint(std::size_t i) const {
+	return (1.0f / 3.0f) * (vertices[triangleIndices[i][0]] + vertices[triangleIndices[i][1]] + vertices[triangleIndices[i][2]]);
+}
+
+std::size_t Model::getNumVertices() const {
+	return vertices.size();
+};
+
+std::size_t Model::getNumTriangles() const {
+	return triangleIndices.size();
+}
+
+Model::triangle_indices_type Model::getTriangleIndices(std::size_t triangleIdx) const {
+	return triangleIndices[triangleIdx];
 }
 
 void Model::translate(const glm::vec3& translation) {
@@ -129,15 +146,15 @@ Model getSingleTriangleModel() {
 		{0.0, 1.0, 0.0},
 	};
 
-	std::vector<Color> colors(vertices.size());
+	std::vector<Model::color_type> colors(vertices.size());
 	std::fill(std::begin(colors), std::end(colors), Color{0, 0, 0});
 
-	const std::vector<Triangle> triangles {
-		Triangle
+	const std::vector<Model::triangle_indices_type> triangleIndices {
+		Model::triangle_indices_type
 		{0, 1, 2}
 	};
 
-	return Model(vertices, colors, triangles);
+	return Model(vertices, colors, triangleIndices);
 }
 
 Model getTwoTriangleModel() {
@@ -152,16 +169,16 @@ Model getTwoTriangleModel() {
 		{2.0, 1.0, 0.0},
 	};
 
-	std::vector<Color> colors(vertices.size());
-	std::fill(std::begin(colors), std::end(colors), Color{0, 0, 0});
+	std::vector<Model::color_type> colors(vertices.size());
+	std::fill(std::begin(colors), std::end(colors), Model::color_type{0, 0, 0});
 
-	const std::vector<Triangle> triangles {
-		Triangle
+	const std::vector<Model::triangle_indices_type> triangleIndices {
+		Model::triangle_indices_type
 		{0, 1, 2},
 		{3, 4, 5},
 	};
 
-	return Model(vertices, colors, triangles);
+	return Model(vertices, colors, triangleIndices);
 }
 
 }

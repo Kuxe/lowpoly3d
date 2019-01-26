@@ -15,8 +15,8 @@ Model PlaneGenerator::generate() {
 
 	std::vector<Vertex> vertices = {axis1, axis2, -axis1, -axis2};
 	std::vector<Color> colors(vertices.size(), color);
-	std::vector<Triangle> triangles = {{0,1,2},{0,2,3}};
-	Model m = {vertices, colors, triangles};
+	std::vector<TriangleIndices> triangleIndices = {{0,1,2},{0,2,3}};
+	Model m = {vertices, colors, triangleIndices};
 	m.subdivide(subdivides);
 	return m;
 }

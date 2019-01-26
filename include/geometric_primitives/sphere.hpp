@@ -6,6 +6,7 @@
 #include <ostream>
 #include <glm/glm.hpp>
 
+#include "geometric_primitives/triangle.hpp"
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/point.hpp"
 
@@ -50,7 +51,7 @@ struct TSphere {
 	bool contains(const point_type& point) const;
 
 	// Returns true if this sphere is the MBS over the provided set of points
-	bool isMBSof(const std::vector<point_type>& points) const;
+	bool isMBSof(const TTriangle<floating_point_type, dimension>& points) const;
 
 	constexpr TSphere(const TSphere& s) = default;
 
@@ -100,6 +101,13 @@ TSphere<floating_point_type, dimension> mbs(
 template<typename floating_point_type, std::size_t dimension>
 TSphere<floating_point_type, dimension> mbs(
 	const std::array<typename TSphere<floating_point_type, dimension>::vec_type, 3>& triangle) {
+	return mbs<floating_point_type, dimension>(triangle[0], triangle[1], triangle[2]);
+}
+
+// Returns a minimum bounding sphere over a triangle
+template<typename floating_point_type, std::size_t dimension>
+TSphere<floating_point_type, dimension> mbs(
+	const TTriangle<floating_point_type, dimension>& triangle) {
 	return mbs<floating_point_type, dimension>(triangle[0], triangle[1], triangle[2]);
 }
 

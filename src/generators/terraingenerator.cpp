@@ -15,7 +15,7 @@ Model TerrainGenerator::generate() {
 	}
 	std::vector<Vertex> vertices(numVerticesPerSide*numVerticesPerSide);
 	std::vector<Color> colors(numVerticesPerSide*numVerticesPerSide);
-	std::vector<Triangle> triangles;
+	std::vector<TriangleIndices> triangleIndices;
 
 	const size_t START_OCTAVE = 0, END_OCTAVE = 6;
 	const int seed = /** Und du bist mein **/0x50FA;
@@ -51,11 +51,11 @@ Model TerrainGenerator::generate() {
 	for(uint16_t i = 0; i < numVerticesPerSide*numVerticesPerSide - numVerticesPerSide; i++) {
 		//Dont wrap triangles around the lattice
 		if((i+1) % numVerticesPerSide != 0) {
-			triangles.push_back({i, i+numVerticesPerSide, i+1});
-			triangles.push_back({i+1, i+numVerticesPerSide, i+numVerticesPerSide+1});
+			triangleIndices.push_back({i, i+numVerticesPerSide, i+1});
+			triangleIndices.push_back({i+1, i+numVerticesPerSide, i+numVerticesPerSide+1});
 		}
 	}
-	return {vertices, colors, triangles};
+	return {vertices, colors, triangleIndices};
 }
 
 }

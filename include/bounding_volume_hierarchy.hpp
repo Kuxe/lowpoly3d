@@ -43,7 +43,7 @@ private:
 	const std::size_t build(const Model& model, const std::vector<std::size_t>& indices, std::size_t depth) {
 		if(indices.size() == 1) {
 			// Extract triangle at the sole index
-			const auto& triangle = model.triangles[indices.front()];
+			const auto& triangle = model.getTriangleIndices(indices.front());
 			bvs.emplace_back(mbs<typename bv_type::floating_point_type, bv_type::dimension>(
 				model.vertices[triangle[0]],
 				model.vertices[triangle[1]],
@@ -65,9 +65,9 @@ private:
 
 public:
 	BVH(const Model& model) {
-		std::vector<std::size_t> indices(model.triangles.size());
+		std::vector<std::size_t> indices(model.getNumTriangles());
 		std::iota(indices.begin(), indices.end(), 0);
-		if(model.triangles.size() > 0 && model.vertices.size() > 2) {
+		if(model.getNumTriangles() > 0 && model.getNumVertices() > 2) {
 			build(model, indices, 1);
 		}
 	}

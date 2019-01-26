@@ -14,15 +14,20 @@ namespace lowpoly3d {
 **/
 
 struct Model {
-	std::vector<Vertex> vertices;
-	std::vector<Color> colors;
-	std::vector<Triangle> triangles;
+	using vertex_type = Vertex;
+	using color_type = Color;
+	using triangle_indices_type = TriangleIndices;
+	using triangle_index_type = TriangleIndices::value_type;
+
+	std::vector<vertex_type> vertices;
+	std::vector<color_type> colors;
+	std::vector<triangle_indices_type> triangleIndices;
 
 	//Load model from "raw" mesh data
 	Model(
-		const std::vector<Vertex>& vertices,
-		const std::vector<Color>& colors,
-		const std::vector<Triangle>& triangles
+		const std::vector<vertex_type>& vertices,
+		const std::vector<color_type>& colors,
+		const std::vector<triangle_indices_type>& triangleIndices
 	);
 
 	Model(const Model& model);
@@ -36,9 +41,12 @@ struct Model {
 	// Returns true on succesful append
 	bool append(const Model& other);
 	
-	glm::vec3 triangle_midpoint(std::size_t i) const {
-		return (1.0f / 3.0f) * (vertices[triangles[i][0]] + vertices[triangles[i][1]] + vertices[triangles[i][2]]);
-	}
+	glm::vec3 triangle_midpoint(std::size_t i) const;
+
+	std::size_t getNumVertices() const;
+	std::size_t getNumTriangles() const;
+
+	triangle_indices_type getTriangleIndices(std::size_t triangleIdx) const;
 
 	void translate(const glm::vec3& translation);
 	void scale(float factor);

@@ -268,7 +268,7 @@ bool Renderer::loadModel(const std::string& name, const Model& model) {
         return false;
     }
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Triangle) * model.triangles.size(), &model.triangles[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(decltype(model.triangleIndices)::value_type) * model.getNumTriangles(), &model.triangleIndices[0], GL_STATIC_DRAW);
     if(glGetError() != GL_NO_ERROR) {
         printf("ERROR: Could not send index buffer to GPU\n");
         return false;
@@ -286,7 +286,7 @@ bool Renderer::loadModel(const std::string& name, const Model& model) {
         return false;
     }
 
-    triangles[name] = model.triangles.size();
+    triangles[name] = model.triangleIndices.size();
     models[name] = vertexArray;
 
     glBindVertexArray(0); //Dont let subsequent calls work on vertexArray

@@ -19,33 +19,33 @@ Model CylinderGenerator::generate() {
 	}
 
 	//Now we have the vertices, time to connect them into a cylinder!
-	std::vector<Triangle> triangles;
+	std::vector<TriangleIndices> triangleIndices;
 
 	//Connect cylinder shell
 	for(std::remove_const<decltype(pies)>::type i = 0; i < pies-1; i++) {
-		triangles.push_back({2*i, 2*i+2, 2*i+1});
-		triangles.push_back({2*i+1, 2*i+2, 2*i+3});
+		triangleIndices.push_back({2*i, 2*i+2, 2*i+1});
+		triangleIndices.push_back({2*i+1, 2*i+2, 2*i+3});
 	}
-	triangles.push_back({2*pies-2, 0, 2*pies-1});
-	triangles.push_back({2*pies-1, 0, 1});
+	triangleIndices.push_back({2*pies-2, 0, 2*pies-1});
+	triangleIndices.push_back({2*pies-1, 0, 1});
 
 	//Connect cylinder bottom
 	vertices.push_back({0.0f, 0.0f, 0.0f}); //Center of bottom fan
 	const size_t bottomIndex = vertices.size()-1;
 	for(std::remove_const<decltype(pies)>::type i = 0; i < pies-1; i++) {
-		triangles.push_back({bottomIndex, 2*i+2, 2*i});
+		triangleIndices.push_back({bottomIndex, 2*i+2, 2*i});
 	}
-	triangles.push_back({0, bottomIndex-2, bottomIndex});
+	triangleIndices.push_back({0, bottomIndex-2, bottomIndex});
 
 	//Connect cylinder lid
 	vertices.push_back({0.0f, 1.0f, 0.0f}); //Center of lid fan
 	const size_t lidIndex = vertices.size()-1;
 	for(std::remove_const<decltype(pies)>::type i = 0; i < pies-1; i++) {
-		triangles.push_back({lidIndex, 2*i+1, 2*i+3});
+		triangleIndices.push_back({lidIndex, 2*i+1, 2*i+3});
 	}
-	triangles.push_back({lidIndex, lidIndex-2, 1});
+	triangleIndices.push_back({lidIndex, lidIndex-2, 1});
 	std::vector<Color> colors(vertices.size(), color);
-	return {vertices, colors, triangles};
+	return {vertices, colors, triangleIndices};
 }
 
 }

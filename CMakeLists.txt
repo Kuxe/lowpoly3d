@@ -274,6 +274,7 @@ add_executable(lowpoly3d_test
 	${TEST_DIR}/intersections_test.cpp
 	${TEST_DIR}/lerp_test.cpp
 	${TEST_DIR}/arithmetic_invariant_test.cpp
+	${TEST_DIR}/triangle_test.cpp
 )
 enable_testing()
 target_include_directories(lowpoly3d_test PRIVATE ${LOWPOLY3D_INCLUDE_DIRS})

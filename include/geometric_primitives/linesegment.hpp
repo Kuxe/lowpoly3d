@@ -11,7 +11,9 @@ namespace lowpoly3d {
 template<typename value_type, std::size_t dimension>
 struct TLineSegment {
 	using point_type = TPoint<value_type, dimension>;
-    point_type start, end;
+
+	union { point_type start, p1; };
+	union { point_type end, p2; };
 
 	TLineSegment(const point_type& start, const point_type& end)
         : start(start), end(end) {

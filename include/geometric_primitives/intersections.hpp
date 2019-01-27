@@ -56,8 +56,8 @@ bool intersects(
 }
 
 // Returns true if segment intersects plane
-template<typename value_type>
-constexpr bool intersects(const TLineSegment<value_type, 3>& segment, const Plane& plane) {
+template<typename floating_point_type>
+constexpr bool intersects(const TLineSegment<floating_point_type, 3>& segment, const TPlane<floating_point_type, 3>& plane) {
     return
         !(plane.above(segment.p1) && plane.above(segment.p2)) || 
         !(plane.below(segment.p1) && plane.below(segment.p2));
@@ -261,19 +261,19 @@ glm::tvec3<floating_point_type> cramer(
 }
 
 template<typename floating_point_type, std::size_t dimension>
-constexpr bool intersect(
+constexpr bool intersects(
 	const TPlane<floating_point_type, dimension>& plane,
 	const TLineSegment<floating_point_type, dimension>& segment) {
-    return intersect(segment, plane);
+    return intersects(segment, plane);
 }
 
 template<typename floating_point_type, std::size_t dimension>
-constexpr bool intersect(
+constexpr bool intersects(
 	const TLineSegment<floating_point_type, dimension>& segment,
 	const TTriangle<floating_point_type, dimension>& triangle) {
     // The segment must at least intersect with paralell plane to the triangle
     // if they should intersect at all
-    if(intersect(segment, triangle.parallel())) {
+    if(intersects(segment, triangle.parallel())) {
         // Proceed to check if the line segment actually intersects the triangle
         // TODO: Implement
 		throw NotImplementedException();
@@ -282,19 +282,19 @@ constexpr bool intersect(
 }
 
 template<typename floating_point_type, std::size_t dimension>
-constexpr bool intersect(
+constexpr bool intersects(
 	const TTriangle<floating_point_type, dimension>& triangle,
 	const TLineSegment<floating_point_type, dimension>& segment) {
-    return intersect(segment, triangle);
+    return intersects(segment, triangle);
 }
 
-template<typename value_type>
-constexpr bool intersect(const TTriangle<value_type, 3>& t1, const TTriangle<value_type, 3>& t2) {
+template<typename floating_point_type>
+constexpr bool intersects(const TTriangle<floating_point_type, 3>& t1, const TTriangle<floating_point_type, 3>& t2) {
     // A triangle T1 intersects another triangle T2 iff any line segment of T1 intersect T2 (or vice versa)
     return
-        intersect(LineSegment(t1.p1, t1.p2), t2) ||
-        intersect(LineSegment(t1.p2, t1.p3), t2) || 
-        intersect(LineSegment(t1.p3, t1.p1), t2);
+        intersects(TLineSegment<floating_point_type, 3>(t1.p1, t1.p2), t2) ||
+        intersects(TLineSegment<floating_point_type, 3>(t1.p2, t1.p3), t2) || 
+        intersects(TLineSegment<floating_point_type, 3>(t1.p3, t1.p1), t2);
 }
 
 }

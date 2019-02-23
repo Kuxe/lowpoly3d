@@ -129,6 +129,10 @@ set(LOWPOLY3D_INCLUDE_DIRS
 	${CONTRIB_DIR}/Source/glfw/include
 	${CONTRIB_DIR}/Source/glm
 	${CONTRIB_DIR}/Source/glbinding_project/source/glbinding/include
+
+	#Temporary fix until Ive figured out if my build is broke or if its glbinding that did something bad
+	${CONTRIB_DIR}/Source/glbinding_project/3rdparty/KHR/include
+
 	${CONTRIB_DIR}/Source/subber
 	${CONTRIB_DIR}/Source/queue
 	${CONTRIB_DIR}/Source/node

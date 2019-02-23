@@ -3,9 +3,12 @@
 
 #include <algorithm>
 #include <cstddef> // std::size_t
+#include <functional> // std::function
 
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/plane.hpp"
+
+#include <glm/gtx/string_cast.hpp> // glm::to_string
 
 namespace lowpoly3d {
 
@@ -23,11 +26,13 @@ struct TTriangle {
 		points_type points;
 	};
 
-	TTriangle(point_type const& p1, point_type const& p2, point_type const& p3)
-		: points({p1, p2, p3}) { }
+	static_assert(sizeof(points) == sizeof(p1) + sizeof(p2) + sizeof(p3));
 
 	TTriangle(points_type const& points)
 		: points(points) { }
+
+	TTriangle(point_type const& p1, point_type const& p2, point_type const& p3)
+		: points({p1, p2, p3}) { }
 
 	TTriangle(TTriangle<floating_point_type, dimension> const&) = default;
 	TTriangle(TTriangle<floating_point_type, dimension>&&) = default;
@@ -69,7 +74,31 @@ struct TTriangle {
 		});
 		return {transformedPoints};
 	}
+
+	// Returns a function in three barycentric coordinates for this triangle
+	std::function<point_type(floating_point_type, floating_point_type, floating_point_type)> getBarycentricParametrization() const {
+		return [=](floating_point_type t1, floating_point_type t2, floating_point_type t3) {
+			return t1*p1 + t2*p2 + t3*p3;
+		};
+	}
+
+	// Returns the barycentric coordinates for the given point
+	std::tuple<floating_point_type, floating_point_type, floating_point_type> getBarycentricCoordinates(point_type const& point) const {
+		// TODO: IMplement. This can be used to determine if a point is interior of this triangle (atleast in 2D, how does it work for 3D?)
+		return {0, 0, 0};
+	}
+
+	// Returns the area of this triangle
+	floating_point_type area() const {
+		return floating_point_type(0.5) * glm::length(glm::cross(p2 - p1, p3 - p1));
+	}
 };
+
+template<typename floating_point_type, std::size_t dimension>
+std::ostream& operator<<(std::ostream& os, TTriangle<floating_point_type, dimension> const& triangle) {
+	os << "(" << glm::to_string(triangle.p1) << "," << glm::to_string(triangle.p2) << "," << glm::to_string(triangle.p3) << ")";
+	return os;
+}
 
 using Triangle = TTriangle<float, 3>;
 

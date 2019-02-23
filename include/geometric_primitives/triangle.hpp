@@ -22,7 +22,7 @@ struct TTriangle {
 	using const_reverse_iterator = typename points_type::const_reverse_iterator;
 
 	union {
-		point_type p1, p2, p3;
+		struct { point_type p1, p2, p3; };
 		points_type points;
 	};
 

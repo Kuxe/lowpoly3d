@@ -7,6 +7,30 @@
 
 namespace lowpoly3d {
 
+SCENARIO("Triangle misc methods") {
+	GIVEN("The triangle ({0,0,0},{3,0,0},{0,4,0})") {
+		Triangle triangle({0,0,0},{3,0,0},{0,4,0});
+		WHEN("Computing its area") {
+			auto const area = triangle.area();
+			THEN("The area is 3*4/2=6") {
+				INFO("triangle=" << triangle);
+				REQUIRE(area == 6.0);
+			}
+		}
+	}
+
+	GIVEN("The triangle ({0,0,0},{0,-8,0},{2,-3,0})") {
+		Triangle triangle({0,0,0},{0,-8,0},{2,-3,0});
+		WHEN("Computing its area") {
+			auto const area = triangle.area();
+			THEN("The area is 3*2/2 + 5*2/2 = 8") {
+				INFO("triangle=" << triangle);
+				REQUIRE(area == 8.0);
+			}
+		}
+	}
+}
+
 SCENARIO("Triangle intersection") {
 
 	auto intersectsCommutativityCheck = [](Triangle const& t1, Triangle const t2) {

@@ -5,6 +5,7 @@
 #include <cstddef> // std::size_t
 #include <functional> // std::function
 
+#include "geometric_primitives/direction.hpp"
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/plane.hpp"
 
@@ -92,6 +93,12 @@ struct TTriangle {
 	floating_point_type area() const {
 		return floating_point_type(0.5) * glm::length(glm::cross(p2 - p1, p3 - p1));
 	}
+
+	// Returns the normal of this triangle, with vertices winding CCW about the normal
+	TDirection<floating_point_type> normal() const {
+		return {glm::cross(p2 - p1, p3 - p1)};
+	}
+
 };
 
 template<typename floating_point_type, std::size_t dimension>

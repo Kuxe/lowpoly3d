@@ -14,11 +14,11 @@ template<typename floating_point_type>
 class TDirection final {
 public:
 	TDirection(floating_point_type theta, floating_point_type phi)
-		: theta(theta), phi(phi) { }
+		: t(theta), p(phi) { }
 
-	TDirection(TPoint<floating_point_typem, 3> const& point)
-		: theta(std::atan2(point.y, point.x))
-		, phi(std::atan2(std::sqrt(point.x * point.x point.y * point.y), point.z)) { }
+	TDirection(TPoint<floating_point_type, 3> const& point)
+		: t(std::atan2(point.y, point.x))
+		, p(std::atan2(std::sqrt(point.x * point.x + point.y * point.y), point.z)) { }
 
 	TDirection(TDirection<floating_point_type> const& others) = default;
 	TDirection(TDirection<floating_point_type>&& others) = default;
@@ -29,7 +29,7 @@ public:
 	[[nodiscard]] phi() const { return p; }
 	void phi(floating_point_type value) { p = value; }
 
-	[[nodiscard]] glm::tvec<3, floating_point_type> getVec() const {
+	[[nodiscard]] glm::vec<3, floating_point_type> getVec() const {
 		auto const cost = std::cos(t);
 		auto const sinp = std::sin(p);
 		auto const sint = std::sin(t);
@@ -45,7 +45,8 @@ public:
 		};
 	}
 
-	friend std::ostream operator<<(std::ostream& os, TDirection<floating_point_type> const& direction);
+	template<typename T>
+	friend std::ostream operator<<(std::ostream& os, TDirection<T> const& direction);
 
 private:
 	floating_point_type p, t;

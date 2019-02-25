@@ -99,6 +99,11 @@ struct TTriangle {
 		return {glm::cross(p2 - p1, p3 - p1)};
 	}
 
+	// Projects this triangle onto given plane
+	TTriangle<floating_point_type, dimension> project(TPlane<floating_point_type, 3> const& plane) const {
+		return {plane.project(p1), plane.project(p2), plane.project(p3)};
+	}
+
 };
 
 template<typename floating_point_type, std::size_t dimension>

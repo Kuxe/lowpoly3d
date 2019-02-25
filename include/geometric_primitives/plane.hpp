@@ -93,6 +93,30 @@ public:
 		return std::abs(glm::dot(getNormal(), plane.getNormal())) - floating_point_type(1) <= std::numeric_limits<floating_point_type>::epsilon();
 	}
 
+	// Projects a given point onto this plane and returns that point
+	[[nodiscard]] point_type project(point_type const& point) const {
+		/* A point p is on a plane through the origin if n.p + d = 0.
+		 * A point P be can be projected onto a plane by forming P + ln
+		 * such that n.(P + ln) + d = 0. So solve n.(P + ln) + d = 0 for l,
+		 * then the projected point is P + ln.
+		 * 
+		 * Solving:
+		 * 
+		 * -d = n.(P+ln) = n.P * l(n.n)
+		 *         => l = -(d + n.P) / n.n
+		 *  [n normal] = -(d + n.P)
+		 * 
+		 * Substitute l=-(d + n.P) into P + ln:
+		 *  P + l*n = P -(d + n.P)n
+		 *          = P - dn - (n.P)n
+		 * [d=-n.p] = P + (n.p)n - (n.P)n
+		 *          = P + (n.p - n.P)n
+		 *          = P + ((p - P).n)n
+		 *
+		 * So P + l*n = P + ((p - P).n)n */
+		return point + glm::dot((getPoint() - point), getNormal())*getNormal();
+	}
+
 private:
 	point_type p, n;
 };

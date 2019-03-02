@@ -4,11 +4,13 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp> // glm::to_string
+#include <glm/gtx/vector_query.hpp> // glm::areCollinear
 
 #include <ostream>
 
 #include "geometric_primitives/point.hpp"
 
+#include "utils/glmutils.hpp"
 #include "utils/strong_type.hpp"
 #include "utils/not_implemented_exception.hpp"
 
@@ -115,6 +117,37 @@ public:
 		 *
 		 * So P + l*n = P + ((p - P).n)n */
 		return point + glm::dot((getPoint() - point), getNormal())*getNormal();
+	}
+
+	// Projects a given point onto this plane and returns the point in a local frame whose z-axis is normal
+	[[nodiscard]] TPoint<floating_point_type, 2> projectIntoLocal(point_type const& point) const {
+		static_assert(dimension == 3, "projectIntoLocal only implemented for planes in 3D space");
+
+		// If my normal is collinear with 0, 0, 1, then
+		// do not choose [0, 0, 1] as a initial vector to cross with,
+		// instead choose [0, 1, 0] 
+		auto const yaxis = glm::cross(getNormal(),
+			! glm::areCollinear(getNormal(), point_type(0, 0, 1), 1e-6f)
+			? point_type(0, 0, 1)
+			: point_type(0, 1, 0)	
+		);
+
+		auto const xaxis = glm::cross(yaxis, getNormal());
+		assert(glm::isNormalized(xaxis));
+		assert(glm::isNormalized(yaxis));
+
+		/* This is essentially T = [xaxis, yaxis, point], inversed (by transposing, thanks ON),
+		 * followed by multiplying with point --- a mapping from world to plane space ---
+		 * but since we know we're doing a projection, the z-component of the point is
+		 * skipped altogether */
+		using vec2 = glm::tvec2<floating_point_type>;
+		glm::mat<3, 2, floating_point_type> const world2plane = {
+			vec2(xaxis.x, yaxis.x),
+			vec2(xaxis.y, yaxis.y),
+			vec2(xaxis.z, yaxis.z)
+		};
+
+		return world2plane * point;
 	}
 
 private:

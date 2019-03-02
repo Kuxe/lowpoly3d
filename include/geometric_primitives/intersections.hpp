@@ -267,34 +267,86 @@ constexpr bool intersects(
     return intersects(segment, plane);
 }
 
-template<typename floating_point_type, std::size_t dimension>
+template<typename floating_point_type>
 constexpr bool intersects(
-	const TLineSegment<floating_point_type, dimension>& segment,
-	const TTriangle<floating_point_type, dimension>& triangle) {
-    // The segment must at least intersect with paralell plane to the triangle
-    // if they should intersect at all
-    if(intersects(segment, triangle.parallel())) {
-        // Proceed to check if the line segment actually intersects the triangle
-        // TODO: Implement
-		throw NotImplementedException();
-    }
-    return false;
-}
+	const TLineSegment<floating_point_type, 3>& segment,
+	const TTriangle<floating_point_type, 3>& triangle) {
 
-template<typename floating_point_type, std::size_t dimension>
-constexpr bool intersects(
-	const TTriangle<floating_point_type, dimension>& triangle,
-	const TLineSegment<floating_point_type, dimension>& segment) {
-    return intersects(segment, triangle);
+	/* (naive but intuitive) Algorithm idea:
+	 * 
+	 * 1. The segment must at least intersect with paralell plane to the triangle
+	 * if they should intersect at all. So check if the LineSegment intersects
+	 * the plane parallel to the triangle.
+	 * 
+	 * 2. Project triangle onto plane that is given by a normal parallel
+	 * the segment and p1 of LineSegment --- the LineSegment becomes the point
+	 * p1 in that plane.
+	 * 
+	 * 3. If the projected triangle contains p1, then the LineSegment
+	 * intersects the triangle. */
+
+	// 1.
+	if(!intersects(segment, triangle.parallel())) return false;
+
+	// 2.
+	// Create plane parallell to the line segment
+	auto const plane = Plane{segment.p2 - segment.p1, segment.p1};
+	auto const projectedTriangle = triangle.projectIntoLocal(plane);
+	auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
+
+	// The two points should be projected into the same point since, see step 2 above
+	assert(glm::epsilonEqual(projectedSegmentPoint, plane.projectIntoLocal(segment.p2)));
+
+	// 3.
+	return projectedTriangle.contains(projectedSegmentPoint);
 }
 
 template<typename floating_point_type>
-constexpr bool intersects(const TTriangle<floating_point_type, 3>& t1, const TTriangle<floating_point_type, 3>& t2) {
-    // A triangle T1 intersects another triangle T2 iff any line segment of T1 intersect T2 (or vice versa)
-    return
-        intersects(TLineSegment<floating_point_type, 3>(t1.p1, t1.p2), t2) ||
-        intersects(TLineSegment<floating_point_type, 3>(t1.p2, t1.p3), t2) || 
-        intersects(TLineSegment<floating_point_type, 3>(t1.p3, t1.p1), t2);
+constexpr bool intersects(
+	const TTriangle<floating_point_type, 3>& triangle,
+	const TLineSegment<floating_point_type, 3>& segment) {
+    return intersects(segment, triangle);
+}
+
+// Triangle-point intersects test
+template<typename floating_point_type>
+constexpr bool intersects(
+	const TTriangle<floating_point_type, 3>& t,
+	const TPoint<floating_point_type, 3>& p) {
+
+	/* A point P0 is within a triangle (P1, P2, P3) iff
+	 * area(P0, P1, P2) + area(P0, P1, P3) + area(P0, P2, P3) = area(P1, P2, P3)
+	 * This is not hard to see --- draw P0, P1, P2 and P3, and just convince
+	 * yourself that the area can only increase beyond that of area(P1, P2, P3)
+	 * if the points lies outside the triangle (or beneath/above it)
+	 * 
+	 * So a simple point in triangle test is just to check if
+	 * area(P0, P1, P2) + area(P0, P1, P3) + area(P0, P2, P3) = area(P1, P2, P3) */
+	return t.contains(p);
+}
+
+// Point-triangle intersects test
+template<typename floating_point_type>
+constexpr bool intersects(
+	const TPoint<floating_point_type, 3>& p,
+	const TTriangle<floating_point_type, 3>& t) {
+	return intersects(t, p);
+}
+
+// Triangle-triangle intersects test
+template<typename floating_point_type>
+constexpr bool intersects(
+	const TTriangle<floating_point_type, 3>& t1,
+	const TTriangle<floating_point_type, 3>& t2) {
+	// A triangle T1 intersects another triangle T2 iff any line segment of T1 intersect T2 (or vice versa)
+	auto const segment1 = TLineSegment<floating_point_type, 3>(t1.p1, t1.p2);
+	auto const segment2 = TLineSegment<floating_point_type, 3>(t1.p2, t1.p3);
+	auto const segment3 = TLineSegment<floating_point_type, 3>(t1.p3, t1.p1);
+
+	return
+		intersects<floating_point_type>(segment1, t2) ||
+		intersects<floating_point_type>(segment2, t2) || 
+		intersects<floating_point_type>(segment3, t2);
 }
 
 }

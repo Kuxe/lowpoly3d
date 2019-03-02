@@ -8,9 +8,9 @@
 
 namespace lowpoly3d {
 
-template<typename value_type, std::size_t dimension>
+template<typename floating_point_type, std::size_t dimension>
 struct TLineSegment {
-	using point_type = TPoint<value_type, dimension>;
+	using point_type = TPoint<floating_point_type, dimension>;
 
 	union { point_type start, p1; };
 	union { point_type end, p2; };
@@ -22,7 +22,7 @@ struct TLineSegment {
             "Start and end of linesegment are equal so it must be a point!");
     }
 
-	value_type midpoint() const {
+	floating_point_type midpoint() const {
 		return 0.5*(end + start);
 	}
 
@@ -34,7 +34,9 @@ struct TLineSegment {
     }
 };
 
-using LineSegment = TLineSegment<glm::vec3, 3>;
+using LineSegment  = TLineSegment<float, 3>;
+using LineSegmentf = TLineSegment<float, 3>;
+using LineSegmentd = TLineSegment<double, 3>;
 
 } // End of namespace lowpoly3d
 

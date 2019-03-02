@@ -13,6 +13,41 @@
 
 namespace lowpoly3d {
 
+namespace detail {
+
+/******************************************************************************************/
+/* Specialize the TTriangle::area method in terms of partially specialized free functions */
+/******************************************************************************************/
+
+template<typename floating_point_type, std::size_t dimension>
+struct TriangleArea {};
+
+template<typename floating_point_type>
+struct TriangleArea<floating_point_type, 3> {
+	floating_point_type operator()(
+		TPoint<floating_point_type, 3> const& p1,
+		TPoint<floating_point_type, 3> const& p2,
+		TPoint<floating_point_type, 3> const& p3) const
+	{
+		return floating_point_type(0.5) * glm::length(glm::cross(p2 - p1, p3 - p1));
+	}
+};
+
+template<typename floating_point_type>
+struct TriangleArea<floating_point_type, 2> {
+	floating_point_type operator()(
+		TPoint<floating_point_type, 2> const& p1,
+		TPoint<floating_point_type, 2> const& p2,
+		TPoint<floating_point_type, 2> const& p3) const
+	{
+		auto const side1 = p2 - p1;
+		auto const side2 = p3 - p1;
+		return floating_point_type(0.5) * std::abs((side1.x * side2.y) - (side1.y * side2.x));
+	}
+};
+
+} // End of namespace detail
+
 template<typename floating_point_type, std::size_t dimension>
 struct TTriangle {
 	using point_type = TPoint<floating_point_type, dimension>;
@@ -91,7 +126,7 @@ struct TTriangle {
 
 	// Returns the area of this triangle
 	floating_point_type area() const {
-		return floating_point_type(0.5) * glm::length(glm::cross(p2 - p1, p3 - p1));
+		return detail::TriangleArea<floating_point_type, dimension>()(p1, p2, p3);
 	}
 
 	// Returns the normal of this triangle, with vertices winding CCW about the normal
@@ -110,10 +145,12 @@ struct TTriangle {
 	}
 
 	// Returns true if this 2D triangle contains the given 2D point
-	bool contains(TPoint<floating_point_type, 2> const& point) const {
-		static_assert(dimension == 2, "TTriangle::contains only implemented for dimension=2");
-		throw NotImplementedException();
-		return false;
+	bool contains(TPoint<floating_point_type, dimension> const& point) const {
+		using tri_type = TTriangle<floating_point_type, dimension>;
+		auto const tri1 = tri_type { point, p1, p2 };
+		auto const tri2 = tri_type { point, p1, p3 };
+		auto const tri3 = tri_type { point, p2, p3 };
+		return std::abs(tri1.area() + tri2.area() + tri3.area() - area() <= std::numeric_limits<floating_point_type>::epsilon());
 	}
 
 };

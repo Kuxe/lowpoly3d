@@ -104,6 +104,18 @@ struct TTriangle {
 		return {plane.project(p1), plane.project(p2), plane.project(p3)};
 	}
 
+	// Projects this triangle onto given plane and returns a point expressed in a local coordinate system of the plane
+	TTriangle<floating_point_type, 2> projectIntoLocal(TPlane<floating_point_type, 3> const& plane) const {
+		return {plane.projectIntoLocal(p1), plane.projectIntoLocal(p2), plane.projectIntoLocal(p3)};
+	}
+
+	// Returns true if this 2D triangle contains the given 2D point
+	bool contains(TPoint<floating_point_type, 2> const& point) const {
+		static_assert(dimension == 2, "TTriangle::contains only implemented for dimension=2");
+		throw NotImplementedException();
+		return false;
+	}
+
 };
 
 template<typename floating_point_type, std::size_t dimension>

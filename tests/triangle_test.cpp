@@ -188,8 +188,8 @@ SCENARIO("Triangle intersection") {
 
 		WHEN("Checking if they intersect") {
 			bool intersecting = intersects(t1, t2);
-			THEN("They are reported as non-intersecting") {
-				REQUIRE_FALSE(intersecting);
+			THEN("They are reported as intersecting") {
+				REQUIRE(intersecting);
 			}
 		}
 
@@ -203,8 +203,8 @@ SCENARIO("Triangle intersection") {
 
 		WHEN("Checking if they intersect") {
 			bool intersecting = intersects(t1, t2);
-			THEN("They are reported as non-intersecting") {
-				REQUIRE_FALSE(intersecting);
+			THEN("They are reported as intersecting") {
+				REQUIRE(intersecting);
 			}
 		}
 

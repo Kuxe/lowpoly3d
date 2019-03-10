@@ -81,9 +81,9 @@ struct TriangleContains<floating_point_type, 2> {
 		// TODO: Maybe create class "ConvexPolygon" that has a "contains" method
 		// which implements this algorithm below? Then we could just instantiate
 		// a ConvexPolygon object here and call "contains" directly on it instead.
-		return std::all_of(lines.cbegin(), lines.cend(), [&point](line_type const& line) {
-			return line.above(point);
-		});
+
+		bool const side = !lines[0].below(point);
+		return side == !lines[1].below(point) && side == !lines[2].below(point);
 	}
 };
 
@@ -185,7 +185,7 @@ struct TTriangle {
 		return {plane.projectIntoLocal(p1), plane.projectIntoLocal(p2), plane.projectIntoLocal(p3)};
 	}
 
-	// Returns true if this 2D triangle contains the given 2D point
+	// Returns true if this (closed) triangle contains the given point
 	bool contains(TPoint<floating_point_type, dimension> const& point) const {
 		return detail::TriangleContains<floating_point_type, dimension>()(*this, point);
 	}

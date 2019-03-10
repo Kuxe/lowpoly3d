@@ -190,6 +190,10 @@ struct TTriangle {
 		return detail::TriangleContains<floating_point_type, dimension>()(*this, point);
 	}
 
+	// Returns true if this triangle is degenerate
+	bool degenerate() const {
+		return area() <= std::numeric_limits<floating_point_type>::epsilon();
+	}
 };
 
 template<typename floating_point_type, std::size_t dimension>

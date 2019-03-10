@@ -290,7 +290,7 @@ constexpr bool intersects(
 
 	// 2.
 	// Create plane parallell to the line segment
-	auto const plane = Plane{segment.p2 - segment.p1, segment.p1};
+	auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
 	auto const projectedTriangle = triangle.projectIntoLocal(plane);
 	auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 

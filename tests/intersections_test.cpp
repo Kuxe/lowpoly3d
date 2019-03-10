@@ -511,5 +511,31 @@ SCENARIO("Intersection tests") {
 		}
 	}
 
+	GIVEN("A LineSegment and a Triangle that intersects. The LineSegment is collinear with the triangle normal.") {
+		Triangle const triangle = {{0, 0, 0}, {3, 0, 0}, {0, 3, 0}};
+		LineSegment const segment = {{1, 1, 1}, {1, 1, -1}};
+
+		WHEN("Checking if they are intersecting") {
+			bool const isIntersecting = intersects(triangle, segment);
+			
+			THEN("They are reported as intersecting") {
+				REQUIRE(isIntersecting);
+			}
+		}
+	}
+
+	GIVEN("A LineSegment and a Triangle that lie in the same plane and intersects") {
+		Triangle const triangle = {{0, 0, 0}, {1, 0, 0}, {1, 1, 0}};
+		LineSegment const segment = {{1, 0, 0}, {0, 1, 0}};
+
+		WHEN("Checking if they are intersecting") {
+			bool const isIntersecting = intersects(triangle, segment);
+			
+			THEN("They are reported as intersecting") {
+				REQUIRE(isIntersecting);
+			}
+		}
+	}
+
 	// TODO: More difficult plane-plane intersections with non-trivial results that cannot be degenerate cases
 }

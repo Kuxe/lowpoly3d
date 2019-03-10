@@ -15,6 +15,49 @@
 
 namespace lowpoly3d {
 
+template<typename floating_point_type, std::size_t dimension>
+struct TLine;
+
+namespace detail {
+	/* Performs a binary operation between the line normal and the point
+	 * in a frame where the line point is at zero. */
+	template<typename fpt, typename binary_op>
+	constexpr fpt LocalLineNormalBinop(
+		TLine<fpt, 2> const& line,
+		TPoint<fpt, 2> const& point,
+		binary_op const& binop)
+	{
+		auto const& direction = line.getDirection();
+		return binop(TPoint<fpt, 2>{-direction.y, direction.x}, point - line.getPoint());
+	};
+	
+	/* Function object that checks if a point of dimension 2 is above a line of dimension 2 */
+	template<typename fpt, std::size_t dim> struct LineAbove {};
+	template<typename fpt>
+	struct LineAbove<fpt, 2> {
+		using line_type = TLine<fpt, 2>;
+		using point_type = TPoint<fpt, 2>;
+		constexpr bool operator()(line_type const& line, point_type const& point) const {
+			return LocalLineNormalBinop(line, point, [](auto const& p1, auto const& p2) {
+				return glm::dot(p1, p2) < 0;
+			});
+		}
+	};
+
+	/* Function object that checks if a point of dimension 2 is below a line of dimension 2 */
+	template<typename fpt, std::size_t dim> struct LineBelow {};
+	template<typename fpt>
+	struct LineBelow<fpt, 2> {
+		using line_type = TLine<fpt, 2>;
+		using point_type = TPoint<fpt, 2>;
+		constexpr bool operator()(line_type const& line, point_type const& point) const {
+			return LocalLineNormalBinop(line, point, [](auto const& p1, auto const& p2) {
+				return glm::dot(p1, p2) > 0;
+			});
+		}
+	};
+} // End of namespace detail
+
 /* TLine is a generic line in d-dimensions, represented by a unit direction
  * vector d and a point intersecting the line */
 template<typename floating_point_type, std::size_t dimension>
@@ -44,6 +87,16 @@ struct TLine {
 	// Returns true if "line" is parallel to this line
 	[[nodiscard]] bool isParallelTo(const line_type& line) const {
 		return isParallelTo(line.getDirection());
+	}
+
+	// Returns true if the point is above this line. Only available for dimension=2.
+	[[nodiscard]] bool above(TPoint<floating_point_type, dimension> const& point) const {
+		return detail::LineAbove<floating_point_type, dimension>()(*this, point);
+	}
+
+	// Returns true if the point is below this line. Only available for dimension=2.
+	[[nodiscard]] bool below(TPoint<floating_point_type, dimension> const& point) const {
+		return detail::LineBelow<floating_point_type, dimension>()(*this, point);
 	}
 
 	// Returns a parametrization of this line

@@ -31,6 +31,135 @@ SCENARIO("Triangle misc methods") {
 	}
 }
 
+SCENARIO("Interior points of triangles") {
+	GIVEN("A triangle {(0, 0, 0), (3, 0, 0), (0, 3, 0)} and a point (1, 1, 0) that lie inside said triangle") {
+		Triangle const triangle {
+			{0.0f, 0.0f, 0.0f},
+			{3.0f, 0.0f, 0.0f},
+			{0.0f, 3.0f, 0.0f}
+		};
+
+		Point const point {1.0f, 1.0f, 0.0f};
+
+		WHEN("Checking if the point is contained by the triangle") {
+			bool const isContained = triangle.contains(point);
+			
+			THEN("The point is reportedly contained by the triangle") {
+				REQUIRE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A triangle {(0, 0, 0), (3, 0, 0), (0, 3, 0)} and a point (2, 2, 0) that lie outside said triangle") {
+		Triangle const triangle {
+			{0.0f, 0.0f, 0.0f},
+			{3.0f, 0.0f, 0.0f},
+			{0.0f, 3.0f, 0.0f}
+		};
+
+		Point const point {2.0f, 2.0f, 0.0f};
+
+		WHEN("Checking if the point is contained by the triangle") {
+			bool const isContained = triangle.contains(point);
+			
+			THEN("The point is reportedly not contained by the triangle") {
+				REQUIRE_FALSE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(0, 0, 0), (1, 1, 0), (-1, -1, 0) and a point within the degenerate triangle (0, 0, 0)") {
+		Triangle const triangle {
+				{0.0f, 0.0f, 0.0f},
+				{1.0f, 1.0f, 0.0f},
+				{-1.0f, -1.0f, 0.0f}
+			};
+
+		Point const point {0.0f, 0.0f, 0.0f};
+		
+		WHEN("Checking if the point is contained by the triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly contained by the triangle") {
+				REQUIRE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(0, 0, 0), (1, 1, 0), (-1, -1, 0) and a point within the degenerate triangle (1, 1, 0)") {
+		Triangle const triangle {
+				{0.0f, 0.0f, 0.0f},
+				{1.0f, 1.0f, 0.0f},
+				{-1.0f, -1.0f, 0.0f}
+			};
+
+		Point const point {1.0f, 1.0f, 0.0f};
+		
+		WHEN("Checking if the point is contained by the triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly contained by the triangle") {
+				REQUIRE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(0, 0, 0), (1, 1, 0), (-1, -1, 0) and a point within the degenerate triangle (-1, -1, 0)") {
+		Triangle const triangle {
+				{0.0f, 0.0f, 0.0f},
+				{1.0f, 1.0f, 0.0f},
+				{-1.0f, -1.0f, 0.0f}
+			};
+
+		Point const point {-1.0f, -1.0f, 0.0f};
+		
+		WHEN("Checking if the point is contained by the triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly contained by the triangle") {
+				REQUIRE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(0, 0, 0), (0, 1/sqrt(2), 0), (0, sqrt(2), 0)} and a point on that triangle (0, 1/sqrt(2), 0)") {
+		Triangle const triangle {
+				{0.0f, 0.0f, 0.0f},
+				{0.0f, 1.0f/sqrtf(2.0f), 0.0f},
+				{0.0f, sqrtf(2.0f), 0.0f}
+			};
+
+		Point const point {0.0f, 1.0f/sqrtf(2.0f), 0.0f};
+
+		WHEN("Checking if the point is contained by the triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly contained by the triangle") {
+				REQUIRE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(0, 0), (0, 1/sqrt(2)), (0, sqrt(2))} and a point on that triangle (0, 1/sqrt(2))") {
+		TTriangle<float, 2> const triangle {
+				{0.0f, 0.0f},
+				{0.0f, 1.0f/sqrtf(2.0f)},
+				{0.0f, sqrtf(2.0f)}
+			};
+
+		TPoint<float, 2> const point {0.0f, 1.0f/sqrtf(2.0f)};
+
+		WHEN("Checking if the point is contained by the triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly contained by the triangle") {
+				INFO("If this test fails but the 3D version didnt fail, then something is probably wrong with 2D specializations");
+				REQUIRE(isContained);
+			}
+		}
+	}
+}
+
 SCENARIO("Triangle intersection") {
 
 	auto intersectsCommutativityCheck = [](Triangle const& t1, Triangle const t2) {

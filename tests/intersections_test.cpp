@@ -519,6 +519,7 @@ SCENARIO("Intersection tests") {
 			bool const isIntersecting = intersects(triangle, segment);
 			
 			THEN("They are reported as intersecting") {
+				INFO("If this test fails, then the LineSegment is not projected into the point (1, 1) or the point (1, 1) is not reported as interior of the triangle.")
 				REQUIRE(isIntersecting);
 			}
 		}

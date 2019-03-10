@@ -6,6 +6,7 @@
 #include <functional> // std::function
 
 #include "geometric_primitives/direction.hpp"
+#include "geometric_primitives/line.hpp"
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/plane.hpp"
 
@@ -13,10 +14,13 @@
 
 namespace lowpoly3d {
 
+template<typename floating_point_type, std::size_t dimension>
+struct TTriangle;
+
 namespace detail {
 
 /******************************************************************************************/
-/* Specialize the TTriangle::area method in terms of partially specialized free functions */
+/* Specialize the TTriangle methods method in terms of partially specialized free functions */
 /******************************************************************************************/
 
 template<typename floating_point_type, std::size_t dimension>
@@ -43,6 +47,43 @@ struct TriangleArea<floating_point_type, 2> {
 		auto const side1 = p2 - p1;
 		auto const side2 = p3 - p1;
 		return floating_point_type(0.5) * std::abs((side1.x * side2.y) - (side1.y * side2.x));
+	}
+};
+
+
+template<typename floating_point_type, std::size_t dimension>
+struct TriangleContains {};
+
+template<typename floating_point_type>
+struct TriangleContains<floating_point_type, 3> {
+	floating_point_type operator()(TTriangle<floating_point_type, 3> const& triangle, TPoint<floating_point_type, 3> const& point) const
+	{
+		using tri_type = TTriangle<floating_point_type, 3>;
+		auto const tri1 = tri_type { point, triangle.p1, triangle.p2 };
+		auto const tri2 = tri_type { point, triangle.p1, triangle.p3 };
+		auto const tri3 = tri_type { point, triangle.p2, triangle.p3 };
+		return std::abs(tri1.area() + tri2.area() + tri3.area() - triangle.area() <= std::numeric_limits<floating_point_type>::epsilon());
+	}
+};
+
+template<typename floating_point_type>
+struct TriangleContains<floating_point_type, 2> {
+	floating_point_type operator()(TTriangle<floating_point_type, 2> const& triangle, TPoint<floating_point_type, 2> const& point) const
+	{
+		using line_type = TLine<floating_point_type, 2>;
+
+		std::array<line_type const, 3> const lines {
+			line_type{triangle.p1, triangle.p2 - triangle.p1},
+			line_type{triangle.p2, triangle.p3 - triangle.p2},
+			line_type{triangle.p3, triangle.p1 - triangle.p3}
+		};
+
+		// TODO: Maybe create class "ConvexPolygon" that has a "contains" method
+		// which implements this algorithm below? Then we could just instantiate
+		// a ConvexPolygon object here and call "contains" directly on it instead.
+		return std::all_of(lines.cbegin(), lines.cend(), [&point](line_type const& line) {
+			return line.above(point);
+		});
 	}
 };
 
@@ -146,11 +187,7 @@ struct TTriangle {
 
 	// Returns true if this 2D triangle contains the given 2D point
 	bool contains(TPoint<floating_point_type, dimension> const& point) const {
-		using tri_type = TTriangle<floating_point_type, dimension>;
-		auto const tri1 = tri_type { point, p1, p2 };
-		auto const tri2 = tri_type { point, p1, p3 };
-		auto const tri3 = tri_type { point, p2, p3 };
-		return std::abs(tri1.area() + tri2.area() + tri3.area() - area() <= std::numeric_limits<floating_point_type>::epsilon());
+		return detail::TriangleContains<floating_point_type, dimension>()(*this, point);
 	}
 
 };

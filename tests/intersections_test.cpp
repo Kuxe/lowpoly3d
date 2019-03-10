@@ -511,6 +511,15 @@ SCENARIO("Intersection tests") {
 		}
 	}
 
+	// TODO: More difficult plane-plane intersections with non-trivial results that cannot be degenerate cases
+}
+
+SCENARIO("Triangle-LineSegment intersection tests") {
+	using namespace lowpoly3d;
+
+	float const eps = std::numeric_limits<float>::epsilon();
+	TPoint<float, 2> const zeropoint2D {0.0f, 0.0f};
+
 	GIVEN("A LineSegment and a Triangle that intersects. The LineSegment is collinear with the triangle normal.") {
 		Triangle const triangle = {{0, 0, 0}, {3, 0, 0}, {0, 3, 0}};
 		LineSegment const segment = {{1, 1, 1}, {1, 1, -1}};
@@ -531,6 +540,39 @@ SCENARIO("Intersection tests") {
 
 		WHEN("Checking if they are intersecting") {
 			bool const isIntersecting = intersects(triangle, segment);
+
+			THEN("The LineSegment intersects with the plane parallel to the triangle") {
+				REQUIRE(intersects(segment, triangle.parallel()));
+			}
+
+			THEN("The LineSegment is projected into a single point") {
+				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
+				auto const projectedSegmentPoint1 = plane.projectIntoLocal(segment.p1);
+				auto const projectedSegmentPoint2 = plane.projectIntoLocal(segment.p2);
+				REQUIRE(glm::all(glm::epsilonEqual(projectedSegmentPoint1, projectedSegmentPoint2, eps)));
+			}
+
+			THEN("The projected triangle has zero area") {
+				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
+				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				REQUIRE(projectedTriangle.area() <= eps);
+			}
+
+			THEN("The Triangle is projected into a degenerate triangle") {
+				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
+				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				INFO("projectedTriangle=" << projectedTriangle);
+				REQUIRE(projectedTriangle.degenerate());
+			}
+
+			THEN("The project triangle contains the projected point") {
+				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
+				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
+				INFO("The triangle " << projectedTriangle << " does not contain the point (" << projectedSegmentPoint.x << "," << projectedSegmentPoint.y << ")");
+				REQUIRE(projectedTriangle.contains(projectedSegmentPoint));
+			}
+
 			
 			THEN("They are reported as intersecting") {
 				REQUIRE(isIntersecting);
@@ -538,5 +580,130 @@ SCENARIO("Intersection tests") {
 		}
 	}
 
-	// TODO: More difficult plane-plane intersections with non-trivial results that cannot be degenerate cases
+	GIVEN("A triangle ({0,0,0},{1,0,0},{1,1,0}) and a non-intersecting LineSegment ({2,0,0},{3,0,0})") {
+		auto const triangle = Triangle {{0,0,0}, {1,0,0}, {1,1,0}};
+		auto const segment = LineSegment {{2,0,0}, {3,0,0}};
+
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+			THEN("They are reported as non-intersecting") {
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle ({0,0,0},{1,0,0},{1,1,0}) and a non-intersecting LineSegment ({3,0,0},{3,1,0})") {
+		auto const triangle = Triangle {{0,0,0}, {1,0,0}, {1,1,0}};
+		auto const segment = LineSegment {{3,0,0}, {3,1,0}};
+
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+			THEN("They are reported as non-intersecting") {
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle ({0,0,0},{1,0,0},{1,1,0}) and a non-intersecting LineSegment ({3,1,0},{2,0,0})") {
+		auto const triangle = Triangle {{0,0,0}, {1,0,0}, {1,1,0}};
+		auto const segment = LineSegment {{3,1,0}, {2,0,0}};
+
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+			THEN("They are reported as non-intersecting") {
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle ({2,0,0},{3,0,0},{3,1,0}) and a non-intersecting LineSegment ({0,0,0},{1,0,0})") {
+		auto const triangle = Triangle {{2,0,0}, {3,0,0}, {3,1,0}};
+		auto const segment = LineSegment {{0,0,0}, {1,0,0}};
+
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+			THEN("They are reported as non-intersecting") {
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle ({2,0,0},{3,0,0},{3,1,0}) and a non-intersecting LineSegment ({1,0,0},{1,1,0})") {
+		auto const triangle = Triangle {{2,0,0}, {3,0,0}, {3,1,0}};
+		auto const segment = LineSegment {{1,0,0}, {1,1,0}};
+
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+			THEN("They are reported as non-intersecting") {
+
+				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
+				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
+
+				INFO("projectedTriangle=" << projectedTriangle);
+				INFO("projectedSegmentPoint=" << glm::to_string(projectedSegmentPoint));
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle ({2,0,0},{3,0,0},{3,1,0}) and a non-intersecting LineSegment ({1,1,0},{0,0,0})") {
+		auto const triangle = Triangle {{2,0,0}, {3,0,0}, {3,1,0}};
+		auto const segment = LineSegment {{1,1,0}, {0,0,0}};
+
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+			THEN("They are reported as non-intersecting") {
+				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
+				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
+
+				INFO("projectedTriangle=" << projectedTriangle);
+				INFO("projectedSegmentPoint=" << glm::to_string(projectedSegmentPoint));
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle {0,0,0},{1,0,0},{1,1,0} and a LineSegment ({1,0,0},{2,0,0}) that touch at a point {1,0,0}") {
+		auto const triangle = Triangle {{0,0,0},{1,0,0},{1,1,0}};
+		auto const segment = LineSegment {{1,0,0},{2,0,0}};
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+				THEN("They are reported as intersecting") {
+				REQUIRE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle {0,0,0},{1,0,0},{1,1,0} and a LineSegment ({2,0,0},{2,1,0}) that does not intersects") {
+		auto const triangle = Triangle {{0,0,0},{1,0,0},{1,1,0}};
+		auto const segment = LineSegment {{2,0,0},{2,1,0}};
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+				THEN("They are reported as non-intersecting") {
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
+
+	GIVEN("A triangle {0,0,0},{1,0,0},{1,1,0} and a LineSegment ({2,1,0},{1,0,0}) that touch at a point {1,0,0}") {
+		auto const triangle = Triangle {{0,0,0},{1,0,0},{1,1,0}};
+		auto const segment = LineSegment {{2,1,0},{1,0,0}};
+		WHEN("Checking if they are intersecting") {
+			auto const intersecting = intersects(triangle, segment);
+
+				THEN("They are reported as intersecting") {
+				REQUIRE(intersecting);
+			}
+		}
+	}
 }

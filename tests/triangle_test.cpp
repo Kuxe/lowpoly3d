@@ -158,6 +158,61 @@ SCENARIO("Interior points of triangles") {
 			}
 		}
 	}
+
+	GIVEN("A degenerate triangle {(-1, 0, 0), (0, 0, 0), (1, 0, 0)} and a point (2, 0.1, 0)") {
+		Triangle const triangle {
+				{-1.0f, 0.0f, 0.0f},
+				{0.0f, 0.0f, 0.0f},
+				{1.0f, 0.0f, 0.0f}
+			};
+
+		Point const point {2.0f, 0.1f, 0.0f};
+
+		WHEN("Checking if the point is contained by the degenerate triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly not contained by the degenerate triangle") {
+				REQUIRE_FALSE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(-1, 0, 0), (0, 0, 0), (1, 0, 0)} and a point (2, 0, 0)") {
+		Triangle const triangle {
+				{-1.0f, 0.0f, 0.0f},
+				{0.0f, 0.0f, 0.0f},
+				{1.0f, 0.0f, 0.0f}
+			};
+
+		Point const point {2.0f, 0.0f, 0.0f};
+
+		WHEN("Checking if the point is contained by the degenerate triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly not contained by the degenerate triangle") {
+				INFO("This test is expected to (wrongly) pass for naive contains method that check if points lies on the three closed half-planes.");
+				REQUIRE_FALSE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(0, 2), (0, 3), (0, 3)} and a point (0, 1)") {
+		auto const triangle = TTriangle<float, 2> {
+				{0.0f, 2.0f},
+				{0.0f, 3.0f},
+				{0.0f, 3.0f}
+			};
+
+		auto const point = Point2f {0.0f, 1.0f};
+
+		WHEN("Checking if the point is contained by the degenerate triangle") {
+			bool const isContained = triangle.contains(point);
+
+			THEN("The point is reportedly not contained by the degenerate triangle") {
+				REQUIRE_FALSE(isContained);
+			}
+		}
+	}
 }
 
 SCENARIO("Triangle intersection") {

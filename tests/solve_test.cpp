@@ -22,3 +22,72 @@ TEST_CASE("solveDotSystem2D") {
 	REQUIRE(solveDotSystem2D<float>(Point2f{1.0f, 3.0f}, Point2f{5.0f, 6.0f}, 14.0f, 34.0f) == Point2f{2.0f, 4.0f});
 	REQUIRE(glm::all(glm::isnan(solveDotSystem2D<float>(Point2f{1.0f, 0.0f}, Point2f{1.0f, 0.0f}, 0.0f, 0.0f))));
 }
+
+SCENARIO("solveScalingVecs") {
+	using namespace lowpoly3d;
+
+	GIVEN("Two linearly independent base vectors e1, e2 and a point p") {
+		auto const e1 = Point2f {2.0f, 1.0f};
+		auto const e2 = Point2f {1.0f, -1.0f};
+		auto const point = Point2f {0.0f, 3.0f};
+
+		WHEN("Computing two coefficients r, s of the base vectors s.t e1*r + e2*s = p") {
+			auto const coeffs = solveScalingVecs(e1, e2, point);
+
+			THEN("The reported coefficients satisfy e1*r + e2*s = p") {
+				REQUIRE(coeffs.x*e1 + coeffs.y*e2 == point);
+			}
+			THEN("The reported coefficients are minimal") {
+				REQUIRE(coeffs == Point2f{1.0f, -2.0f});
+			}
+		}
+	}
+
+	GIVEN("Two linearly dependent base vectors e1, e2 and a collinear point p") {
+		auto const e1 = Point2f {1.0f, 0.0f};
+		auto const e2 = Point2f {0.5f, 0.0f};
+		auto const point = Point2f {1.0f, 0.0f};
+
+		WHEN("Computing two coefficients r, s of the base vectors s.t e1*r + e2*s = p") {
+			auto const coeffs = solveScalingVecs(e1, e2, point);
+
+			THEN("The reported coefficients satisfy e1*r + e2*s = p") {
+				REQUIRE(coeffs.x*e1 + coeffs.y*e2 == point);
+			}
+		}
+	}
+
+	GIVEN("Two linearly dependent base vectors e1, e2 and a non-collinear point p") {
+		auto const e1 = Point2f {1.0f, 0.0f};
+		auto const e2 = Point2f {0.5f, 0.0f};
+		auto const point = Point2f {1.0f, 1.0f};
+
+		WHEN("Computing two coefficients r, s of the base vectors s.t that any answer is nonsense because the point p is not spanned by e1, e2") {
+			auto const coeffs = solveScalingVecs(e1, e2, point);
+
+			THEN("The reported coefficients are NaNs") {
+				REQUIRE(glm::all(glm::isnan(coeffs)));
+			}
+		}
+	}
+
+	GIVEN("Two equal base vectors e1, e2 and an equal point p") {
+		auto const e1 = Point2f {0.0f, 1.0f};
+		auto const e2 = Point2f {0.0f, 1.0f};
+		auto const point = Point2f {0.0f, 1.0f};
+		
+		WHEN("Computing the two coefficients of the two equal bases that are equal to the given point") {
+			auto const coeffs = solveScalingVecs(e1, e2, point);
+
+			THEN("The reported coefficients are (1, 0)") {
+				REQUIRE(coeffs[0] == 1.0f);
+				REQUIRE(coeffs[1] == 0.0f);
+			}
+
+			THEN("The reported coefficients satisfy e1*r + e2*s = p") {
+				INFO("coeffs[0]=" << coeffs[0] << ", coeffs[1]=" << coeffs[1]);
+				REQUIRE(coeffs.x*e1 + coeffs.y*e2 == point);
+			}
+		}
+	}
+}

@@ -14,6 +14,8 @@
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/triangle.hpp"
 
+#include "utils/solve.hpp"
+
 /* intersections.hpp contains a bulk of various boolean intersection-tests
  * between geometric primitives. */
 
@@ -75,12 +77,27 @@ bool intersects(
  * Returns NaN if there are infinitly many intersection points
  * or if there is no intersection points */
 template<typename floating_point_type, std::size_t dimension>
+TPoint<floating_point_type, 2> intersection(
+	const TLineSegment<floating_point_type, 2>& l1,
+	const TLineSegment<floating_point_type, 2>& l2)
+{
+	// Compute two t's in (-inf, +inf) that run along the (infinite) lines induced
+	// by each LineSegment. If the two t's lie in [0, 1] then the LineSegments
+	// intersect
+	auto const ts = solveScalingVecs(l1.p2 - l1.p1, l2.p1 - l2.p2, l2.p1 - l1.p1);
+
+	assert(glm::all(glm::epsilonEqual((l1.p2 - l1.p1)*ts.x + l1.p1, (l2.p2 - l2.p1)*ts.y + l2.p1)));
+	return (l1.p2 - l1.p1) * ts.x + l1.p1;
+}
+
+/* LineSegment-LineSegment intersects. Returns true if the two LineSegments
+ * intersects, otherwise returns false. */
+template<typename floating_point_type, std::size_t dimension>
 bool intersects(
-    const TLineSegment<floating_point_type, dimension>& l1,
-    const TLineSegment<floating_point_type, dimension>& l2) {
-	
-	// TODO: Implement
-	throw NotImplementedException();
+	const TLineSegment<floating_point_type, 2>& l1,
+	const TLineSegment<floating_point_type, 2>& l2)
+{
+	return !glm::any(glm::isnan(intersection(l1, l2)));
 }
 
 /* Plane-plane intersection yields a line. If the two planes are parallell,

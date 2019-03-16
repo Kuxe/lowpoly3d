@@ -200,6 +200,7 @@ add_library(lowpoly3d SHARED
 	include/utils/lerp.hpp
 	include/utils/misc.hpp
 	include/utils/not_implemented_exception.hpp	src/utils/not_implemented_exception.cpp
+	include/utils/solve.hpp
 	include/utils/strong_type.hpp
 )
 
@@ -274,6 +275,7 @@ set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 add_executable(lowpoly3d_test
 	${TEST_DIR}/catch_tests_main.cpp
 	${TEST_DIR}/bounding_volume_hierarchy_test.cpp
+	${TEST_DIR}/solve_test.cpp
 	${TEST_DIR}/sphere_test.cpp
 	${TEST_DIR}/intersections_test.cpp
 	${TEST_DIR}/lerp_test.cpp

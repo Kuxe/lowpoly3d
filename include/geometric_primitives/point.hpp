@@ -39,6 +39,9 @@ bool almostEqual(
 using Pointf = TPoint<float, 3>;
 using Pointd = TPoint<double, 3>;
 using Point = Pointf;
+using Point2f = TPoint<float, 2>;
+using Point2d = TPoint<double, 2>;
+using Point2 = Point2f;
 
 } // End of namespace lowpoly3d
 

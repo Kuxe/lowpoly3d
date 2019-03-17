@@ -12,6 +12,8 @@
 
 #include <glm/gtx/string_cast.hpp> // glm::to_string
 
+#include "utils/solve.hpp"
+
 namespace lowpoly3d {
 
 template<typename floating_point_type, std::size_t dimension>
@@ -62,6 +64,8 @@ struct TriangleContains<floating_point_type, 3> {
 		auto const tri1 = tri_type { point, triangle.p1, triangle.p2 };
 		auto const tri2 = tri_type { point, triangle.p1, triangle.p3 };
 		auto const tri3 = tri_type { point, triangle.p2, triangle.p3 };
+		// FIXME: This method will break when the triangle degenerates into a line segment,
+		// and the point lies on the line formed from the line segment.
 		return std::abs(tri1.area() + tri2.area() + tri3.area() - triangle.area() <= std::numeric_limits<floating_point_type>::epsilon());
 	}
 };
@@ -70,20 +74,25 @@ template<typename floating_point_type>
 struct TriangleContains<floating_point_type, 2> {
 	floating_point_type operator()(TTriangle<floating_point_type, 2> const& triangle, TPoint<floating_point_type, 2> const& point) const
 	{
-		using line_type = TLine<floating_point_type, 2>;
+		auto const ts = solveScalingVecs(triangle.p3 - triangle.p1, triangle.p2 - triangle.p1, point - triangle.p1);
+		auto const sumt = ts.x + ts.y;
 
-		std::array<line_type const, 3> const lines {
-			line_type{triangle.p1, triangle.p2 - triangle.p1},
-			line_type{triangle.p2, triangle.p3 - triangle.p2},
-			line_type{triangle.p3, triangle.p1 - triangle.p3}
+		auto inRangeEps = [](
+			floating_point_type variable,
+			floating_point_type start,
+			floating_point_type end,
+			floating_point_type eps
+		){
+			assert(start <= end);
+			assert(eps >= 0);
+			return start - eps <= variable && variable <= end + eps; 
 		};
 
-		// TODO: Maybe create class "ConvexPolygon" that has a "contains" method
-		// which implements this algorithm below? Then we could just instantiate
-		// a ConvexPolygon object here and call "contains" directly on it instead.
-
-		bool const side = !lines[0].below(point);
-		return side == !lines[1].below(point) && side == !lines[2].below(point);
+		floating_point_type const eps = std::numeric_limits<floating_point_type>::epsilon();
+		return
+			inRangeEps(ts.x, 0, 1, eps) &&
+			inRangeEps(ts.y, 0, 1, eps) &&
+			inRangeEps(sumt, 0, 1, eps);
 	}
 };
 

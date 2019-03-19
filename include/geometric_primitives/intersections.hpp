@@ -355,15 +355,40 @@ template<typename floating_point_type>
 constexpr bool intersects(
 	const TTriangle<floating_point_type, 3>& t1,
 	const TTriangle<floating_point_type, 3>& t2) {
-	// A triangle T1 intersects another triangle T2 iff any line segment of T1 intersect T2 (or vice versa)
-	auto const segment1 = TLineSegment<floating_point_type, 3>(t1.p1, t1.p2);
-	auto const segment2 = TLineSegment<floating_point_type, 3>(t1.p2, t1.p3);
-	auto const segment3 = TLineSegment<floating_point_type, 3>(t1.p3, t1.p1);
 
-	return
-		intersects<floating_point_type>(segment1, t2) ||
-		intersects<floating_point_type>(segment2, t2) || 
-		intersects<floating_point_type>(segment3, t2);
+	/* A triangle T1 intersects another triangle T2 iff any line segment of T1 intersect T2 (or vice versa)
+	 * But I don't really need to check vice-versa, just make sure that we test the line segments of
+	 * the smaller triangle against the larger triangle --- this way, we're never at risk of the following situation:
+	 *
+	 * |\
+	 * | \
+	 * |  \
+	 * |   \
+	 * | |\ \
+	 * | |_\ \
+	 * |______\
+	 * 
+	 * where one small triangle is contained by the larger triangle and we would've been testing
+	 * the larger triangles line segments against the smaller triangle, which wouldt work... but as stated above,
+	 * we're good as long as we compare smaller triangle line segments against the larger triangle. */
+	if(t1.area() < t2.area()) {
+		auto const segment1 = TLineSegment<floating_point_type, 3>(t1.p1, t1.p2);
+		auto const segment2 = TLineSegment<floating_point_type, 3>(t1.p2, t1.p3);
+		auto const segment3 = TLineSegment<floating_point_type, 3>(t1.p3, t1.p1);
+		return
+			intersects<floating_point_type>(segment1, t2) ||
+			intersects<floating_point_type>(segment2, t2) || 
+			intersects<floating_point_type>(segment3, t2);
+	}
+	else {
+		auto const segment1 = TLineSegment<floating_point_type, 3>(t2.p1, t2.p2);
+		auto const segment2 = TLineSegment<floating_point_type, 3>(t2.p2, t2.p3);
+		auto const segment3 = TLineSegment<floating_point_type, 3>(t2.p3, t2.p1);
+		return
+			intersects<floating_point_type>(segment1, t1) ||
+			intersects<floating_point_type>(segment2, t1) || 
+			intersects<floating_point_type>(segment3, t1);
+	}
 }
 
 }

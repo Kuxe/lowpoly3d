@@ -34,6 +34,11 @@ struct TLineSegment {
     }
 };
 
+template<typename floating_point_type, std::size_t dimension>
+std::ostream& operator<<(std::ostream& out, const TLineSegment<floating_point_type, dimension>& segment) {
+	return out << "(p1=" << glm::to_string(segment.p1).c_str() << ", p2=" << glm::to_string(segment.p2).c_str() << ")";
+}
+
 using LineSegment  = TLineSegment<float, 3>;
 using LineSegmentf = TLineSegment<float, 3>;
 using LineSegmentd = TLineSegment<double, 3>;

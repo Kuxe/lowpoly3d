@@ -300,7 +300,7 @@ SCENARIO("Triangle intersection") {
 		// These two triangles intersects at (2, 1, 0)
 		Triangle
 			t1({0,0,0},{4,0,0},{4,4,0}),
-			t2({2,1,-3},{2,1,-3},{2,5,1});
+			t2({2,1,3},{2,1,-3},{2,5,1});
 
 		WHEN("Checking if they intersect") {
 			bool intersecting = intersects(t1, t2);

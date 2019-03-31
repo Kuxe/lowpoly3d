@@ -712,7 +712,10 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 		WHEN("Checking if they are intersecting") {
 			auto const intersecting = intersects(triangle, segment);
 
-				THEN("They are reported as intersecting") {
+			THEN("They are reported as intersecting") {
+				INFO("Segment should intersect plane parallel to triangle. Does it? " << (intersects(segment, triangle.parallel()) ? "Yes." : "No."));
+				INFO("Triangle was projected into " << triangle.projectIntoLocal(Plane(segment.p1, segment.p2-segment.p1)));
+				INFO("Segment.p1 was projected into " << glm::to_string(Plane(segment.p1, segment.p2-segment.p1).projectIntoLocal(segment.p1)));
 				REQUIRE(intersecting);
 			}
 		}

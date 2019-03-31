@@ -295,17 +295,30 @@ constexpr bool intersects(
 	 * if they should intersect at all. So check if the LineSegment intersects
 	 * the plane parallel to the triangle.
 	 * 
-	 * 2. Project triangle onto plane that is given by a normal parallel
+	 * 2. Check if LineSegment lies on the plane of the triangle, if so,
+	 * check if both points of the LineSegment are contained by the triangle
+	 * by projecting the triangle and the LineSegment locally into plane parallel to triangle
+	 * 
+	 * 3. Project triangle onto plane that is given by a normal parallel
 	 * the segment and p1 of LineSegment --- the LineSegment becomes the point
 	 * p1 in that plane.
 	 * 
-	 * 3. If the projected triangle contains p1, then the LineSegment
+	 * 4. If the projected triangle contains p1, then the LineSegment
 	 * intersects the triangle. */
 
 	// 1.
-	if(!intersects(segment, triangle.parallel())) return false;
+	auto const trianglePlane = triangle.parallel();
+	if(!intersects(segment, trianglePlane)) return false;
 
-	// 2.
+	// 2
+	if(trianglePlane.contains(segment.p1) && trianglePlane.contains(segment.p2)) {
+		auto const projectedTriangle = triangle.projectIntoLocal(trianglePlane);
+		auto const projectedSegmentPoint1 = trianglePlane.projectIntoLocal(segment.p1);
+		auto const projectedSegmentPoint2 = trianglePlane.projectIntoLocal(segment.p2);
+		return projectedTriangle.contains(projectedSegmentPoint1) || projectedTriangle.contains(projectedSegmentPoint2);
+	}
+
+	// 3.
 	// Create plane parallell to the line segment
 	auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
 	auto const projectedTriangle = triangle.projectIntoLocal(plane);
@@ -314,7 +327,7 @@ constexpr bool intersects(
 	// The two points should be projected into the same point since, see step 2 above
 	assert(glm::epsilonEqual(projectedSegmentPoint, plane.projectIntoLocal(segment.p2)));
 
-	// 3.
+	// 4.
 	return projectedTriangle.contains(projectedSegmentPoint);
 }
 

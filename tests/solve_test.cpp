@@ -90,4 +90,34 @@ SCENARIO("solveScalingVecs") {
 			}
 		}
 	}
+
+	GIVEN("(1,0) and the zero vector as two base vectors and a point on the x-axis, which is spanned by (1,0)") {
+		auto const zerovec = Point2 {0.0f, 0.0f};
+		auto const xvec = Point2 {1.0f, 0.0f};
+		auto const point = Point2 {2.0f, 0.0f};
+
+		WHEN("Computing the two coefficients of (1,0) and (0,0)") {
+			auto const coeffs = solveScalingVecs(xvec, zerovec, point);
+
+			THEN("The reported coefficients are (2, 0)") {
+				CHECK(coeffs[0] == 2.0f);
+				CHECK(coeffs[1] == 0.0f);
+			}
+		}
+	}
+
+	GIVEN("The zero vector and (1,0) as two base vectors and a point on the x-axis, which is spanned by (1,0)") {
+		auto const zerovec = Point2 {0.0f, 0.0f};
+		auto const xvec = Point2 {1.0f, 0.0f};
+		auto const point = Point2 {2.0f, 0.0f};
+
+		WHEN("Computing the two coefficients of (1,0) and (0,0)") {
+			auto const coeffs = solveScalingVecs(zerovec, xvec, point);
+
+			THEN("The reported coefficients are (0, 2)") {
+				CHECK(coeffs[0] == 0.0f);
+				CHECK(coeffs[1] == 2.0f);
+			}
+		}
+	}
 }

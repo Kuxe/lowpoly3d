@@ -211,7 +211,12 @@ std::ostream& operator<<(std::ostream& os, TTriangle<floating_point_type, dimens
 	return os;
 }
 
-using Triangle = TTriangle<float, 3>;
+using Trianglef = TTriangle<float, 3>;
+using Triangled = TTriangle<double, 3>;
+using Triangle = Trianglef;
+using Triangle2f = TTriangle<float, 2>;
+using Triangle2d = TTriangle<double, 2>;
+using Triangle2 = Triangle2f;
 
 } // End of namespace lowpoly3d
 

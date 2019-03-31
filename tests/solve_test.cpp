@@ -120,4 +120,26 @@ SCENARIO("solveScalingVecs") {
 			}
 		}
 	}
+
+	GIVEN("Two base vectors (0,-1), (0, 0) and a point (0,0)") {
+		auto const zerovec = Point2 {0.0f, 0.0f};
+		auto const nyvec = Point2 {0.0f, -1.0f};
+		auto const point = Point2 {0.0f, 0.0f};
+
+		WHEN("Computing the two coefficients of (0,-1) and (0,0)") {
+			auto const coeffs = solveScalingVecs(nyvec, zerovec, point);
+
+			THEN("The reported coefficients are (0, 0)") {
+				auto const eps = std::numeric_limits<float>::epsilon();
+				INFO("(0,0) and (0,-1) are reported as collinear: " << (glm::areCollinear(nyvec, zerovec, eps) ? "Yes." : "No."));
+				INFO("glm::dot(point, point)=" << glm::dot(point, point));
+				INFO("glm::dot(nyvec, point)=" << glm::dot(nyvec, point));
+				INFO("glm::dot(nyvec, point)/glm::dot(nyvec, nyvec)=" << glm::dot(nyvec, point)/glm::dot(nyvec, nyvec));
+				INFO("glm::dot(nyvec, point)/glm::dot(nyvec, nyvec) * nyvec = " << glm::to_string(glm::dot(nyvec, point)/glm::dot(nyvec, nyvec) * nyvec));
+				INFO("glm::dot(nyvec, point)/glm::dot(nyvec, nyvec) * nyvec == point? " << (glm::all(glm::epsilonEqual(glm::dot(nyvec, point)/glm::dot(nyvec, nyvec) * nyvec, point, eps)) ? "Yes. (as expected)" : "No. (this was unexpected)"));
+				CHECK(coeffs[0] == 0.0f);
+				CHECK(coeffs[1] == 0.0f);
+			}
+		}
+	}
 }

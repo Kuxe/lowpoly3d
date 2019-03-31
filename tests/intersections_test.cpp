@@ -623,6 +623,11 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 			auto const intersecting = intersects(triangle, segment);
 
 			THEN("They are reported as non-intersecting") {
+				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
+				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
+				INFO("projectedTriangle=" << projectedTriangle);
+				INFO("projectedSegmentPoint=" << glm::to_string(projectedSegmentPoint));
 				REQUIRE_FALSE(intersecting);
 			}
 		}

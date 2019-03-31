@@ -4,6 +4,7 @@
 #define SOLVE_HPP
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/epsilon.hpp>
 #include <glm/gtx/vector_query.hpp> // glm::areCollinear
 
 #include "geometric_primitives/point.hpp"
@@ -43,12 +44,28 @@ TPoint<floating_point_type, 2> solveScalingVecs(
 
 	// Handle special case where v,w are collinear --- c may still be spanned by v and w.
 	if(glm::areCollinear(v, w, eps)) {
-		auto const vcdot = glm::dot(v, c);
-		auto const vvdot = glm::dot(v, v);
-		auto const r = vcdot / vvdot;
 		auto const NaN = std::numeric_limits<floating_point_type>::quiet_NaN();
-		return r * v == c // True iff v, c collinear as well
-			? vec2{r, 0}
+		auto const vvdot = glm::dot(v, v);
+		if(vvdot != 0) {
+			auto const vcdot = glm::dot(v, c);
+			auto const r = vcdot / vvdot;
+			return glm::all(glm::epsilonEqual(r * v, c, eps)) // True iff v, c collinear as well
+				? vec2{r, 0}
+				: vec2{NaN, NaN};
+		}
+
+		auto const wwdot = glm::dot(w, w);
+		if(wwdot != 0) {
+			auto const wcdot = glm::dot(w, c);
+			auto const s = wcdot / wwdot;
+			return glm::all(glm::epsilonEqual(s * w, c, eps)) // True iff w, c collinear as well
+				? vec2{0, s}
+				: vec2{NaN, NaN};
+		}
+
+		// v=w=zerovec, so they can only span the zeropoint
+		return glm::all(glm::epsilonEqual(c, vec2(0, 0), eps))
+			? vec2{0, 0}
 			: vec2{NaN, NaN};
 	}
 

@@ -16,7 +16,7 @@ namespace lowpoly3d {
  *   a . v = p
  *   b . v = q
  * 
- * for v in R2, with a,b,p,q given vectors in R2. */
+ * for v in R2, with a,b given vectors in R2 and p,q given scalars in R. */
 template<typename floating_point_type>
 TPoint<floating_point_type, 2> solveDotSystem2D(
 	TPoint<floating_point_type, 2> const& a,

@@ -532,6 +532,21 @@ SCENARIO("Plane-LineSegment intersection tests") {
 			}
 		}
 	}
+
+	GIVEN("A a LineSegment((1,0,0),(2,0,0)), that lies on the XY-plane, and the XY-plane") {
+		auto const point = Point(0.0f, 0.0f, 0.0f);
+		auto const normal = Point(0.0f, 0.0f, 1.0f);
+		auto const plane = Plane(point, normal);
+		auto const segment = LineSegment {{1.0f,0.0f,0.0f},{2.0f,0.0f,0.0f}};
+
+		WHEN("Checking if that LineSegment intersects the XY-plane") {
+			bool isIntersecting = intersects(segment, plane);
+
+			THEN("They are reported as intersecting") {
+				REQUIRE(isIntersecting);
+			}
+		}
+	}
 }
 
 SCENARIO("Triangle-LineSegment intersection tests") {

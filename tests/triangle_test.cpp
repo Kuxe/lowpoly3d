@@ -215,6 +215,33 @@ SCENARIO("Interior points of triangle (2D)") {
 			}
 		}
 	}
+
+	GIVEN("A degenerate triangle {(0, -1/sqrt(2)), (0,0), (0, -1/sqrt(2))} and the zeropoint, which is contained by the degenerate triangle") {
+		auto const triangle = Triangle2{{0.0f, -1.0f/sqrtf(2.0f)}, {0.0f, 0.0f}, {0.0f, -1.0f/sqrtf(2.0f)}};
+		auto const point = Point2{0.0f, 0.0f};
+
+		WHEN("Checking if the zeropoint is contained by the degenerate triangle") {
+			auto const isContained = triangle.contains(point);
+
+			THEN("The zeropoint is reportedly contained by the degenerate triangle") {
+				REQUIRE(isContained);
+			}
+		}
+	}
+
+	GIVEN("A degenerate triangle {(0, -1/sqrt(2)), (0,0), (0, -1/sqrt(2))} and the point (0, -1/sqrt(2)), which is contained by the degenerate triangle") {
+		auto const triangleVertex = Point2{0.0f, -1.0f/sqrtf(2.0f)};
+		auto const triangle = Triangle2{triangleVertex, {0.0f, 0.0f}, triangleVertex};
+		auto const point = triangleVertex;
+
+		WHEN("Checking if the zeropoint is contained by the degenerate triangle") {
+			auto const isContained = triangle.contains(point);
+
+			THEN("The zeropoint is reportedly contained by the degenerate triangle") {
+				REQUIRE(isContained);
+			}
+		}
+	}
 }
 
 SCENARIO("Triangle intersection") {

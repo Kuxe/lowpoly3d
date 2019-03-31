@@ -514,6 +514,26 @@ SCENARIO("Intersection tests") {
 	// TODO: More difficult plane-plane intersections with non-trivial results that cannot be degenerate cases
 }
 
+SCENARIO("Plane-LineSegment intersection tests") {
+	using namespace lowpoly3d;
+
+
+	GIVEN("A a LineSegment((2,1,0),(1,0,0)), that lies on the XY-plane, and the XY-plane") {
+		auto const point = Point(0.0f, 0.0f, 0.0f);
+		auto const normal = Point(0.0f, 0.0f, 1.0f);
+		auto const plane = Plane(point, normal);
+		auto const segment = LineSegment {{2,1,0},{1,0,0}};
+
+		WHEN("Checking if that LineSegment intersects the XY-plane") {
+			bool isIntersecting = intersects(segment, plane);
+
+			THEN("They are reported as intersecting") {
+				REQUIRE(isIntersecting);
+			}
+		}
+	}
+}
+
 SCENARIO("Triangle-LineSegment intersection tests") {
 	using namespace lowpoly3d;
 

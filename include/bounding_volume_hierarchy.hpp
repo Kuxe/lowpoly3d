@@ -15,7 +15,9 @@
 
 #include "model.hpp"
 
+#include "utils/no_such_triangle_exception.hpp"
 #include "utils/not_implemented_exception.hpp"
+#include "utils/throw_if.hpp"
 
 namespace lowpoly3d {
 
@@ -229,9 +231,14 @@ public:
 	BVHModel(const Model* model) : BVH(*model), model(model) { }
 
 	TTriangle<floating_point_type, 3> getTriangle(std::size_t idx) const {
-		throw NotImplementedException();
-		TPoint<floating_point_type, 3> const zero(0.0f, 0.0f, 0.0f);
-		return TTriangle<floating_point_type, 3>(zero, zero, zero);
+		throw_no_such_triangle_if_geq(idx, model->triangleIndices.size());
+		auto const& vertices = model->vertices;
+		auto const& triangle = model->triangleIndices[idx];
+		return TTriangle<floating_point_type, 3>(
+			vertices[triangle[0]],
+			vertices[triangle[1]],
+			vertices[triangle[2]]
+		);
 	}
 };
 

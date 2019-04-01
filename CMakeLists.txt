@@ -203,6 +203,7 @@ add_library(lowpoly3d SHARED
 	include/utils/not_implemented_exception.hpp	src/utils/not_implemented_exception.cpp
 	include/utils/solve.hpp
 	include/utils/strong_type.hpp
+	include/utils/throw_if.hpp					src/utils/throw_if.cpp
 )
 
 target_compile_options(lowpoly3d 

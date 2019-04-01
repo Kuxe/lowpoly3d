@@ -1,6 +1,7 @@
 #ifndef BOUNDING_VOLUME_HIERARCHY
 #define BOUNDING_VOLUME_HIERARCHY
 
+#include <algorithm> //std::all
 #include <iostream> //std::cout
 #include <utility> //std::pair
 #include <numeric> //std::iota
@@ -202,6 +203,21 @@ public:
 		unaryNodeFunction(*this, idx);
 		depthfirstExceptLeaves(unaryNodeFunction, current.left_idx);
 		depthfirstExceptLeaves(unaryNodeFunction, current.right_idx);
+	}
+
+	/* Returns true if predicate is true for all BVs */
+	bool all_of(std::function<bool(bv_type const&)> const& predicate) {
+		return std::all_of(bvs.begin(), bvs.end(), predicate);
+	}
+
+	/* Returns true if predicate is true for any BV */
+	bool any_of(std::function<bool(bv_type const&)> const& predicate) {
+		return std::any_of(bvs.begin(), bvs.end(), predicate);
+	}
+
+	/* Returns true if predicate is true for no BV */
+	bool none_of(std::function<bool(bv_type const&)> const& predicate) {
+		return std::none_of(bvs.begin(), bvs.end(), predicate);
 	}
 
 	std::string dotgraph() const {

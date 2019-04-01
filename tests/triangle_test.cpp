@@ -435,6 +435,19 @@ SCENARIO("Triangle intersection") {
 
 		intersectsCommutativityCheck(large, small);
 	}
+
+	GIVEN("A triangle {(0,0,0),(1,0,0),(0,1,0)} and another non-intersecting triangle {(5,0,0),(6,0,0),(5,1,0)}") {
+		Triangle const
+			t1{{0,0,0},{1,0,0},{0,1,0}},
+			t2{{5,0,0},{6,0,0},{5,1,0}};
+
+		WHEN("Checking if they intersect") {
+			bool const intersecting = intersects(t1, t2);
+			THEN("They are reported as non-intersecting") {
+				REQUIRE_FALSE(intersecting);
+			}
+		}
+	}
 }
 
 }

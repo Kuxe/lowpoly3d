@@ -199,6 +199,7 @@ add_library(lowpoly3d SHARED
 	include/utils/glmutils.hpp
 	include/utils/lerp.hpp
 	include/utils/misc.hpp
+	include/utils/no_such_triangle_exception.hpp src/utils/no_such_triangle_exception.cpp
 	include/utils/not_implemented_exception.hpp	src/utils/not_implemented_exception.cpp
 	include/utils/solve.hpp
 	include/utils/strong_type.hpp

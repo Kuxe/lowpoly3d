@@ -143,6 +143,16 @@ SCENARIO("BVH collision") {
 				REQUIRE_FALSE(intersecting);
 			}
 		}
+
+		WHEN("testing intersection between intersecting translated bvh and bvh at identity") {
+			const glm::mat4 identity = glm::mat4(1.0f);
+			const glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			const bool intersecting = collides(bvh, bvh, identity, translation);
+
+			THEN("intersection is not detected") {
+				REQUIRE_FALSE(intersecting);
+			}
+		}
 	}
 }
 

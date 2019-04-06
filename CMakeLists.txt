@@ -192,6 +192,7 @@ add_library(lowpoly3d SHARED
 	include/geometric_primitives/linesegment.hpp
 	include/geometric_primitives/plane.hpp
 	include/geometric_primitives/point.hpp
+	include/geometric_primitives/rectangle.hpp
 	include/geometric_primitives/sphere.hpp		src/geometric_primitives/sphere.cpp
 	include/geometric_primitives/triangle.hpp
 

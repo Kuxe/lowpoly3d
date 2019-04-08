@@ -240,8 +240,8 @@ SCENARIO("BVH collision") {
 			const glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 			const bool intersecting = collides(bvh, bvh, identity, translation);
 
-			THEN("intersection is not detected") {
-				REQUIRE_FALSE(intersecting);
+			THEN("intersection is detected") {
+				REQUIRE(intersecting);
 			}
 		}
 	}

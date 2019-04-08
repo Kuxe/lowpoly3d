@@ -3,6 +3,8 @@
 #include <functional>
 #include <catch.hpp>
 
+#include "generators/terraingenerator.hpp"
+
 namespace lowpoly3d {
 
 SCENARIO("BVH building") {
@@ -56,6 +58,27 @@ SCENARIO("BVH building") {
 			}
 			THEN("The BV at the root index is the same BV returned by root()") {
 				REQUIRE(&bvh[bvh.root_idx()] == &bvh.root());
+			}
+		}
+	}
+
+	GIVEN("A procedurally generated terrain") {
+		TerrainGenerator tg;
+		Model terrainModel = tg.generate();
+
+		WHEN("Building a BVH over the terrain") {
+			BVH<Sphere> terrainBVH(terrainModel);
+
+			THEN("Each parent BV encloses its child BV") {
+				auto enclosesChildren = [](const BVH<Sphere>& bvh, const std::size_t& idx) {
+					auto const& current = bvh[idx];
+					auto const& left = bvh.left(current);
+					auto const& right = bvh.right(current);
+					REQUIRE(current.encloses(left));
+					REQUIRE(current.encloses(right));
+				};
+
+				terrainBVH.depthfirstExceptLeaves(enclosesChildren, terrainBVH.root_idx());
 			}
 		}
 	}

@@ -116,7 +116,98 @@ SCENARIO("BVH collision") {
 				REQUIRE_FALSE(intersecting);
 			}
 		}
+	}
 
+	GIVEN("A BVH over a single triangle and a rectangle") {
+		using vertex_type = Model::vertex_type;
+		using color_type = Model::color_type;
+		using triangle_indices_type = Model::triangle_indices_type;
+
+		auto rectangleModel = []() {
+			std::vector<vertex_type> const vertices {
+			{0.0f, 0.0f, 0.0f},
+			{1.0f, 0.0f, 0.0f},
+			{1.0f, 1.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f}
+		};
+
+		std::vector<color_type> const colors {
+			{0.0f, 0.0f, 0.0f},
+			{1.0f, 0.0f, 0.0f},
+			{1.0f, 1.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f}
+		};
+
+		std::vector<triangle_indices_type> const indices {
+			{0, 1, 3},
+			{1, 2, 3}
+		};
+			
+			return Model{vertices, colors, indices};
+		}();
+
+		auto triangleModel = []() {
+			std::vector<vertex_type> const vertices {
+				{0.0f, 0.0f, 0.0f},
+				{1.0f, 0.0f, 0.0f},
+				{1.0f, 1.0f, 0.0f},
+			};
+
+			std::vector<color_type> const colors {
+				{0.0f, 0.0f, 0.0f},
+				{1.0f, 0.0f, 0.0f},
+				{1.0f, 1.0f, 0.0f}
+			};
+
+			std::vector<triangle_indices_type> const indices {
+				{0, 1, 2}
+			};
+			
+			return Model{vertices, colors, indices};
+		}();
+
+		BVHModel
+			rectangleBVH(&rectangleModel),
+			triangleBVH(&triangleModel);
+		
+		WHEN("Testing intersections with identity transformations") {
+			const glm::mat4 identity = glm::mat4(1.0f);
+			const bool intersection = collides(rectangleBVH, triangleBVH, identity, identity);
+			
+			THEN("intersection is detected") {
+				REQUIRE(intersection);
+			}
+		}
+
+		WHEN("Testing intersections with transformations so that they do collide") {
+			auto const identity = glm::mat4(1.0f);
+			auto const translationTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.0f, 0.0f));
+			auto const intersection = collides(rectangleBVH, triangleBVH, identity, identity);
+			
+			THEN("intersection is detected") {
+				REQUIRE(intersection);
+			}
+		}
+
+		WHEN("Testing intersections with transformations so that they touch") {
+			auto const identity = glm::mat4(1.0f);
+			auto const translationTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			auto const intersection = collides(rectangleBVH, triangleBVH, identity, translationTransformation);
+			
+			THEN("intersection is reported") {
+				REQUIRE(intersection);
+			}
+		}
+		
+		WHEN("Testing intersections with transformations so that they do not collide") {
+			auto const identity = glm::mat4(1.0f);
+			auto const translationTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.01f));
+			auto const intersection = collides(rectangleBVH, triangleBVH, identity, translationTransformation);
+			
+			THEN("no intersection is reported") {
+				REQUIRE_FALSE(intersection);
+			}
+		}
 	}
 
 	GIVEN("A BVH over a single sphere") {

@@ -23,10 +23,10 @@ public:
 	TDirection(TDirection<floating_point_type> const& others) = default;
 	TDirection(TDirection<floating_point_type>&& others) = default;
 
-	[[nodiscard]] theta() const { return t; }
+	[[nodiscard]] floating_point_type theta() const { return t; }
 	void theta(floating_point_type value) { t = value; }
 
-	[[nodiscard]] phi() const { return p; }
+	[[nodiscard]] floating_point_type phi() const { return p; }
 	void phi(floating_point_type value) { p = value; }
 
 	[[nodiscard]] glm::vec<3, floating_point_type> getVec() const {

@@ -5,6 +5,7 @@
 #include <sstream>
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/epsilon.hpp>
 #include <glm/gtx/vector_angle.hpp>
 #include <glm/gtx/vector_query.hpp> //glm::areCollinear
 #include <glm/gtx/string_cast.hpp>
@@ -129,8 +130,8 @@ TLine<floating_point_type, dimension> intersection(
 	// That vector is n1 cross n2.
 	// Need only take an arbitrary point within both planes to determine the
 	// line uniquely
-	assert(glm::length(n1) == 1.0f);
-	assert(glm::length(n2) == 1.0f);
+	assert(glm::isNormalized(n1, eps));
+	assert(glm::isNormalized(n2, eps));
 	return {pointOnLine, direction};
 }
 
@@ -325,7 +326,8 @@ constexpr bool intersects(
 	auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 
 	// The two points should be projected into the same point since, see step 2 above
-	assert(glm::epsilonEqual(projectedSegmentPoint, plane.projectIntoLocal(segment.p2)));
+	auto const eps = std::numeric_limits<floating_point_type>::epsilon();
+	assert(glm::all(glm::epsilonEqual(projectedSegmentPoint, plane.projectIntoLocal(segment.p2), eps)));
 
 	// 4.
 	return projectedTriangle.contains(projectedSegmentPoint);

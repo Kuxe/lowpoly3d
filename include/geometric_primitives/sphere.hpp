@@ -134,10 +134,15 @@ TSphere<floating_point_type, dimension> mbs(
 		const vec_type midpoint = Sphere::floating_point_type(0.5)*(e1 + e2);
 
 		const floating_point_type enclosing_radius = Sphere::floating_point_type(0.5) * (d + a.r + b.r); // Since glm::distance(e1, e2) / 2.0f = (d + a.r + b.r) / 2.0f
-		assert(enclosing_radius >= a.r);
-		assert(enclosing_radius >= b.r);
-		assert(Sphere(midpoint, enclosing_radius).encloses(a));
-		assert(Sphere(midpoint, enclosing_radius).encloses(b));
+
+		// Sanity checks
+		{
+			auto constexpr eps = std::numeric_limits<floating_point_type>::epsilon();
+			assert(enclosing_radius + eps >= a.r);
+			assert(enclosing_radius + eps >= b.r);
+			assert(Sphere(midpoint, enclosing_radius).encloses(a));
+			assert(Sphere(midpoint, enclosing_radius).encloses(b));
+		}
 		return {midpoint, enclosing_radius};
 	}
 }

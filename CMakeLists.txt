@@ -196,6 +196,7 @@ add_library(lowpoly3d SHARED
 	include/geometric_primitives/sphere.hpp		src/geometric_primitives/sphere.cpp
 	include/geometric_primitives/triangle.hpp
 
+	include/utils/apt_assert.hpp
 	include/utils/arithmetic_invariant.hpp
 	include/utils/glmutils.hpp
 	include/utils/lerp.hpp

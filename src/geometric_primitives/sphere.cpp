@@ -5,6 +5,7 @@
 #include <iostream>
 #include <numeric>
 
+#include "utils/glmprint.hpp"
 #include "utils/not_implemented_exception.hpp"
 #include "geometric_primitives/intersections.hpp"
 
@@ -83,6 +84,11 @@ TSphere<floating_point_type, dimension> mbs(
 	const typename TSphere<floating_point_type, dimension>::point_type& b,
 	const typename TSphere<floating_point_type, dimension>::point_type& c) {
 
+	// Check that input points are not NaN
+	APT_ASSERT_EQ(a, a);
+	APT_ASSERT_EQ(b, b);
+	APT_ASSERT_EQ(c, c);
+
 	/* Check if MBS is midpoint of longest side, if so, return MBS at the midpoint */
 	floating_point_type const abside2 = glm::distance2(a, b);
 	floating_point_type const acside2 = glm::distance2(a, c);
@@ -116,32 +122,36 @@ TSphere<floating_point_type, dimension> mbs(
 		}
 	}
 
-	auto const midpoint = floating_point_type(0.5)*(farthestApartPoints.first + farthestApartPoints.second);
-	auto const radius = floating_point_type(0.5)*std::sqrt(longestSide);
-	TSphere<floating_point_type, dimension> ret(midpoint, radius);
-	if(ret.contains(otherPoint)) {
-		return ret;
+	{
+		auto const midpoint = floating_point_type(0.5)*(farthestApartPoints.first + farthestApartPoints.second);
+		auto const radius = floating_point_type(0.5)*std::sqrt(longestSide);
+		TSphere<floating_point_type, dimension> ret(midpoint, radius);
+		if(ret.contains(otherPoint)) {
+			return ret;
+		}
 	}
 
-	/* Let t=(p1,p2,3), then the center and radius of its MBS is given by:
-	 * 
-	 * (1)	||p1-c|| = r
-	 * (2)	||p2-c|| = r
-	 * (3)	||p3-c|| = r
-	 * 
-	 * Then:
-	 * =>	||p1-c|| = ||p2-c||, all solutions for c give a plane 
-	 * =>	||p1-c|| = ||p3-c||, all solutions for c give another plane
-	 * =>	||p2-c|| = ||p3-c||, all solutions for c give the last plane
-	 * 
-	 * So there exist exactly one c that satisfy (1-3), namely the intersection
-	 * of all 3 planes, which yields a point (if the three planes have different normals) */ 
-	ret.p = intersection(
-		getEquidistantPlane<floating_point_type, dimension>(a, b),
-		getEquidistantPlane<floating_point_type, dimension>(a, c),
-		getEquidistantPlane<floating_point_type, dimension>(b, c));
-	ret.r = glm::length(a - ret.p);
-	return ret;
+	{
+		/* Let t=(p1,p2,3), then the center and radius of its MBS is given by:
+		* 
+		* (1)	||p1-c|| = r
+		* (2)	||p2-c|| = r
+		* (3)	||p3-c|| = r
+		* 
+		* Then:
+		* =>	||p1-c|| = ||p2-c||, all solutions for c give a plane 
+		* =>	||p1-c|| = ||p3-c||, all solutions for c give another plane
+		* =>	||p2-c|| = ||p3-c||, all solutions for c give the last plane
+		* 
+		* So there exist exactly one c that satisfy (1-3), namely the intersection
+		* of all 3 planes, which yields a point (if the three planes have different normals) */ 
+		auto const midpoint = intersection(
+			getEquidistantPlane<floating_point_type, dimension>(a, b),
+			getEquidistantPlane<floating_point_type, dimension>(a, c),
+			getEquidistantPlane<floating_point_type, dimension>(b, c));
+		auto const radius = glm::length(a - midpoint);
+		return {midpoint, radius};
+	}
 }
 
 // Explicit instantiations of sphere

@@ -24,7 +24,6 @@ struct TSphere {
 	vec_type p;
 	floating_point_type r;
 
-	TSphere() = default;
 	constexpr TSphere(const vec_type& p, const floating_point_type r) : p(p), r(r) {
 		assert(!std::isinf(r));
 		assert(!std::isinf(p.x) && !std::isinf(p.y) && !std::isinf(p.z));

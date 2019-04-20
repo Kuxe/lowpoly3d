@@ -6,6 +6,12 @@
 
 #ifdef NDEBUG
 #define apt_assert(condition) ((void)0)
+#define APT_ASSERT_LESS(a, b)    ((void)0)
+#define APT_ASSERT_LEQ(a, b)     ((void)0)
+#define APT_ASSERT_EQ(a, b)      ((void)0)
+#define APT_ASSERT_GREATER(a, b) ((void)0)
+#define APT_ASSERT_GEQ(a, b)     ((void)0)
+#define APT_ASSERT_NEQ(a, b)     ((void)0)
 #else
 
 static constexpr auto& apt_assert_default_out = std::cout;

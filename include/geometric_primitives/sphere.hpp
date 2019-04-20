@@ -10,6 +10,7 @@
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/point.hpp"
 
+#include "utils/apt_assert.hpp"
 #include "utils/not_implemented_exception.hpp"
 
 namespace lowpoly3d {
@@ -116,11 +117,17 @@ template<typename floating_point_type, std::size_t dimension>
 TSphere<floating_point_type, dimension> mbs(
 	const TSphere<floating_point_type, dimension>& a,
 	const TSphere<floating_point_type, dimension>& b) {
+	
+	// Check that the radii of a and b are not NaN
+	APT_ASSERT_EQ(a.r, a.r);
+	APT_ASSERT_EQ(b.r, b.r);
 
 	using vec_type = typename TSphere<floating_point_type, dimension>::vec_type;
 
 	const vec_type diff = b.p - a.p;
 	const floating_point_type d = ::glm::length(diff);
+	APT_ASSERT_EQ(d, d);
+
 	// FIXME: d can be zero, causing a divide by zero
 	// If one sphere is enclosed by the other sphere, return the bigger sphere
 	const floating_point_type radiidiff = std::abs(a.r - b.r);
@@ -138,8 +145,8 @@ TSphere<floating_point_type, dimension> mbs(
 		// Sanity checks
 		{
 			auto constexpr eps = std::numeric_limits<floating_point_type>::epsilon();
-			assert(enclosing_radius + eps >= a.r);
-			assert(enclosing_radius + eps >= b.r);
+			APT_ASSERT_GEQ(enclosing_radius + eps, a.r);
+			APT_ASSERT_GEQ(enclosing_radius + eps, b.r);
 			assert(Sphere(midpoint, enclosing_radius).encloses(a));
 			assert(Sphere(midpoint, enclosing_radius).encloses(b));
 		}

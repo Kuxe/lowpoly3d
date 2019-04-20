@@ -198,6 +198,7 @@ add_library(lowpoly3d SHARED
 
 	include/utils/apt_assert.hpp
 	include/utils/arithmetic_invariant.hpp
+	include/utils/glmprint.hpp
 	include/utils/glmutils.hpp
 	include/utils/lerp.hpp
 	include/utils/misc.hpp

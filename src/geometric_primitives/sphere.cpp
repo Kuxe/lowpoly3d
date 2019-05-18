@@ -42,6 +42,17 @@ bool TSphere<floating_point_type, dimension>::contains(
 }
 
 template<typename floating_point_type, std::size_t dimension>
+bool TSphere<floating_point_type, dimension>::contains(
+	const triangle_type& triangle) const {
+	return std::all_of(
+		triangle.cbegin(),
+		triangle.cend(),
+	[this](auto const& point) {
+		return contains(point);
+	});
+}
+
+template<typename floating_point_type, std::size_t dimension>
 bool TSphere<floating_point_type, dimension>::isMBSof(
 	const TTriangle<floating_point_type, dimension>& triangle) const {
 	return *this == mbs<floating_point_type, dimension>(triangle);

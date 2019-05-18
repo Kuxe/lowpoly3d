@@ -21,6 +21,7 @@ struct TSphere {
 	static constexpr std::size_t dimension = TDimension;
 	using vec_type = ::glm::vec<dimension, floating_point_type>;
 	using point_type = TPoint<floating_point_type, dimension>;
+	using triangle_type = TTriangle<floating_point_type, dimension>;
 	vec_type p;
 	floating_point_type r;
 
@@ -49,6 +50,8 @@ struct TSphere {
 
 	// Returns true if point is within this (closed) sphere
 	bool contains(const point_type& point) const;
+	// Returns true if triangle is within this (closed) sphere
+	bool contains(const triangle_type& triangle) const;
 
 	// Returns true if this sphere is the MBS over the provided set of points
 	bool isMBSof(const TTriangle<floating_point_type, dimension>& points) const;

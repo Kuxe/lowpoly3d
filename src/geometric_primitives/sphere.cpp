@@ -37,18 +37,20 @@ bool TSphere<floating_point_type, dimension>::enclosed(
 
 template<typename floating_point_type, std::size_t dimension>
 bool TSphere<floating_point_type, dimension>::contains(
-	const point_type& point) const {
-	return glm::distance(point, p) <= r;
+	const point_type& point,
+	floating_point_type eps) const {
+	return glm::distance(point, p) <= r + eps;
 }
 
 template<typename floating_point_type, std::size_t dimension>
 bool TSphere<floating_point_type, dimension>::contains(
-	const triangle_type& triangle) const {
+	const triangle_type& triangle,
+	floating_point_type eps) const {
 	return std::all_of(
 		triangle.cbegin(),
 		triangle.cend(),
-	[this](auto const& point) {
-		return contains(point);
+	[this, eps](auto const& point) {
+		return contains(point, eps);
 	});
 }
 
@@ -138,6 +140,9 @@ TSphere<floating_point_type, dimension> mbs(
 		auto const radius = floating_point_type(0.5)*std::sqrt(longestSide);
 		TSphere<floating_point_type, dimension> ret(midpoint, radius);
 		if(ret.contains(otherPoint)) {
+			APT_ASSERT_LEQ(glm::distance(ret.p, a), ret.r + 1e-6);
+			APT_ASSERT_LEQ(glm::distance(ret.p, b), ret.r + 1e-6);
+			APT_ASSERT_LEQ(glm::distance(ret.p, c), ret.r + 1e-6);
 			return ret;
 		}
 	}
@@ -161,7 +166,18 @@ TSphere<floating_point_type, dimension> mbs(
 			getEquidistantPlane<floating_point_type, dimension>(a, c),
 			getEquidistantPlane<floating_point_type, dimension>(b, c));
 		auto const radius = glm::length(a - midpoint);
-		return {midpoint, radius};
+
+		// Check that midpoint has no NaN components and that radius is not NaN
+		APT_ASSERT_EQ(midpoint.x, midpoint.x);
+		APT_ASSERT_EQ(midpoint.y, midpoint.y);
+		APT_ASSERT_EQ(midpoint.z, midpoint.z);
+		APT_ASSERT_EQ(radius, radius);
+
+		TSphere<floating_point_type, dimension> ret {midpoint, radius};
+		assert(ret.contains(a));
+		assert(ret.contains(b));
+		assert(ret.contains(c));
+		return ret;
 	}
 }
 

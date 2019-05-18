@@ -134,9 +134,8 @@ public:
 
 		auto const xaxis = glm::cross(yaxis, getNormal());
 
-		auto const eps = std::numeric_limits<floating_point_type>::epsilon();
-		assert(glm::isNormalized(xaxis, eps));
-		assert(glm::isNormalized(yaxis, eps));
+		assert(glm::isNormalized(xaxis, std::numeric_limits<floating_point_type>::epsilon()));
+		assert(glm::isNormalized(yaxis, std::numeric_limits<floating_point_type>::epsilon()));
 
 		/* This is essentially T = [xaxis, yaxis, point], inversed (by transposing, thanks ON),
 		 * followed by multiplying with point --- a mapping from world to plane space ---

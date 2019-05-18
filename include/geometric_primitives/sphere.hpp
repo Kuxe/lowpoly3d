@@ -146,9 +146,8 @@ TSphere<floating_point_type, dimension> mbs(
 
 		// Sanity checks
 		{
-			auto constexpr eps = std::numeric_limits<floating_point_type>::epsilon();
-			APT_ASSERT_GEQ(enclosing_radius + eps, a.r);
-			APT_ASSERT_GEQ(enclosing_radius + eps, b.r);
+			APT_ASSERT_GEQ(enclosing_radius + std::numeric_limits<floating_point_type>::epsilon(), a.r);
+			APT_ASSERT_GEQ(enclosing_radius + std::numeric_limits<floating_point_type>::epsilon(), b.r);
 			assert(Sphere(midpoint, enclosing_radius).encloses(a));
 			assert(Sphere(midpoint, enclosing_radius).encloses(b));
 		}

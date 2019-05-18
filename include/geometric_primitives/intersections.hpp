@@ -326,8 +326,11 @@ constexpr bool intersects(
 	auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 
 	// The two points should be projected into the same point since, see step 2 above
-	auto const eps = std::numeric_limits<floating_point_type>::epsilon();
-	assert(glm::all(glm::epsilonEqual(projectedSegmentPoint, plane.projectIntoLocal(segment.p2), eps)));
+	assert(glm::all(
+		glm::epsilonEqual(projectedSegmentPoint,
+		plane.projectIntoLocal(segment.p2),
+		std::numeric_limits<floating_point_type>::epsilon())
+	));
 
 	// 4.
 	return projectedTriangle.contains(projectedSegmentPoint);

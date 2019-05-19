@@ -9,6 +9,8 @@
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/string_cast.hpp> //glm::vec3 into std::cout
 
+#include "utils/glm/glmprint.hpp"
+
 namespace Catch {
     template<>
     struct StringMaker<glm::vec3> {
@@ -512,6 +514,53 @@ SCENARIO("Intersection tests") {
 	}
 
 	// TODO: More difficult plane-plane intersections with non-trivial results that cannot be degenerate cases
+}
+
+SCENARIO("Line-Line (2D) intersection tests") {
+	using namespace lowpoly3d;
+
+	auto const zeropoint = Point2f{0.0f, 0.0f};
+
+	auto testLineIntersection = [](Line2 const& l1, Line2 const& l2, Point2 const& expected) {
+		std::stringstream ss;
+		ss << "l1=" << l1 << "\nl2=" << l2;
+		GIVEN(ss.str()) {
+
+			WHEN("Checking if the two lines are parallel") {
+				bool const parallel = areParallel(l1.getDirection(), l2.getDirection());
+
+				THEN("They are reported as not parallel") {
+					REQUIRE_FALSE(parallel);
+				}
+			}
+
+			WHEN("Intersecting the two Lines") {
+				auto const result = intersection(l1, l2);
+
+				std::stringstream ssexpected;
+				ssexpected << "The result is reportedly " << glm::to_string(expected);
+				THEN(ssexpected.str()) {
+					INFO("result=" << result);
+					REQUIRE(glm::all(glm::epsilonEqual(result, expected, 1e-6f)));
+				}
+			}
+		}
+	};
+
+	testLineIntersection(
+		{{0.0f, 0.0f}, {1.0f, 0.0f}},
+		{{0.0f, 0.0f}, {0.0f, 1.0f}},
+		{0.0f, 0.0f});
+
+	testLineIntersection(
+		{{1.0f, 1.0f}, {1.0f, 0.0f}},
+		{{-1.0f, 0.0f}, {0.0f, 1.0f}},
+		{-1.0f, 1.0f});
+
+	testLineIntersection(
+		{{1.0f, -1.0f}, {1.0f, -2.0f}},
+		{{-2.0f, 2.0f}, {2.0f, -1.0f}},
+		{0.0f, 1.0f});
 }
 
 SCENARIO("Plane-LineSegment intersection tests") {

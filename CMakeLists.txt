@@ -201,6 +201,7 @@ add_library(lowpoly3d SHARED
 	include/utils/glm/are_parallel.hpp
 	include/utils/glm/glmprint.hpp
 	include/utils/glm/glmutils.hpp
+	include/utils/glm/vector_projection.hpp
 	include/utils/lerp.hpp
 	include/utils/misc.hpp
 	include/utils/no_such_triangle_exception.hpp src/utils/no_such_triangle_exception.cpp

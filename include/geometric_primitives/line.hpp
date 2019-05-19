@@ -124,7 +124,12 @@ bool almostEqual(
 	return l1.isParallelTo(l2) && l1.contains(l2.getPoint());
 }
 
-using Line = TLine<float, 3>;
+using Line   = TLine<float , 3>;
+using Lined  = TLine<double, 3>;
+using Linef  = TLine<float , 3>;
+using Line2  = TLine<float , 2>;
+using Line2d = TLine<double, 2>;
+using Line2f = TLine<float , 2>;
 
 template<typename floating_point_type, std::size_t dimension>
 std::ostream& operator<<(std::ostream& out, const TLine<floating_point_type, dimension>& line) {

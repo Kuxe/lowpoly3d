@@ -9,7 +9,7 @@
 #include <iostream>
 #include <type_traits>
 
-#include "utils/glmutils.hpp"
+#include "utils/glm/glmutils.hpp"
 
 #include "geometric_primitives/point.hpp"
 

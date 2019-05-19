@@ -5,7 +5,7 @@
 #include <iostream>
 #include <numeric>
 
-#include "utils/glmprint.hpp"
+#include "utils/glm/glmprint.hpp"
 #include "utils/not_implemented_exception.hpp"
 #include "geometric_primitives/intersections.hpp"
 

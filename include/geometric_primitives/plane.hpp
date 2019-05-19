@@ -10,7 +10,7 @@
 
 #include "geometric_primitives/point.hpp"
 
-#include "utils/glmutils.hpp"
+#include "utils/glm/glmutils.hpp"
 #include "utils/strong_type.hpp"
 #include "utils/not_implemented_exception.hpp"
 

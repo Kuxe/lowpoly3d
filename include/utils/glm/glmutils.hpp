@@ -9,17 +9,6 @@
 
 namespace lowpoly3d {
 
-template<typename floating_point_type, std::size_t dimension>
-bool areParallel(
-	const glm::vec<dimension, floating_point_type>& d1,
-	const glm::vec<dimension, floating_point_type>& d2) {
-
-	const auto d1normalized = glm::normalize(d1);
-	const auto d2normalized = glm::normalize(d2);
-
-	return std::abs(glm::dot(d1normalized, d2normalized) - floating_point_type(1)) < std::numeric_limits<floating_point_type>::epsilon();
-}
-
 // Given three vectors in R^4, returns a forth orthogonal vector
 template<typename floating_point_type>
 glm::vec<4, floating_point_type> orthogonal4(

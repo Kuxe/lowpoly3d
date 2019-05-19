@@ -9,6 +9,7 @@
 #include <iostream>
 #include <type_traits>
 
+#include "utils/glm/are_parallel.hpp"
 #include "utils/glm/glmutils.hpp"
 
 #include "geometric_primitives/point.hpp"
@@ -79,9 +80,7 @@ struct TLine {
 
 	// Returns true if "direction" is parallel to this line
 	[[nodiscard]] bool isParallelTo(const vec_type& direction) const {
-		return
-			glm::length(glm::cross(getDirection(), direction)) <=
-			std::numeric_limits<floating_point_type>::epsilon();
+		return areParallel<floating_point_type, dimension>(getDirection(), direction);
 	}
 
 	// Returns true if "line" is parallel to this line

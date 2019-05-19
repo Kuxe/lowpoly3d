@@ -135,9 +135,44 @@ TLine<floating_point_type, dimension> intersection(
 	return {pointOnLine, direction};
 }
 
-/* Returns a plane of points that satisfy dot(a, p) = b, where a,b is given
- * and p is any point on the returned plane. */
+/* Line-line intersection in 2D that returns the point of intersection.
+ * Returns a point with two quiet NaN components if the two lines are parallel */
+template<typename floating_point_type>
+TPoint<floating_point_type, 2> intersection(
+	TLine<floating_point_type, 2> const& l1,
+	TLine<floating_point_type, 2> const& l2
+)
+{
+	if(l1.isParallelTo(l2)) {
+		auto constexpr quietNaN = std::numeric_limits<floating_point_type>::quiet_NaN();
+		return TPoint<floating_point_type, 2>(quietNaN, quietNaN);
+	}
 
+	/* C1 + d1*t2 = C2 + d2*t2
+	 *          C = d2*d2 -d1*t2
+	 * 
+	 * i.e
+	 * 
+	 * Cx = d2x*t2 - d1x*t1 = (-d1x, d2x) dot (t1, t2)
+	 * Cy = d2y*t2 - d1y*t1 = (-d1y, d2y) dot (t1, t2)
+	 * 
+	 * For this we have solveDotSystem2D */
+
+	/* a . v = p */
+ 	/* b . v = q */
+	auto const timepoints = solveDotSystem2D(
+		{-l1.getDirection().x, l2.getDirection().x},
+		{-l1.getDirection().y, l2.getDirection().y},
+		l1.getPoint().x - l2.getPoint().x,
+		l1.getPoint().y - l2.getPoint().y
+	);
+
+	// TODO: Figure out good name for a function that returns time
+	// of intersection instead of the intersection itself
+	// then factor the functionality in this function to such a
+	// function, and make this function a function of that function :)
+	return l1.parametrization(timepoints.x);
+}
 
 /* Line-plane intersection that returns the point of intersection.
  * Returns (NaN) if either:

@@ -3,9 +3,8 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-// TODO: Add more operarotrs / find generic way to generate << for all glm types
-
-std::ostream& operator<<(std::ostream& out, const glm::vec3& g) {
+template<typename Out, int T, typename U, glm::precision P>
+Out& operator<<(Out& out, const glm::vec<T, U, P>& g) {
     return out << glm::to_string(g);
 }
 

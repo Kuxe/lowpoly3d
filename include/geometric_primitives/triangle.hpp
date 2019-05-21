@@ -12,6 +12,7 @@
 
 #include <glm/gtx/string_cast.hpp> // glm::to_string
 
+#include "utils/glm/vector_projection.hpp"
 #include "utils/solve.hpp"
 
 namespace lowpoly3d {
@@ -93,6 +94,31 @@ struct TriangleContains<floating_point_type, 2> {
 			inRangeEps(ts.x, 0, 1, eps) &&
 			inRangeEps(ts.y, 0, 1, eps) &&
 			inRangeEps(sumt, 0, 1, eps);
+	}
+};
+
+template<typename floating_point_type, std::size_t dimension>
+struct Circumcenter { }; // Not implemented for arbitrary dimension
+
+template<typename floating_point_type>
+struct Circumcenter<floating_point_type, 3> {
+	using point_type = TPoint<floating_point_type, 3>;
+
+	point_type operator()(TTriangle<floating_point_type, 3> const& triangle) const {
+		/* To figure out whats going on here:
+		 * Let A, B, C be a triangle.
+		 * By convention, let all bisectors point inward.
+		 * Draw two bisectors bisector(AB), bisector(CA) in the triangle
+		 * The intersection of bisector(AB) with bisector(CA) is the circumcenter
+		 * Project AC/2 onto bisector(AB). Denote this projection point as 'P'.
+		 * Form AC/2 - P. Denote this vector as v.
+		 * Project v onto -bisector(AB) but do a funny projection where the rejection vector is
+		 * perpendicular to v instead of -bisector(AB). Note that this point is exactly the
+		 * intersection of bisector(AB) and bisector(CA) i.e the circumcenter. Done. */
+		auto const t1t0 = triangle[1] - triangle[0];
+		auto t1t0InwardBisector = glm::cross(triangle.normal().getVec(), t1t0);
+		auto const t0t2midpoint = floating_point_type(0.5)*(triangle[0] + triangle[2]);
+		return projectOnto2(t0t2midpoint - projectOnto(t0t2midpoint, t1t0InwardBisector), -t1t0InwardBisector);
 	}
 };
 
@@ -202,6 +228,10 @@ struct TTriangle {
 	// Returns true if this triangle is degenerate
 	bool degenerate() const {
 		return area() <= std::numeric_limits<floating_point_type>::epsilon();
+	}
+
+	point_type circumcenter() const {
+		return detail::Circumcenter<floating_point_type, dimension>()(*this);
 	}
 };
 

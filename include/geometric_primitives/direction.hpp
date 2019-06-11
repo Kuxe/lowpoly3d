@@ -49,7 +49,7 @@ public:
 	friend std::ostream operator<<(std::ostream& os, TDirection<T> const& direction);
 
 private:
-	floating_point_type p, t;
+	floating_point_type t, p;
 };
 
 using Direction = TDirection<double>;

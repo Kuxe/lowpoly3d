@@ -1,6 +1,8 @@
 #ifndef CYLINDER_HPP
 #define CYLINDER_HPP
 
+#include <functional>
+
 #include "geometric_primitives/point.hpp"
 
 namespace lowpoly3d {
@@ -10,18 +12,20 @@ namespace lowpoly3d {
 template<typename floating_point_type>
 class TCylinder {
 public:
-	TCylinder(floating_point_type radius, floating_point_type height) 
-		: r(radius), h(height) { }
+	using fpt = floating_point_type;
+
+	TCylinder(fpt radius, fpt height) 
+		: radius(radius), height(height) { }
 
 	/* Returns a parametrization(rad, t) of this cylinder,
 	 * with rad in [0, 2pi) and t in [0, 1) */
-	[[nodiscard]] std::function<TPoint<floating_point_type, 3>(floating_point_type, floating_point_type)> parametrization() const {
-		return [radius, height](floating_point_type theta, t) -> TPoint<floating_point_type, 3> {
-			return {radius*std::cos(theta), radius*std::sin(theta), t*height - floating_point_type(0.5) * height };
+	[[nodiscard]] std::function<TPoint<fpt, 3>(fpt, fpt)> parametrization() const {
+		return [r = radius, h = height](fpt theta, fpt t) -> TPoint<fpt, 3> {
+			return {r*std::cos(theta), r*std::sin(theta), t*h - fpt(0.5) * h };
 		};
 	}
 private:
-	floating_point_type radius, height;
+	fpt radius, height;
 };
 
 using Cylinder = TCylinder<double>;

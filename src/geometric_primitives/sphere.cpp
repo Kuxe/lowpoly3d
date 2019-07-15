@@ -2,7 +2,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 #include <cassert>
-#include <iostream>
 #include <numeric>
 
 #include "utils/glm/glmprint.hpp"
@@ -161,19 +160,17 @@ TSphere<floating_point_type, dimension> mbs(
 		* 
 		* So there exist exactly one c that satisfy (1-3), namely the intersection
 		* of all 3 planes, which yields a point (if the three planes have different normals) */ 
-		auto const midpoint = intersection(
-			getEquidistantPlane<floating_point_type, dimension>(a, b),
-			getEquidistantPlane<floating_point_type, dimension>(a, c),
-			getEquidistantPlane<floating_point_type, dimension>(b, c));
-		auto const radius = glm::length(a - midpoint);
 
-		// Check that midpoint has no NaN components and that radius is not NaN
-		APT_ASSERT_EQ(midpoint.x, midpoint.x);
-		APT_ASSERT_EQ(midpoint.y, midpoint.y);
-		APT_ASSERT_EQ(midpoint.z, midpoint.z);
+		auto const circumcenter = TTriangle<floating_point_type, dimension>(a, b, c).circumcenter();
+		auto const radius = glm::length(a - circumcenter);
+
+		// Check that circumcenter has no NaN components and that radius is not NaN
+		APT_ASSERT_EQ(circumcenter.x, circumcenter.x);
+		APT_ASSERT_EQ(circumcenter.y, circumcenter.y);
+		APT_ASSERT_EQ(circumcenter.z, circumcenter.z);
 		APT_ASSERT_EQ(radius, radius);
 
-		TSphere<floating_point_type, dimension> ret {midpoint, radius};
+		TSphere<floating_point_type, dimension> ret {circumcenter, radius};
 		assert(ret.contains(a));
 		assert(ret.contains(b));
 		assert(ret.contains(c));

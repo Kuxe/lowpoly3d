@@ -187,7 +187,8 @@ add_library(lowpoly3d SHARED
 
 	include/geometric_primitives/cylinder.hpp
 	include/geometric_primitives/direction.hpp
-	include/geometric_primitives/intersections.hpp
+	include/geometric_primitives/intersections.hpp src/geometric_primitives/intersections.cpp
+	include/geometric_primitives/intersects.hpp src/geometric_primitives/intersects.cpp
 	include/geometric_primitives/line.hpp
 	include/geometric_primitives/linesegment.hpp
 	include/geometric_primitives/plane.hpp

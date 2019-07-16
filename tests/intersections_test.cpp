@@ -1,8 +1,12 @@
 #include <catch.hpp>
 #include <iostream>
+#include <sstream>
 
 #include "geometric_primitives/intersections.hpp"
+#include "geometric_primitives/intersects.hpp"
+#include "geometric_primitives/linesegment.hpp"
 #include "geometric_primitives/point.hpp"
+#include "geometric_primitives/triangle.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/epsilon.hpp> //glm::epsilonEqual

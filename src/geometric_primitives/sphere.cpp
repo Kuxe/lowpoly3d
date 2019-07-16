@@ -1,12 +1,13 @@
 #include "geometric_primitives/sphere.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/norm.hpp>
 #include <cmath>
 #include <cassert>
 #include <numeric>
 
 #include "utils/glm/glmprint.hpp"
 #include "utils/not_implemented_exception.hpp"
-#include "geometric_primitives/intersections.hpp"
+#include "geometric_primitives/intersects.hpp"
 
 namespace lowpoly3d {
 

@@ -1,6 +1,6 @@
 #include <catch.hpp>
 
-#include "geometric_primitives/intersections.hpp"
+#include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/triangle.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>

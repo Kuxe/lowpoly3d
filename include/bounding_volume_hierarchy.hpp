@@ -8,7 +8,7 @@
 #include <functional> //std::function
 #include <sstream> //std::stringstream
 
-#include "geometric_primitives/intersections.hpp"
+#include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/sphere.hpp"
 #include "geometric_primitives/triangle.hpp"
 

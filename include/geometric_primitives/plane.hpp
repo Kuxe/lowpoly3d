@@ -127,7 +127,7 @@ public:
 		// do not choose [0, 0, 1] as a initial vector to cross with,
 		// instead choose [0, 1, 0] 
 		auto const yaxis = glm::cross(getNormal(),
-			! glm::areCollinear(getNormal(), point_type(0, 0, 1), 1e-6f)
+			! glm::areCollinear(getNormal(), point_type(0, 0, 1), floating_point_type(1e-6))
 			? point_type(0, 0, 1)
 			: point_type(0, 1, 0)	
 		);

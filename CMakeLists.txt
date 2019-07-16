@@ -216,7 +216,7 @@ target_compile_options(lowpoly3d
 		-Wall
 		"$<$<CONFIG:RELEASE>:-O3>"
 		"$<$<CONFIG:DEBUG>:-DDEBUG>")
-target_compile_features(lowpoly3d PUBLIC cxx_std_14)
+target_compile_features(lowpoly3d PUBLIC cxx_std_17)
 
 #Thanks to https://stackoverflow.com/questions/13429656/cmake-how-to-copy-contents-of-a-directory-into-build-directory-after-make/13429998
 add_custom_command(TARGET lowpoly3d POST_BUILD
@@ -293,7 +293,7 @@ add_executable(lowpoly3d_test
 enable_testing()
 target_include_directories(lowpoly3d_test PRIVATE ${LOWPOLY3D_INCLUDE_DIRS})
 target_link_libraries(lowpoly3d_test PUBLIC lowpoly3d Catch2::Catch)
-target_compile_features(lowpoly3d_test PRIVATE cxx_std_14)
+target_compile_features(lowpoly3d_test PRIVATE cxx_std_17)
 
 include(CTest)
 include("cmake/Catch.cmake")

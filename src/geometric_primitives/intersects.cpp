@@ -45,8 +45,8 @@ bool Intersects<fpt, dim>::intersects(TLineSegment<fpt, dim> l,	TPoint<fpt, dim>
 		std::numeric_limits<double>::epsilon();
 }
 
-template<typename fpt, std::size_t dim>
-bool intersects(TLineSegment<fpt, dim> const& segment, TTriangle<fpt, dim> const& triangle)
+template<typename fpt>
+bool intersects(TLineSegment<fpt, 3> const& segment, TTriangle<fpt, 3> const& triangle)
 {
 	/* (naive but intuitive) Algorithm idea:
 	*
@@ -66,12 +66,12 @@ bool intersects(TLineSegment<fpt, dim> const& segment, TTriangle<fpt, dim> const
 	* intersects the triangle. */
 
 	// 1.
-	auto const trianglePlane = triangle.parallel();
+	auto const trianglePlane = parallel(triangle);
 	if(!intersects(segment, trianglePlane)) return false;
 
 	// 2
 	if(trianglePlane.contains(segment.p1) && trianglePlane.contains(segment.p2)) {
-		auto const projectedTriangle = triangle.projectIntoLocal(trianglePlane);
+		auto const projectedTriangle = projectIntoLocal(triangle, trianglePlane);
 		auto const projectedSegmentPoint1 = trianglePlane.projectIntoLocal(segment.p1);
 		auto const projectedSegmentPoint2 = trianglePlane.projectIntoLocal(segment.p2);
 		return projectedTriangle.contains(projectedSegmentPoint1) || projectedTriangle.contains(projectedSegmentPoint2);
@@ -80,7 +80,7 @@ bool intersects(TLineSegment<fpt, dim> const& segment, TTriangle<fpt, dim> const
 	// 3.
 	// Create plane parallell to the line segment
 	auto const plane = TPlane<fpt, 3>{segment.p1, segment.p2 - segment.p1};
-	auto const projectedTriangle = triangle.projectIntoLocal(plane);
+	auto const projectedTriangle = projectIntoLocal(triangle, plane);
 	auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 
 	// The two points should be projected into the same point since, see step 2 above

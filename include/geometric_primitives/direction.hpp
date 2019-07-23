@@ -1,6 +1,8 @@
 #ifndef DIRECTION_HPP
 #define DIRECTION_HPP
 
+#include <functional>
+
 #include "geometric_primitives/point.hpp"
 
 #include <ostream>

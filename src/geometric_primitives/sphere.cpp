@@ -162,16 +162,18 @@ TSphere<floating_point_type, dimension> mbs(
 		* So there exist exactly one c that satisfy (1-3), namely the intersection
 		* of all 3 planes, which yields a point (if the three planes have different normals) */ 
 
-		auto const circumcenter = TTriangle<floating_point_type, dimension>(a, b, c).circumcenter();
-		auto const radius = glm::length(a - circumcenter);
+
+		auto const cc = circumcenter(TTriangle<floating_point_type, dimension>(a, b, c));
+		auto const r = glm::length(a - cc);
 
 		// Check that circumcenter has no NaN components and that radius is not NaN
-		APT_ASSERT_EQ(circumcenter.x, circumcenter.x);
-		APT_ASSERT_EQ(circumcenter.y, circumcenter.y);
-		APT_ASSERT_EQ(circumcenter.z, circumcenter.z);
-		APT_ASSERT_EQ(radius, radius);
+		APT_ASSERT_EQ(cc.x, cc.x);
+		APT_ASSERT_EQ(cc.y, cc.y);
+		APT_ASSERT_EQ(cc.z, cc.z);
+		APT_ASSERT_EQ(r, r);
 
-		TSphere<floating_point_type, dimension> ret {circumcenter, radius};
+		TSphere<floating_point_type, dimension> ret {cc, r};
+
 		assert(ret.contains(a));
 		assert(ret.contains(b));
 		assert(ret.contains(c));

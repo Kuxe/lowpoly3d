@@ -630,7 +630,7 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 			bool const isIntersecting = intersects(triangle, segment);
 
 			THEN("The LineSegment intersects with the plane parallel to the triangle") {
-				REQUIRE(intersects(segment, triangle.parallel()));
+				REQUIRE(intersects(segment, parallel(triangle)));
 			}
 
 			THEN("The LineSegment is projected into a single point") {
@@ -642,20 +642,20 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 
 			THEN("The projected triangle has zero area") {
 				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
-				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedTriangle = projectIntoLocal(triangle, plane);
 				REQUIRE(projectedTriangle.area() <= eps);
 			}
 
 			THEN("The Triangle is projected into a degenerate triangle") {
 				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
-				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedTriangle = projectIntoLocal(triangle, plane);
 				INFO("projectedTriangle=" << projectedTriangle);
 				REQUIRE(projectedTriangle.degenerate());
 			}
 
 			THEN("The project triangle contains the projected point") {
 				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
-				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedTriangle = projectIntoLocal(triangle, plane);
 				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 				INFO("The triangle " << projectedTriangle << " does not contain the point (" << projectedSegmentPoint.x << "," << projectedSegmentPoint.y << ")");
 				REQUIRE(projectedTriangle.contains(projectedSegmentPoint));
@@ -677,7 +677,7 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 
 			THEN("They are reported as non-intersecting") {
 				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
-				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedTriangle = projectIntoLocal(triangle, plane);
 				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 				INFO("projectedTriangle=" << projectedTriangle);
 				INFO("projectedSegmentPoint=" << glm::to_string(projectedSegmentPoint));
@@ -735,7 +735,7 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 			THEN("They are reported as non-intersecting") {
 
 				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
-				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedTriangle = projectIntoLocal(triangle, plane);
 				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 
 				INFO("projectedTriangle=" << projectedTriangle);
@@ -754,7 +754,7 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 
 			THEN("They are reported as non-intersecting") {
 				auto const plane = Plane{segment.p1, segment.p2 - segment.p1};
-				auto const projectedTriangle = triangle.projectIntoLocal(plane);
+				auto const projectedTriangle = projectIntoLocal(triangle, plane);
 				auto const projectedSegmentPoint = plane.projectIntoLocal(segment.p1);
 
 				INFO("projectedTriangle=" << projectedTriangle);
@@ -771,8 +771,8 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 			auto const intersecting = intersects(triangle, segment);
 
 			THEN("They are reported as intersecting") {
-				INFO("Segment should intersect plane parallel to triangle. Does it? " << (intersects(segment, triangle.parallel()) ? "Yes." : "No."));
-				INFO("Triangle was projected into " << triangle.projectIntoLocal(Plane(segment.p1, segment.p2-segment.p1)));
+				INFO("Segment should intersect plane parallel to triangle. Does it? " << (intersects(segment, parallel(triangle)) ? "Yes." : "No."));
+				INFO("Triangle was projected into " << projectIntoLocal(triangle, Plane(segment.p1, segment.p2-segment.p1)));
 				INFO("Segment.p1 was projected into " << glm::to_string(Plane(segment.p1, segment.p2-segment.p1).projectIntoLocal(segment.p1)));
 				REQUIRE(intersecting);
 			}

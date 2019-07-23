@@ -175,6 +175,7 @@ add_library(lowpoly3d SHARED
 	include/uniformbuffer.hpp					src/uniformbuffer.cpp
 	include/glframe.hpp							src/glframe.cpp
 	include/worlduniformdata.hpp
+	include/minimum_bounding_sphere.hpp			src/minimum_bounding_sphere.cpp
 
 	include/generators/circlegenerator.hpp		src/generators/circlegenerator.cpp
 	include/generators/cubegenerator.hpp		src/generators/cubegenerator.cpp

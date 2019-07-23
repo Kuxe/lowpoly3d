@@ -14,6 +14,7 @@
 
 #include "generators/spheregenerator.hpp"
 
+#include "minimum_bounding_sphere.hpp"
 #include "model.hpp"
 
 #include "utils/no_such_triangle_exception.hpp"
@@ -53,9 +54,11 @@ private:
 			// Extract triangle at the sole index
 			const auto& triangle = model.getTriangleIndices(indices.front());
 			bvs.emplace_back(mbs<typename bv_type::floating_point_type, bv_type::dimension>(
-				model.vertices[triangle[0]],
-				model.vertices[triangle[1]],
-				model.vertices[triangle[2]]), indices[0], indices[0], true);
+				TTriangle<floating_point_type, 3> {
+					model.vertices[triangle[0]],
+					model.vertices[triangle[1]],
+					model.vertices[triangle[2]]
+				}), indices[0], indices[0], true);
 		} else {
 			// Split and recurse
 			const auto pair = split(model, indices);

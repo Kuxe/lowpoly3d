@@ -1,9 +1,12 @@
-#include "geometric_primitives/sphere.hpp"
-#include <iostream>
 #include <catch.hpp>
+
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <catch.hpp>
+
+#include "geometric_primitives/sphere.hpp"
+#include "geometric_primitives/triangle.hpp"
+
+#include "minimum_bounding_sphere.hpp"
 
 namespace lowpoly3d {
 

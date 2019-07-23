@@ -6,14 +6,13 @@
 #include <ostream>
 #include <glm/glm.hpp>
 
-#include "geometric_primitives/triangle.hpp"
-#include "geometric_primitives/plane.hpp"
-#include "geometric_primitives/point.hpp"
-
-#include "utils/apt_assert.hpp"
-#include "utils/not_implemented_exception.hpp"
-
 namespace lowpoly3d {
+
+template<typename fpt, std::size_t dim>
+using TPoint = glm::vec<dim, fpt>;
+
+template<typename fpt, std::size_t dim>
+struct TTriangle;
 
 template<typename TFloatingPointType, std::size_t TDimension>
 struct TSphere {
@@ -96,77 +95,6 @@ bool colliding(
 }
 
 bool colliding(const Sphere& a, const Sphere& b, const ::glm::mat4& a_transform, const ::glm::mat4& b_transform);
-
-// Returns a minimum bounding sphere over a triangle defined by vertices a, b and c
-template<typename floating_point_type, std::size_t dimension>
-TSphere<floating_point_type, dimension> mbs(
-	const typename TSphere<floating_point_type, dimension>::point_type& a,
-	const typename TSphere<floating_point_type, dimension>::point_type& b,
-	const typename TSphere<floating_point_type, dimension>::point_type& c);
-
-// Returns a minimum bounding sphere over a triangle
-template<typename floating_point_type, std::size_t dimension>
-TSphere<floating_point_type, dimension> mbs(
-	const std::array<typename TSphere<floating_point_type, dimension>::vec_type, 3>& triangle) {
-	return mbs<floating_point_type, dimension>(triangle[0], triangle[1], triangle[2]);
-}
-
-// Returns a minimum bounding sphere over a triangle
-template<typename floating_point_type, std::size_t dimension>
-TSphere<floating_point_type, dimension> mbs(
-	const TTriangle<floating_point_type, dimension>& triangle) {
-	return mbs<floating_point_type, dimension>(triangle[0], triangle[1], triangle[2]);
-}
-
-// Finds a minimum bounding sphere that encloses two spheres a and b
-template<typename floating_point_type, std::size_t dimension>
-TSphere<floating_point_type, dimension> mbs(
-	const TSphere<floating_point_type, dimension>& a,
-	const TSphere<floating_point_type, dimension>& b) {
-	
-	// Check that the radii of a and b are not NaN
-	APT_ASSERT_EQ(a.r, a.r);
-	APT_ASSERT_EQ(b.r, b.r);
-
-	using vec_type = typename TSphere<floating_point_type, dimension>::vec_type;
-
-	const vec_type diff = b.p - a.p;
-	const floating_point_type d = ::glm::length(diff);
-	APT_ASSERT_EQ(d, d);
-
-	// FIXME: d can be zero, causing a divide by zero
-	// If one sphere is enclosed by the other sphere, return the bigger sphere
-	const floating_point_type radiidiff = std::abs(a.r - b.r);
-	if (d <= radiidiff) {
-		// One sphere is fully enclosed in the other, return the biggest sphere
-		return a.r > b.r ? a : b; 
-	} else {
-		const vec_type unitdiff = diff / d;
-		const vec_type e2 = b.p + unitdiff * b.r;
-		const vec_type e1 = a.p - unitdiff * a.r;
-		const vec_type midpoint = Sphere::floating_point_type(0.5)*(e1 + e2);
-
-		const floating_point_type enclosing_radius = Sphere::floating_point_type(0.5) * (d + a.r + b.r); // Since glm::distance(e1, e2) / 2.0f = (d + a.r + b.r) / 2.0f
-
-		// Sanity checks
-		{
-			APT_ASSERT_GEQ(enclosing_radius + std::numeric_limits<floating_point_type>::epsilon(), a.r);
-			APT_ASSERT_GEQ(enclosing_radius + std::numeric_limits<floating_point_type>::epsilon(), b.r);
-			assert(Sphere(midpoint, enclosing_radius).encloses(a));
-			assert(Sphere(midpoint, enclosing_radius).encloses(b));
-		}
-		return {midpoint, enclosing_radius};
-	}
-}
-
-// Computes the minimum bounding sphere over a set of points in O(n^2)-time
-template<typename floating_point_type, std::size_t dimension>
-TSphere<floating_point_type, dimension> mbsNaive(
-	const std::vector<typename TSphere<floating_point_type, dimension>::point_type>& points) {
-
-	throw NotImplementedException();
-}
-
 	
 }; //End of lowpoly3d
 

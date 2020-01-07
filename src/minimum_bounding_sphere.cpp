@@ -88,16 +88,21 @@ TSphere<fpt, dim> mbs(TTriangle<fpt, dim> const& t) {
 		* So there exist exactly one c that satisfy (1-3), namely the intersection
 		* of all 3 planes, which yields a point (if the three planes have different normals) */ 
 
-		auto const oc = circumcenter(TTriangle<fpt, dim>(a, b, c));
-		auto const r = glm::length(a - c);
+		auto const cc = circumcenter(TTriangle<fpt, dim>(a, b, c));
+		auto const r = glm::length(a - cc);
+
+		// Check that (1), (2) and (3) hold
+		APT_ASSERT_EQ(glm::length(a - cc), r);
+		APT_ASSERT_EQ(glm::length(b - cc), r);
+		APT_ASSERT_EQ(glm::length(c - cc), r);
 
 		// Check that circumcenter has no NaN components and that radius is not NaN
-		APT_ASSERT_EQ(oc.x, oc.x);
-		APT_ASSERT_EQ(oc.y, oc.y);
-		APT_ASSERT_EQ(oc.z, oc.z);
+		APT_ASSERT_EQ(cc.x, cc.x);
+		APT_ASSERT_EQ(cc.y, cc.y);
+		APT_ASSERT_EQ(cc.z, cc.z);
 		APT_ASSERT_EQ(r, r);
 
-		TSphere<fpt, dim> ret {oc, r};
+		TSphere<fpt, dim> ret {cc, r};
 		assert(ret.contains(a));
 		assert(ret.contains(b));
 		assert(ret.contains(c));

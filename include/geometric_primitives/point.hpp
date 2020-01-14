@@ -22,7 +22,7 @@ TPoint<value_type, dimension> midpoint(
 };
 
 // Returns true if p1 and p2 are componentwise almost equal with ulp=2
-template<typename value_type, std::size_t dimension>
+template<typename value_type, auto dimension>
 bool almostEqual(
 	const TPoint<value_type, dimension>& p1,
 	const TPoint<value_type, dimension>& p2,

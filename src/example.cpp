@@ -6,11 +6,12 @@ using namespace lowpoly3d;
 struct Game : public ILowpolyInput {
 	using duration_s = std::chrono::duration<double, std::ratio<1, 1>>;
 	KeyManager keymanager;
-	Camera camera;
+	FPSCamera camera;
 
 	bool running = true;
 	duration_s dt;
-	double cameraSpeed = 3.0;
+
+	Game() : camera(keymanager, dt) {}
 
 	std::vector<RenderData> rds = {
 		{translate(glm::mat4(1.0f), -100.0f*glm::vec3(1.0f, 0.0, 1.0f)), "terrain", "default"},
@@ -25,8 +26,7 @@ struct Game : public ILowpolyInput {
 	}
 
 	void onMouse(double xpos, double ypos) {
-		const double radsPerPixel = std::acos(-1) / 2000.0;
-		camera.look({xpos, ypos}, cameraSpeed * radsPerPixel);
+		camera.look(xpos, ypos);
 	}
 
 	void run(Renderer& renderer) {
@@ -36,17 +36,8 @@ struct Game : public ILowpolyInput {
 		};
 		
 		/** Map key events to functions **/
-		keymanager[GLFW_KEY_W].setOnHoldFunction([this]() { camera.dolly(+cameraSpeed * dt.count()); });
-		keymanager[GLFW_KEY_S].setOnHoldFunction([this]() { camera.dolly(-cameraSpeed * dt.count()); });
-		keymanager[GLFW_KEY_A].setOnHoldFunction([this]() { camera.truck(-cameraSpeed * dt.count()); });
-		keymanager[GLFW_KEY_D].setOnHoldFunction([this]() { camera.truck(+cameraSpeed * dt.count()); });
-		keymanager[GLFW_KEY_Q].setOnHoldFunction([this]() { camera.pedestal(-cameraSpeed * dt.count()); });
-		keymanager[GLFW_KEY_E].setOnHoldFunction([this]() { camera.pedestal(+cameraSpeed * dt.count()); });
 		keymanager[GLFW_KEY_ESCAPE].setOnHoldFunction([this]() { running = false; });
 		keymanager[GLFW_KEY_Z].setOnPressFunction([this]() { showWireframes = !showWireframes; });
-		keymanager[GLFW_KEY_LEFT_SHIFT]
-			.setOnPressFunction([this]() { cameraSpeed = 10.0f; })
-			.setOnReleaseFunction([this]() { cameraSpeed = 3.0f; });
 
 		while(running) {
 			// Game logic here - handle input and make a sphere go round and round

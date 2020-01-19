@@ -157,6 +157,7 @@ add_library(lowpoly3d SHARED
 	include/events.hpp
 	include/debugrenderer.hpp					src/debugrenderer.cpp
 	include/depthframebuffer.hpp				src/depthframebuffer.cpp
+	include/fps_camera.hpp						src/fps_camera.cpp
 	include/framebuffer.hpp						src/framebuffer.cpp
 	include/gamedata.hpp
 	include/ilowpolyinput.hpp

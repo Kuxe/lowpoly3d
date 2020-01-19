@@ -34,26 +34,19 @@ struct Game : public ILowpolyInput {
 		const auto gametime = [start = high_resolution_clock::now()] {
 			return duration_s(high_resolution_clock::now() - start);
 		};
-
-		// Setup keybindings
-		KeyAction keyw, keya, keys, keyd, keyq, keye, keyescape, keyz, keyleftshift;
-		keyw.setOnHoldFunction([this]() { camera.dolly(+cameraSpeed * dt.count()); });
-		keys.setOnHoldFunction([this]() { camera.dolly(-cameraSpeed * dt.count()); });
-		keya.setOnHoldFunction([this]() { camera.truck(-cameraSpeed * dt.count()); });
-		keyd.setOnHoldFunction([this]() { camera.truck(+cameraSpeed * dt.count()); });
-		keyq.setOnHoldFunction([this]() { camera.pedestal(-cameraSpeed * dt.count()); });
-		keye.setOnHoldFunction([this]() { camera.pedestal(+cameraSpeed * dt.count()); });
-		keyescape.setOnHoldFunction([this]() { running = false; });
-		keyz.setOnPressFunction([this]() { showWireframes = !showWireframes; });
-		keyleftshift
-		.setOnPressFunction([this]() { cameraSpeed = 10.0f; })
-		.setOnReleaseFunction([this]() { cameraSpeed = 3.0f; });
-
-		/** Bind key actions to GLFW key identifiers **/
-		keymanager
-		.bind(GLFW_KEY_W, keyw).bind(GLFW_KEY_S, keys).bind(GLFW_KEY_A, keya)
-		.bind(GLFW_KEY_D, keyd).bind(GLFW_KEY_Q, keyq).bind(GLFW_KEY_E, keye)
-		.bind(GLFW_KEY_Z, keyz).bind(GLFW_KEY_LEFT_SHIFT, keyleftshift);
+		
+		/** Map key events to functions **/
+		keymanager[GLFW_KEY_W].setOnHoldFunction([this]() { camera.dolly(+cameraSpeed * dt.count()); });
+		keymanager[GLFW_KEY_S].setOnHoldFunction([this]() { camera.dolly(-cameraSpeed * dt.count()); });
+		keymanager[GLFW_KEY_A].setOnHoldFunction([this]() { camera.truck(-cameraSpeed * dt.count()); });
+		keymanager[GLFW_KEY_D].setOnHoldFunction([this]() { camera.truck(+cameraSpeed * dt.count()); });
+		keymanager[GLFW_KEY_Q].setOnHoldFunction([this]() { camera.pedestal(-cameraSpeed * dt.count()); });
+		keymanager[GLFW_KEY_E].setOnHoldFunction([this]() { camera.pedestal(+cameraSpeed * dt.count()); });
+		keymanager[GLFW_KEY_ESCAPE].setOnHoldFunction([this]() { running = false; });
+		keymanager[GLFW_KEY_Z].setOnPressFunction([this]() { showWireframes = !showWireframes; });
+		keymanager[GLFW_KEY_LEFT_SHIFT]
+			.setOnPressFunction([this]() { cameraSpeed = 10.0f; })
+			.setOnReleaseFunction([this]() { cameraSpeed = 3.0f; });
 
 		while(running) {
 			// Game logic here - handle input and make a sphere go round and round

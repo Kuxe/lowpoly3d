@@ -2,6 +2,14 @@
 
 namespace lowpoly3d {
 
+KeyAction::KeyAction(int keycode)
+	: mKeycode(keycode)
+{}
+
+int KeyAction::getKeycode() const {
+	return mKeycode;
+}
+
 void KeyAction::executeOnPress() {
 	onPress();
 }

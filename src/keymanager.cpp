@@ -2,14 +2,12 @@
 
 namespace lowpoly3d {
 
-KeyManager& KeyManager::bind(int key, const KeyAction& action) {
-	keybindings.emplace(key, action);
-	return *this;
+void KeyManager::bind(const KeyAction& action) {
+	keybindings.emplace(action.getKeycode(), action);
 }
 
-KeyManager& KeyManager::unbind(int key) {
+void KeyManager::unbind(int key) {
 	keybindings.erase(key);
-	return *this;
 }
 
 void KeyManager::execute() {
@@ -42,6 +40,12 @@ void KeyManager::released(int key) {
 		releasedKeys.insert(key);
 		heldKeys.erase(key);
 	}
+}
+
+KeyAction& KeyManager::operator[](int key) {
+	auto[it, emplaced] = keybindings.try_emplace(key, KeyAction(key));
+	auto&[dummy, value] = *it;
+	return value;
 }
 
 } // End of namespace lowpoly3d

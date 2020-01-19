@@ -106,8 +106,8 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
     lowpolyInput = li;
     this->shaderDirectory = shaderDirectory;
     glfwSetErrorCallback(error_callback);
-    if(!glfwInit()) {
-        fprintf(stderr, "Could not load glfw (call to glfwInit returned 0)\n");
+    if(glfwInit() == GLFW_FALSE) {
+        fprintf(stderr, "Could not load glfw (call to glfwInit returned GLFW_FALSE)\n");
         return false;
     }
 

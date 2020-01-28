@@ -681,16 +681,19 @@ bool Renderer::run() {
 				by letting the sun look at the point which is the foci of the camera, or something along
 				those lines (this corresponds to computing shadowmap only where player is looking). **/
 			const Scene& scene = scenes.front(); //This assignment to Scene& scene assumes that scenes.front() is only modified by this thread
-			const glm::mat4 sunView = glm::lookAt(suncb.getPos(scene.sunRadians), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+			auto const& constants = scene.getSceneConstants();
+			const glm::mat4 sunView = glm::lookAt(suncb.getPos(constants.getSunRadians()), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 			const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
 			const glm::mat4 sunvp = sunPerspective * sunView;
-			debugRenderer.render(scene.view * projection, debugFBO, debugProgram);
+			debugRenderer.render(constants.getView() * projection, debugFBO, debugProgram);
 
-			showWireframes = scene.showWireframes;
+			showWireframes = constants.getShowWireframes();
+
+			auto const& renderDatas = scene.getRenderDatas();
 
 			if(!(
-				render2depth(scene.renderDatas, sunvp) &&
-				render2fbo(scene.renderDatas, scene.sunRadians, sunvp, scene.view, projection, mainFBO) &&
+				render2depth(renderDatas, sunvp) &&
+				render2fbo(renderDatas, constants.getSunRadians(), sunvp, constants.getView(), projection, mainFBO) &&
 				render2screen())) {
 					scenes.pop();
 					return false;

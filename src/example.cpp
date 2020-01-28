@@ -44,7 +44,13 @@ struct Game : public ILowpolyInput {
 			const auto start = high_resolution_clock::now();
 			keymanager.execute();
 			const double sunRads = std::acos(-1.0) / 30.0 * gametime().count();
-			renderer.offer({rds, camera.view(), sunRads, showWireframes}); //Render a scene
+
+			SceneConstants const sceneConstants { camera.view(), sunRads, showWireframes };
+
+			Scene scene { sceneConstants };
+			scene.insert(begin(rds), end(rds));
+
+			renderer.offer(scene); //Render a scene
 			dt = high_resolution_clock::now() - start;
 		}
 	}

@@ -171,7 +171,7 @@ add_library(lowpoly3d SHARED
 	include/perlin.hpp							src/perlin.cpp
 	include/renderer.hpp 						src/renderer.cpp
 	include/renderdata.hpp 						src/renderdata.cpp
-	include/scene.hpp
+	include/scene.hpp							src/scene.cpp
 	include/shaderprogram.hpp					src/shaderprogram.cpp
 	include/uniformbuffer.hpp					src/uniformbuffer.cpp
 	include/glframe.hpp							src/glframe.cpp

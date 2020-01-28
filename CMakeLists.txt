@@ -266,6 +266,20 @@ target_include_directories(example
 target_link_libraries(example PUBLIC lowpoly3d)
 set_target_properties(example PROPERTIES OUTPUT_NAME example)
 
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ----------------- SETUP intersection_visualizations TARGET ----------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+#Run "make example" to build the example
+add_executable(intersection_visualizations src/intersection_visualizations.cpp)
+target_include_directories(intersection_visualizations
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/include/
+)
+target_link_libraries(intersection_visualizations PUBLIC lowpoly3d)
+set_target_properties(intersection_visualizations PROPERTIES OUTPUT_NAME intersection_visualizations)
+
 
 # All targets trigger the library target build. Library target output shared libraries into "libs" directory
 # dev target depends on library target

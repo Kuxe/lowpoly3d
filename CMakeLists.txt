@@ -95,9 +95,7 @@ ExternalProject_Add(lsys_project
 
 add_dependencies(glbinding_project glfw)
 
-#Run "make conf" to download dependencies
-#This must be done atleast once before running "make example" or "make dev"
-add_custom_target(configure
+add_custom_target(common
     DEPENDS glm glfw glbinding_project subber queue node lsys_project
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
@@ -250,7 +248,7 @@ elseif(APPLE)
 	target_link_libraries(lowpoly3d PUBLIC lsys Catch2::Catch)
 endif(WIN32)
 
-add_dependencies(lowpoly3d configure)
+add_dependencies(lowpoly3d common glm)
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #

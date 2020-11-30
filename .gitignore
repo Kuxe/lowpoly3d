@@ -44,3 +44,6 @@ lowpoly3d.code-workspace
 
 # clangd
 .cache/
+
+# Misc
+compile_commands.json

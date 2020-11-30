@@ -41,3 +41,6 @@ desktop.ini
 # vscode project
 lowpoly3d.code-workspace
 .vscode/
+
+# clangd
+.cache/

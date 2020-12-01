@@ -24,6 +24,8 @@
 #include "geometric_primitives/line.hpp"
 #include "glframe.hpp"
 
+#include <sstream>
+
 using namespace gl;
 
 namespace lowpoly3d {
@@ -548,7 +550,26 @@ bool Renderer::run() {
 				glBindVertexArray(models.at(rd.model)); 
 				glDrawElements(GL_TRIANGLES, triangles.at(rd.model)*3, GL_UNSIGNED_SHORT, nullptr);
 			} catch(const std::out_of_range& oor) {
-				printf("ERROR: Could not lookup vertex array given by render data \"%s\"!\n", rd.model.c_str());
+				std::stringstream ss;
+				ss << "ERROR: Could not lookup vertex array given by render data \"" << rd.model << "\"\n";
+
+				std::vector<std::string> names;
+				names.reserve(models.size());
+
+				ss << "Available models are: {";
+
+				if(models.empty()) ss << "}\n";
+				else
+				{
+					auto lastIt = prev(end(models));
+					for(auto it = begin(models); it != lastIt; ++it)
+					{
+						ss << it->first << ", ";
+					}
+					ss << lastIt->first << "}\n";
+				}
+				printf("%s!", ss.str().c_str());
+
 				return false;
 			} catch(const std::exception& e) {
 				printf("Error: Could not draw render data %s", e.what());

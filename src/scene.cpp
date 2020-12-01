@@ -30,6 +30,11 @@ Scene::Scene() = default;
 
 Scene::Scene(SceneConstants const& iSceneConstants)
 	: mSceneConstants(iSceneConstants) {}
+	
+void Scene::insert(RenderData const& iRenderData)
+{
+	mRenderDatas.emplace_back(iRenderData);
+}
 
 SceneConstants const& Scene::getSceneConstants() const
 {

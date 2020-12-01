@@ -42,6 +42,8 @@ public:
 		mRenderDatas.insert(mRenderDatas.end(), iBegin, iEnd);
 	}
 
+	void insert(RenderData const& iRenderData);
+
 	RenderDatas const& getRenderDatas() const;
 	SceneConstants const& getSceneConstants() const;
 

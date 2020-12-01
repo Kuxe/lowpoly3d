@@ -152,6 +152,7 @@ add_library(lowpoly3d SHARED
 	include/bounding_volume_hierarchy.hpp		src/bounding_volume_hierarchy.cpp
 	include/celestialbody.hpp
 	include/camera.hpp							src/camera.cpp
+	include/draw_geometric_primitives.hpp		src/draw_geometric_primitives.cpp
 	include/events.hpp
 	include/debugrenderer.hpp					src/debugrenderer.cpp
 	include/depthframebuffer.hpp				src/depthframebuffer.cpp

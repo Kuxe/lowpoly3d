@@ -1,8 +1,10 @@
 
 #include "draw_geometric_primitives.hpp"
 
+#include "generators/cylindergenerator.hpp"
 #include "generators/spheregenerator.hpp"
 
+#include "geometric_primitives/linesegment.hpp"
 #include "geometric_primitives/sphere.hpp"
 
 #include "lowpoly3d.hpp"
@@ -35,7 +37,12 @@ public:
 			lowpoly3d::SceneConstants sceneConstants { mCamera.view(), std::acos(-1.0) / 2.0, false };
 			lowpoly3d::Scene scene { sceneConstants };
 
-			lowpoly3d::draw(scene, lowpoly3d::Point(0.0f, 0.0f, 0.0f));
+			auto const p0 = lowpoly3d::Point(0.0f, 0.0f, 0.0f);
+			auto const p1 = lowpoly3d::Point(-1.0f, 1.0f, -1.0f);
+
+			lowpoly3d::draw(scene, p0);
+			lowpoly3d::draw(scene, p1);
+			lowpoly3d::draw(scene, lowpoly3d::LineSegment(p0, p1));
 
 			iRenderer.offer(scene); //Render a scene
 			mDt = std::chrono::high_resolution_clock::now() - start;
@@ -63,12 +70,13 @@ int main()
 	lowpoly3d::Renderer renderer;
 	IntersectionVisualizer iv;
 
-	lowpoly3d::Model model = lowpoly3d::SphereGenerator({255, 0, 255}, 3).generate();
+	lowpoly3d::Model sphere = lowpoly3d::SphereGenerator({200, 0, 200}, 3).generate();
+	lowpoly3d::Model cylinder = lowpoly3d::CylinderGenerator({255, 50, 255}, 16).generate();
 
 	std::thread visualizerThread([&] { iv.run(renderer); });
 
 	renderer.initialize(&iv, "../shaders/") &&
-	renderer.loadModels("sphere", model) &&
+	renderer.loadModels("sphere", sphere, "cylinder", cylinder) &&
 	renderer.run();
 	iv.stop();
 	visualizerThread.join();

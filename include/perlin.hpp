@@ -6,6 +6,7 @@
 #include <functional>
 #include <cmath>
 #include <cassert>
+#include <cstdint>
 
 namespace lowpoly3d {
 

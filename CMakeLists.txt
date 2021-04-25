@@ -135,6 +135,18 @@ set(LOWPOLY3D_INCLUDE_DIRS
 	${CONTRIB_DIR}/Source/lsys_project
 )
 
+# Thanks to https://stackoverflow.com/a/34317588
+find_program(CCACHE_EXECUTABLE ccache)
+mark_as_advanced(CCACHE_EXECUTABLE)
+if(CCACHE_EXECUTABLE)
+	foreach(LANG C CXX)
+		if(NOT DEFINED CMAKE_${LANG}_COMPILER_LAUNCHER AND NOT CMAKE_${LANG}_COMPILER MATCHES ".*/ccache")
+			message(STATUS "Enabling ccache for ${LANG}")
+			set(CMAKE_${LANG}_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "")
+		endif()
+	endforeach()
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #Create a compilation database for use with clang static analyzer
 
 # ---------------------------------------------------------------------------- #

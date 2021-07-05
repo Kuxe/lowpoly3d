@@ -221,6 +221,13 @@ add_custom_command(TARGET lowpoly3d POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 	${CONTRIB_DIR}/Source/lsys_project/install/bin $<TARGET_FILE_DIR:lowpoly3d>)
 
+# Symlink compile_commands.json from build-directory to CMakelists-directory.
+# Reason: clangd recursively looks in parent directories
+# for compile_commands.json, but build-directory is not necessarily a parent
+# directory of source files, whereas CMakeLists-directory is.
+add_custom_command(TARGET lowpoly3d POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json)
+
 # Setup headers
 target_include_directories(lowpoly3d
 	PUBLIC

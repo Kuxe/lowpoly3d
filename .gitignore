@@ -47,3 +47,6 @@ lowpoly3d.code-workspace
 
 # clangd
 .cache
+
+# Compilation database
+compile_commands.json

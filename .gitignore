@@ -50,3 +50,6 @@ lowpoly3d.code-workspace
 
 # Compilation database
 compile_commands.json
+
+# build-directory
+out/

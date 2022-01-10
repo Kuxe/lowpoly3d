@@ -1,0 +1,95 @@
+{
+	"version": 3,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 21,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "linux-debug",
+			"displayName": "Linux debug",
+			"description": "Standard Linux debug build",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "linux-release",
+			"description": "Standard Linux release build",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "windows-debug",
+			"displayName": "Windows debug",
+			"description": "Standard Windows debug build",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "windows-release",
+			"displayName": "Windows release",
+			"description": "Standard Windows release build",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "linux-debug",
+			"displayName": "Linux debug",
+			"configurePreset": "linux-debug"
+		},
+		{
+			"name": "linux-release",
+			"displayName": "Linux release",
+			"configurePreset": "linux-release"
+		},
+		{
+			"name": "windows-debug",
+			"displayName": "Windows debug",
+			"configurePreset": "windows-debug"
+		},
+		{
+			"name": "windows-release",
+			"displayName": "Windows release",
+			"configurePreset": "windows-release"
+		}
+	]
+}

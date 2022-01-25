@@ -1,11 +1,12 @@
 #ifndef PERLIN_HPP
 #define PERLIN_HPP
 
-#include <stddef.h>
-#include <vector>
-#include <functional>
-#include <cmath>
 #include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <vector>
 
 namespace lowpoly3d {
 

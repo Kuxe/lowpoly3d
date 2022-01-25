@@ -9,6 +9,9 @@ else()
 	set(UPDATE_DISCONNECTED_IF_AVAILABLE UPDATE_DISCONNECTED 1)
 endif()
 
+configure_file(build.hpp.in build.hpp @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------- GENERATE .gitignore in build directory--------------------- #

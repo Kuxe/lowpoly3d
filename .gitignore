@@ -43,7 +43,7 @@ lowpoly3d.code-workspace
 .vscode/
 
 # clangd
-.cache/
+.cache
 
-# Misc
+# Compilation database
 compile_commands.json

@@ -1,0 +1,205 @@
+{
+	"version": 3,
+	"configurePresets": [
+		{
+			"name": "linux-debug",
+			"displayName": "Linux Debug",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "linux-release",
+			"displayName": "Linux Release",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "windows-debug",
+			"displayName": "Windows Debug",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "windows-release",
+			"displayName": "Windows Release",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "linux-debug",
+			"displayName": "Linux Debug",
+			"configurePreset": "linux-debug",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "linux-release",
+			"displayName": "Linux Release",
+			"configurePreset": "linux-release",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "windows-debug",
+			"displayName": "Windows Debug",
+			"configurePreset": "windows-debug",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "windows-release",
+			"displayName": "Windows Release",
+			"configurePreset": "windows-release",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		}
+	],
+	"testPresets": [
+		{
+			"name": "linux-debug-tests",
+			"displayName": "Linux Debug Tests",
+			"configurePreset": "linux-debug",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			},
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "linux-debug-tests-verbose",
+			"displayName": "Linux Debug Tests (verbose)",
+			"inherits": "linux-debug-tests",
+			"output": {
+				"outputOnFailure": false,
+				"verbosity": "verbose"
+			}
+		},
+		{
+			"name": "linux-release-tests",
+			"displayName": "Linux Release Tests",
+			"configurePreset": "linux-release",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			},
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "linux-release-tests-verbose",
+			"displayName": "Linux Release Tests (verbose)",
+			"inherits": "linux-release-tests",
+			"output": {
+				"outputOnFailure": false,
+				"verbosity": "verbose"
+			}
+		},
+		{
+			"name": "windows-debug-tests",
+			"displayName": "Windows Debug Tests",
+			"configurePreset": "windows-debug",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			},
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "windows-debug-tests-verbose",
+			"displayName": "Windows Debug Tests (verbose)",
+			"inherits": "windows-debug-tests",
+			"output": {
+				"outputOnFailure": false,
+				"verbosity": "verbose"
+			}
+		},
+		{
+			"name": "windows-release-tests",
+			"displayName": "Windows Release Tests",
+			"configurePreset": "windows-release",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			},
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "windows-release-tests-verbose",
+			"displayName": "Windows Release Tests (verbose)",
+			"inherits": "windows-release-tests",
+			"output": {
+				"outputOnFailure": false,
+				"verbosity": "verbose"
+			}
+		}
+	]
+}

@@ -24,6 +24,7 @@
 		},
 		{
 			"name": "linux-release",
+			"displayName": "Linux release",
 			"description": "Standard Linux release build",
 			"generator": "Ninja",
 			"binaryDir": "${sourceDir}/out/build/${presetName}",

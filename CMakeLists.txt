@@ -344,7 +344,6 @@ catch_discover_tests(lowpoly3d_test)
 # --------------------------- SETUP install TARGET --------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install)
 install(TARGETS lowpoly3d DESTINATION lib)
 install(DIRECTORY include DESTINATION .)
 install(DIRECTORY contrib/Source/glfw/include/ DESTINATION include)

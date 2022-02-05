@@ -139,6 +139,18 @@ set(LOWPOLY3D_INCLUDE_DIRS
 	${CONTRIB_DIR}/Source/lsys_project
 )
 
+# Thanks to https://stackoverflow.com/a/34317588
+find_program(CCACHE_EXECUTABLE ccache)
+mark_as_advanced(CCACHE_EXECUTABLE)
+if(CCACHE_EXECUTABLE)
+	foreach(LANG C CXX)
+		if(NOT DEFINED CMAKE_${LANG}_COMPILER_LAUNCHER AND NOT CMAKE_${LANG}_COMPILER MATCHES ".*/ccache")
+			message(STATUS "Enabling ccache for ${LANG}")
+			set(CMAKE_${LANG}_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "")
+		endif()
+	endforeach()
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #Create a compilation database for use with clang static analyzer
 
 # ---------------------------------------------------------------------------- #
@@ -225,6 +237,13 @@ add_custom_command(TARGET lowpoly3d POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 	${CONTRIB_DIR}/Source/lsys_project/install/bin $<TARGET_FILE_DIR:lowpoly3d>)
 
+# Symlink compile_commands.json from build-directory to CMakelists-directory.
+# Reason: clangd recursively looks in parent directories
+# for compile_commands.json, but build-directory is not necessarily a parent
+# directory of source files, whereas CMakeLists-directory is.
+add_custom_command(TARGET lowpoly3d POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json)
+
 # Setup headers
 target_include_directories(lowpoly3d
 	PUBLIC
@@ -238,8 +257,9 @@ if(WIN32)
 	target_link_libraries(lowpoly3d PRIVATE glbinding glfw3 opengl32)
 	target_link_libraries(lowpoly3d PUBLIC lsys Catch2::Catch)
 elseif(UNIX AND NOT APPLE)
-    target_link_libraries(lowpoly3d PRIVATE glbinding glfw3 dl GL X11 Xxf86vm Xrandr pthread Xi Xinerama Xcursor)
-	target_link_libraries(lowpoly3d PUBLIC lsys Catch2::Catch)
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+	find_package(Threads)
+    target_link_libraries(lowpoly3d PUBLIC glbinding glfw3 dl GL X11 Xxf86vm Xrandr Threads::Threads Xi Xinerama Xcursor lsys Catch2::Catch)
 elseif(APPLE)
 	find_package(OpenGL REQUIRED)
 	find_library(COCOA_LIBRARY Cocoa)

@@ -39,5 +39,16 @@ desktop.ini
 *.sublime-workspace
 
 # vscode project
-lowpoly3d.code-workspace
-.vscode/
+.vscode/tasks.json
+.vscode/settings.json
+.vscode/launch.json
+.vscode/c_cpp_properties.json
+
+# clangd
+.cache
+
+# Compilation database
+compile_commands.json
+
+# build-directory
+out/

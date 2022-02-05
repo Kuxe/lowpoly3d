@@ -14,6 +14,7 @@
 #include "lsys.hpp"
 #include "bounding_volume_hierarchy.hpp"
 #include "keymanager.hpp"
+#include "fps_camera.hpp"
 
 #include "generators/spheregenerator.hpp"
 #include "generators/terraingenerator.hpp"

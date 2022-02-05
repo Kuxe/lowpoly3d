@@ -9,6 +9,9 @@ else()
 	set(UPDATE_DISCONNECTED_IF_AVAILABLE UPDATE_DISCONNECTED 1)
 endif()
 
+configure_file(build.hpp.in build.hpp @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------- GENERATE .gitignore in build directory--------------------- #
@@ -95,9 +98,7 @@ ExternalProject_Add(lsys_project
 
 add_dependencies(glbinding_project glfw)
 
-#Run "make conf" to download dependencies
-#This must be done atleast once before running "make example" or "make dev"
-add_custom_target(configure
+add_custom_target(common
     DEPENDS glm glfw glbinding_project subber queue node lsys_project
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
@@ -166,9 +167,11 @@ add_library(lowpoly3d SHARED
 	include/bounding_volume_hierarchy.hpp		src/bounding_volume_hierarchy.cpp
 	include/celestialbody.hpp
 	include/camera.hpp							src/camera.cpp
+	include/draw_geometric_primitives.hpp		src/draw_geometric_primitives.cpp
 	include/events.hpp
 	include/debugrenderer.hpp					src/debugrenderer.cpp
 	include/depthframebuffer.hpp				src/depthframebuffer.cpp
+	include/fps_camera.hpp						src/fps_camera.cpp
 	include/framebuffer.hpp						src/framebuffer.cpp
 	include/gamedata.hpp
 	include/ilowpolyinput.hpp
@@ -182,7 +185,7 @@ add_library(lowpoly3d SHARED
 	include/perlin.hpp							src/perlin.cpp
 	include/renderer.hpp 						src/renderer.cpp
 	include/renderdata.hpp 						src/renderdata.cpp
-	include/scene.hpp
+	include/scene.hpp							src/scene.cpp
 	include/shaderprogram.hpp					src/shaderprogram.cpp
 	include/uniformbuffer.hpp					src/uniformbuffer.cpp
 	include/glframe.hpp							src/glframe.cpp
@@ -269,7 +272,7 @@ elseif(APPLE)
 	target_link_libraries(lowpoly3d PUBLIC lsys Catch2::Catch)
 endif(WIN32)
 
-add_dependencies(lowpoly3d configure)
+add_dependencies(lowpoly3d common glm)
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
@@ -284,6 +287,20 @@ target_include_directories(example
 )
 target_link_libraries(example PUBLIC lowpoly3d)
 set_target_properties(example PROPERTIES OUTPUT_NAME example)
+
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ----------------- SETUP intersection_visualizations TARGET ----------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+#Run "make example" to build the example
+add_executable(intersection_visualizations src/intersection_visualizations.cpp)
+target_include_directories(intersection_visualizations
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/include/
+)
+target_link_libraries(intersection_visualizations PUBLIC lowpoly3d)
+set_target_properties(intersection_visualizations PROPERTIES OUTPUT_NAME intersection_visualizations)
 
 
 # All targets trigger the library target build. Library target output shared libraries into "libs" directory

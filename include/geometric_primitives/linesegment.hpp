@@ -6,6 +6,11 @@
 
 #include "utils/lerp.hpp" // lerp
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
+#include <ostream>
+
 namespace lowpoly3d {
 
 template<typename floating_point_type, std::size_t dimension>
@@ -32,11 +37,17 @@ struct TLineSegment {
             lerp(start, end, t);
         };
     }
+
+	floating_point_type length() const
+	{
+		return glm::length(p2 - p1);
+	}
 };
 
 template<typename floating_point_type, std::size_t dimension>
 std::ostream& operator<<(std::ostream& out, const TLineSegment<floating_point_type, dimension>& segment) {
-	return out << "(p1=" << glm::to_string(segment.p1).c_str() << ", p2=" << glm::to_string(segment.p2).c_str() << ")";
+	out << "(p1=" << glm::to_string(segment.p1) << ", p2=" << glm::to_string(segment.p2) << ")";
+	return out;
 }
 
 using LineSegment  = TLineSegment<float, 3>;

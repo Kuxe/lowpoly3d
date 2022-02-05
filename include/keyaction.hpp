@@ -20,6 +20,10 @@ class KeyAction {
 public:
 	using function_type = std::function<void(void)>;
 
+	KeyAction(int keycode);
+
+	int getKeycode() const;
+
 	void executeOnPress();
 	void executeOnRelease();
 	void executeOnHold();
@@ -37,6 +41,7 @@ private:
 		onPress = [](){},
 		onRelease = [](){},
 		onHold = [](){};
+	int mKeycode;
 };
 
 } // End of namespace lowpoly3d

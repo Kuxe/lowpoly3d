@@ -228,7 +228,7 @@ SCENARIO("Interior points of triangle (2D)") {
 			bool const isContained = triangle.contains(point);
 
 			THEN("The point is reportedly contained by the triangle") {
-				INFO("If this test fails but the 3D version didnt fail, then something is probably wrong with 2D specializations");
+				INFO("If this test fails but the 3D version didn't fail, then something is probably wrong with 2D specializations");
 				REQUIRE(isContained);
 			}
 		}
@@ -440,7 +440,7 @@ SCENARIO("Triangle intersection") {
 		intersectsCommutativityCheck(t1, t2);
 	}
 
-	GIVEN("Two triangles where an egde of the first triangle intersects the surface of the other triangle ") {
+	GIVEN("Two triangles where an edge of the first triangle intersects the surface of the other triangle ") {
 		// These two triangles intersects at (2, 1, 0)
 		Triangle
 			t1({0,0,0},{4,0,0},{4,4,0}),

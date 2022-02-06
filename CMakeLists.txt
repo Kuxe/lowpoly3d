@@ -8,8 +8,19 @@ project(lowpoly3d
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+include(CheckCXXCompilerFlag)
 include(FetchContent)
 include(buildcache)
+
+# Check if compiler supports colored diagnostics, if so, use it.
+check_cxx_compiler_flag(-fcolor-diagnostics is_supported_fcolor-diagnostics)
+if(${is_supported_fcolor-diagnostics})
+	add_compile_options("-fcolor-diagnostics")
+endif()
+check_cxx_compiler_flag(-fdiagnostics-color=always is_supported_fdiagnostics-color)
+if(${is_supported_fdiagnostics-color})
+	add_compile_options("-fdiagnostics-color=always")
+endif()
 
 configure_file(build.hpp.in build.hpp @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")

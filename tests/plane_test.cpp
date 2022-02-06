@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/epsilon.hpp> //glm::epsilonEqual

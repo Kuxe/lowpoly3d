@@ -5,9 +5,6 @@
 #include <functional> // std::function
 #include <iosfwd> // forwrd declare std::ostream
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/detail/type_vec.hpp>
-
 namespace lowpoly3d {
 
 template<typename fpt, std::size_t dim>

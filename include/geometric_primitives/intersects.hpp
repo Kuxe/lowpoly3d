@@ -1,7 +1,7 @@
 #ifndef INTERSECTS_HPP
 #define INTERSECTS_HPP
 
-#include <glm/detail/type_vec.hpp>
+#include <glm/detail/qualifier.hpp>
 
 /* intersects.hpp contains a bulk of various boolean
  * intersection-tests between geometric primitives 

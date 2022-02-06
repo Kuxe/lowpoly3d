@@ -2,7 +2,6 @@
 #include "geometric_primitives/point.hpp"
 #include "renderdata.hpp"
 #include "scene.hpp"
-#include <glm/detail/type_mat.hpp>
 #include <glm/ext/vector_relational.hpp>
 #include <glm/geometric.hpp>
 

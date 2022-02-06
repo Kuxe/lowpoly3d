@@ -11,6 +11,8 @@
 #include "utils/apt_assert.hpp"
 #include "utils/glm/glmprint.hpp"
 
+#include <glm/detail/qualifier.hpp>
+
 namespace lowpoly3d
 {
 
@@ -144,10 +146,14 @@ TSphere<fpt, dim> mbs(
 		{
 			APT_ASSERT_GEQ(enclosing_radius + std::numeric_limits<fpt>::epsilon(), a.r);
 			APT_ASSERT_GEQ(enclosing_radius + std::numeric_limits<fpt>::epsilon(), b.r);
-			auto ok = TSphere<fpt, dim>(midpoint, enclosing_radius).encloses(a);
-			assert(ok);
-			ok = TSphere<fpt, dim>(midpoint, enclosing_radius).encloses(b);
-			assert(ok);
+			{
+				[[maybe_unused]] auto const ok = TSphere<fpt, dim>(midpoint, enclosing_radius).encloses(a);
+				assert(ok);
+			}
+			{
+				[[maybe_unused]] auto const ok = TSphere<fpt, dim>(midpoint, enclosing_radius).encloses(b);
+				assert(ok);
+			}
 		}
 		return {midpoint, enclosing_radius};
 	}

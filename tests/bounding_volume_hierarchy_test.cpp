@@ -1,7 +1,7 @@
 #include "bounding_volume_hierarchy.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <functional>
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #include "generators/terraingenerator.hpp"
 

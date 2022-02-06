@@ -7,6 +7,9 @@
 	"settings": {
 		"editor.insertSpaces": false,
 		"editor.tabSize": 2,
-		"cmake.allowCommentsInPresetsFile": true
+		"cmake.allowCommentsInPresetsFile": true,
+		"cmake.clearOutputBeforeBuild": false,
+		"cmake.configureOnEdit": false,
+		"cmake.exportCompileCommandsFile": false
 	}
 }

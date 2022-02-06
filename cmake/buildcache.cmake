@@ -1,0 +1,28 @@
+
+# Download buildcache and use it (Windows only).
+
+# Could probably use this in Linux too but ccache works good there.
+# Might be a reason to use only buildcache anyway to keep
+# the build-configuration simple
+
+if(WIN32)
+	set(buildcache_archive "${CMAKE_SOURCE_DIR}/download/buildcache-windows.zip")
+	set(buildcache_bindir "${CMAKE_SOURCE_DIR}/buildcache/bin")
+	set(buildcache_expected_binfile "${CMAKE_SOURCE_DIR}/buildcache/bin/buildcache.exe")
+	set(buildcache_download_url "https://github.com/mbitsnbites/buildcache/releases/download/v0.27.6/buildcache-windows.zip")
+
+	if(NOT EXISTS ${buildcache_expected_binfile})
+		message(STATUS "buildcache.cmake: buildcache not found, downloading and extracting...")
+		file(DOWNLOAD ${buildcache_download_url} ${buildcache_archive})
+		message(STATUS "buildcache.cmake: buildcache downloaded to ${buildcache_archive}")
+		file(ARCHIVE_EXTRACT INPUT ${buildcache_archive} DESTINATION ${CMAKE_SOURCE_DIR})
+		message(STATUS "buildcache.cmake: buildcache extracted to ${CMAKE_SOURCE_DIR}")
+	endif()
+
+	find_program(buildcache buildcache ${buildcache_bindir})
+	if(buildcache)
+		message(STATUS "Found \"buildcache\" at \"${buildcache}\"")
+		set(CMAKE_C_COMPILER_LAUNCHER ${buildcache})
+		set(CMAKE_CXX_COMPILER_LAUNCHER ${buildcache})
+	endif()
+endif()

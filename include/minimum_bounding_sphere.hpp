@@ -1,8 +1,6 @@
 #ifndef MINIMUM_BOUNDING_SPHERE_HPP
 #define MINIMUM_BOUNDING_SPHERE_HPP
 
-#include <glm/detail/type_vec.hpp>
-
 namespace lowpoly3d
 {
 

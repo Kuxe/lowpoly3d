@@ -1,7 +1,7 @@
 #ifndef VECTOR_PROJECTION
 #define VECTOR_PROJECTION
 
-#include <glm/detail/type_vec.hpp>
+#include <glm/detail/qualifier.hpp>
 
 /* Projects a vector 'projectee' orthogonally onto a vector 'v' */
 template<int D, typename T, glm::precision P>

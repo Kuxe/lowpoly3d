@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <iostream>
 #include <sstream>
 
@@ -459,7 +459,7 @@ SCENARIO("Intersection tests") {
 				THEN("P is reportedly contained within all planes") {
 					INFO("Reported point is " << glm::to_string(reportedPoint));
 					INFO("Expected point is " << glm::to_string(p));
-					INFO("If this test fails, then the line-plane intersection may be broke")
+					INFO("If this test fails, then the line-plane intersection may be broke");
 					INFO("Note that intersection of three planes can be done with cramer(p1, p2, p3) too!");
 					REQUIRE(p1.contains(reportedPoint));
 					REQUIRE(p2.contains(reportedPoint));
@@ -616,7 +616,7 @@ SCENARIO("Triangle-LineSegment intersection tests") {
 			bool const isIntersecting = intersects(triangle, segment);
 			
 			THEN("They are reported as intersecting") {
-				INFO("If this test fails, then the LineSegment is not projected into the point (1, 1) or the point (1, 1) is not reported as interior of the triangle.")
+				INFO("If this test fails, then the LineSegment is not projected into the point (1, 1) or the point (1, 1) is not reported as interior of the triangle.");
 				REQUIRE(isIntersecting);
 			}
 		}

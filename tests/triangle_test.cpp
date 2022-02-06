@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/point.hpp"

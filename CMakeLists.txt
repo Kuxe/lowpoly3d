@@ -277,31 +277,7 @@ target_include_directories(${PROJECT_NAME}_intersection_visualizations
 target_link_libraries(${PROJECT_NAME}_intersection_visualizations PUBLIC ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME}_intersection_visualizations PROPERTIES OUTPUT_NAME intersection_visualizations)
 
-# ---------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------- #
-# --------------------------- Testing using Catch ---------------------------- #
-# ---------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------- #
-set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
-add_executable(${PROJECT_NAME}_test
-	${TEST_DIR}/bounding_volume_hierarchy_test.cpp
-	${TEST_DIR}/solve_test.cpp
-	${TEST_DIR}/sphere_test.cpp
-	${TEST_DIR}/intersections_test.cpp
-	${TEST_DIR}/lerp_test.cpp
-	${TEST_DIR}/arithmetic_invariant_test.cpp
-	${TEST_DIR}/triangle_test.cpp
-	${TEST_DIR}/plane_test.cpp
-)
-enable_testing()
-target_include_directories(${PROJECT_NAME}_test PRIVATE ${${PROJECT_NAME}_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME}_test PUBLIC ${PROJECT_NAME} Catch2::Catch2WithMain)
-target_compile_features(${PROJECT_NAME}_test PRIVATE cxx_std_17)
-
-list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
-include(CTest)
-include(Catch)
-catch_discover_tests(${PROJECT_NAME}_test)
+add_subdirectory(tests)
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #

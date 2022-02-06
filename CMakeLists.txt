@@ -49,7 +49,8 @@ file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 
-SET(CONTRIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/contrib")
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+set(CONTRIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/contrib")
 
 FetchContent_Declare(
 	Catch2

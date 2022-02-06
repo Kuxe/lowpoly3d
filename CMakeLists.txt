@@ -221,9 +221,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 # Setup headers
 set(${PROJECT_NAME}_INCLUDE_DIRS
 	${CMAKE_CURRENT_SOURCE_DIR}/include
-
-	#Temporary fix until Ive figured out if my build is broke or if its glbinding that did something bad
-	${CONTRIB_DIR}/Source/glbinding_project/3rdparty/KHR/include
 	${CONTRIB_DIR}
 )
 

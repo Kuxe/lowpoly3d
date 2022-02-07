@@ -153,7 +153,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #Create a compilation database for use wit
 # -------------------------- SETUP lowpoly3d TARGET -------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-add_library(${PROJECT_NAME} SHARED
+# TODO: Don't use SHARED, let users decide with BUILD_SHARED_LIBS
+add_library(${PROJECT_NAME}
 	include/args.hxx
 	include/bezier.hpp
 	include/bounding_volume_hierarchy.hpp src/bounding_volume_hierarchy.cpp

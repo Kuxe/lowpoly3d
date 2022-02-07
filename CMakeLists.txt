@@ -80,6 +80,8 @@ FetchContent_Declare(
 )
 set(OPTION_BUILD_TOOLS OFF CACHE INTERNAL "")
 set(OPTION_BUILD_EXAMPLES OFF CACHE INTERNAL "")
+# FIXME: glbinding does some install calls that really mess up my own install
+#        How to circumvent? I don't want libglbinding.dll in root install dir..
 FetchContent_MakeAvailable(glbinding)
 if(WIN32)
 	set_target_properties(glbinding PROPERTIES

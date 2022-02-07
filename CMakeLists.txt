@@ -8,9 +8,10 @@ project(lowpoly3d
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+include(buildcache)
 include(CheckCXXCompilerFlag)
 include(FetchContent)
-include(buildcache)
+include(GNUInstallDirs)
 
 # Check if compiler supports colored diagnostics, if so, use it.
 check_cxx_compiler_flag(-fcolor-diagnostics is_supported_fcolor-diagnostics)

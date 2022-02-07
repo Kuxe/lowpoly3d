@@ -28,6 +28,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 # Global options
 option(BUILD_SHARED_LIBS "Build shared libraries." ON)
+option(${PROJECT_NAME}_BUILD_EXAMPLES "Build examples." ON)
 
 # [WIN32] All projects should output dlls to the binary directory.
 # This is because .exe-files look for .dlls in its own directory,
@@ -240,7 +241,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 # Setup headers
 set(${PROJECT_NAME}_INCLUDE_DIRS
-	${CMAKE_CURRENT_SOURCE_DIR}/include
+	include
 	${CONTRIB_DIR}
 )
 
@@ -268,18 +269,9 @@ elseif(APPLE)
 	target_link_libraries(${PROJECT_NAME} PUBLIC lsys)
 endif(WIN32)
 
-# ---------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------- #
-# --------------------------- SETUP example TARGET --------------------------- #
-# ---------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------- #
-add_executable(${PROJECT_NAME}_example src/example.cpp)
-target_include_directories(${PROJECT_NAME}_example
-	PRIVATE
-		${CMAKE_CURRENT_SOURCE_DIR}/include/
-)
-target_link_libraries(${PROJECT_NAME}_example PRIVATE ${PROJECT_NAME})
-set_target_properties(${PROJECT_NAME}_example PROPERTIES OUTPUT_NAME example)
+if(${PROJECT_NAME}_BUILD_EXAMPLES)
+add_subdirectory(example)
+endif()
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
@@ -302,7 +294,6 @@ add_subdirectory(tests)
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 install(TARGETS ${PROJECT_NAME} RUNTIME)
-install(TARGETS ${PROJECT_NAME}_example RUNTIME)
 install(TARGETS ${PROJECT_NAME}_intersection_visualizations RUNTIME)
 install(TARGETS glbinding glbinding-aux RUNTIME)
 install(DIRECTORY include DESTINATION include)

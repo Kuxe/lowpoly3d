@@ -30,6 +30,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 option(BUILD_SHARED_LIBS "Build shared libraries." ON)
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build examples." ON)
 option(${PROJECT_NAME}_BUILD_TESTS "Build tests." ON)
+option(${PROJECT_NAME}_BUILD_INTERSECTION_VISUALIZATIONS "Build intersection-visualizations." ON)
 
 # [WIN32] All projects should output dlls to the binary directory.
 # This is because .exe-files look for .dlls in its own directory,
@@ -274,18 +275,9 @@ if(${PROJECT_NAME}_BUILD_EXAMPLES)
 add_subdirectory(example)
 endif()
 
-# ---------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------- #
-# ----------------- SETUP intersection_visualizations TARGET ----------------- #
-# ---------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------- #
-add_executable(${PROJECT_NAME}_intersection_visualizations src/intersection_visualizations.cpp)
-target_include_directories(${PROJECT_NAME}_intersection_visualizations
-	PRIVATE
-		${CMAKE_CURRENT_SOURCE_DIR}/include/
-)
-target_link_libraries(${PROJECT_NAME}_intersection_visualizations PRIVATE ${PROJECT_NAME})
-set_target_properties(${PROJECT_NAME}_intersection_visualizations PROPERTIES OUTPUT_NAME intersection_visualizations)
+if(${PROJECT_NAME}_BUILD_INTERSECTION_VISUALIZATIONS)
+	add_subdirectory(intersection_visualizations)
+endif()
 
 if(${PROJECT_NAME}_BUILD_TESTS)
 add_subdirectory(tests)
@@ -297,7 +289,6 @@ endif()
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 install(TARGETS ${PROJECT_NAME} RUNTIME)
-install(TARGETS ${PROJECT_NAME}_intersection_visualizations RUNTIME)
 install(TARGETS glbinding glbinding-aux RUNTIME)
 install(DIRECTORY include DESTINATION include)
 install(DIRECTORY shaders DESTINATION .)

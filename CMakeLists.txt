@@ -26,6 +26,9 @@ endif()
 configure_file(build.hpp.in build.hpp @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
+# Global options
+option(BUILD_SHARED_LIBS "Build shared libraries." ON)
+
 # [WIN32] All projects should output dlls to the binary directory.
 # This is because .exe-files look for .dlls in its own directory,
 # so if .exe-files should be runnable from the binary directory

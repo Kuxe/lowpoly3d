@@ -29,6 +29,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 # Global options
 option(BUILD_SHARED_LIBS "Build shared libraries." ON)
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build examples." ON)
+option(${PROJECT_NAME}_BUILD_TESTS "Build tests." ON)
 
 # [WIN32] All projects should output dlls to the binary directory.
 # This is because .exe-files look for .dlls in its own directory,
@@ -286,7 +287,9 @@ target_include_directories(${PROJECT_NAME}_intersection_visualizations
 target_link_libraries(${PROJECT_NAME}_intersection_visualizations PRIVATE ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME}_intersection_visualizations PROPERTIES OUTPUT_NAME intersection_visualizations)
 
+if(${PROJECT_NAME}_BUILD_TESTS)
 add_subdirectory(tests)
+endif()
 
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #

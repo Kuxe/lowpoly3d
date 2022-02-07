@@ -274,7 +274,7 @@ target_include_directories(${PROJECT_NAME}_example
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
-target_link_libraries(${PROJECT_NAME}_example PUBLIC ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_example PRIVATE ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME}_example PROPERTIES OUTPUT_NAME example)
 
 # ---------------------------------------------------------------------------- #
@@ -287,7 +287,7 @@ target_include_directories(${PROJECT_NAME}_intersection_visualizations
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
-target_link_libraries(${PROJECT_NAME}_intersection_visualizations PUBLIC ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_intersection_visualizations PRIVATE ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME}_intersection_visualizations PROPERTIES OUTPUT_NAME intersection_visualizations)
 
 add_subdirectory(tests)
@@ -297,7 +297,10 @@ add_subdirectory(tests)
 # --------------------------- SETUP install TARGET --------------------------- #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(TARGETS ${PROJECT_NAME} RUNTIME)
+install(TARGETS ${PROJECT_NAME}_example RUNTIME)
+install(TARGETS ${PROJECT_NAME}_intersection_visualizations RUNTIME)
+install(TARGETS glbinding glbinding-aux RUNTIME)
 install(DIRECTORY include DESTINATION include)
 install(DIRECTORY shaders DESTINATION .)
 

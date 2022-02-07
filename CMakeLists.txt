@@ -256,23 +256,21 @@ target_include_directories(${PROJECT_NAME}
 )
 
 if(WIN32)
-	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32)
-	target_link_libraries(${PROJECT_NAME} PUBLIC lsys glm::glm glfw glbinding::glbinding)
+	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32 lsys glm::glm glfw glbinding::glbinding)
 elseif(UNIX AND NOT APPLE)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
 	find_package(Threads)
-	target_link_libraries(${PROJECT_NAME} PUBLIC glfw dl GL X11 Xxf86vm Xrandr Threads::Threads Xi Xinerama Xcursor lsys glbinding::glbinding)
+	target_link_libraries(${PROJECT_NAME} PRIVATE glfw dl GL X11 Xxf86vm Xrandr Threads::Threads Xi Xinerama Xcursor lsys glbinding::glbinding)
 elseif(APPLE)
 	find_package(OpenGL REQUIRED)
 	find_library(COCOA_LIBRARY Cocoa)
 	find_library(IOKIT_LIBRARY IOKit)
 	find_library(COREVIDEO CoreVideo)
-	target_link_libraries(${PROJECT_NAME} PRIVATE glfw dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO} glbinding::glbinding)
-	target_link_libraries(${PROJECT_NAME} PUBLIC lsys)
+	target_link_libraries(${PROJECT_NAME} PRIVATE lsys glfw dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO} glbinding::glbinding)
 endif(WIN32)
 
 if(${PROJECT_NAME}_BUILD_EXAMPLES)
-add_subdirectory(example)
+	add_subdirectory(example)
 endif()
 
 if(${PROJECT_NAME}_BUILD_INTERSECTION_VISUALIZATIONS)
@@ -280,7 +278,7 @@ if(${PROJECT_NAME}_BUILD_INTERSECTION_VISUALIZATIONS)
 endif()
 
 if(${PROJECT_NAME}_BUILD_TESTS)
-add_subdirectory(tests)
+	add_subdirectory(tests)
 endif()
 
 # ---------------------------------------------------------------------------- #

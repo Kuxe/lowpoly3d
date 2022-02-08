@@ -80,9 +80,13 @@ FetchContent_Declare(
 )
 set(OPTION_BUILD_TOOLS OFF CACHE INTERNAL "")
 set(OPTION_BUILD_EXAMPLES OFF CACHE INTERNAL "")
-# FIXME: glbinding does some install calls that really mess up my own install
-#        How to circumvent? I don't want libglbinding.dll in root install dir..
-FetchContent_MakeAvailable(glbinding)
+
+FetchContent_GetProperties(glbinding)
+if(NOT glbinding_POPULATED)
+	FetchContent_Populate(glbinding)
+	add_subdirectory(${glbinding_SOURCE_DIR} ${glbinding_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
 if(WIN32)
 	set_target_properties(glbinding PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -289,7 +293,7 @@ endif()
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
 install(TARGETS ${PROJECT_NAME} RUNTIME)
-install(TARGETS glbinding glbinding-aux RUNTIME)
+install(TARGETS glbinding RUNTIME)
 install(DIRECTORY include DESTINATION include)
 install(DIRECTORY shaders DESTINATION .)
 

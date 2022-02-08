@@ -58,3 +58,6 @@ buildcache/
 
 # download-directory
 download/
+
+# cmake
+CMakeUserPresets.json

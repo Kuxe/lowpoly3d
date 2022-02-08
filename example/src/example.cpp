@@ -1,13 +1,7 @@
-#include "binary_path.hpp"
 #include "lowpoly3d.hpp"
 
 /** Example file illustrating how to use lowpoly3d **/
 using namespace lowpoly3d;
-
-// TODO: 
-// When running from build-tree, use CMAKE_SOURCE_DIR (available from build.hpp) as RESOURCE_DIR
-// When running from install-tree, use "../" relative to executable as RESOURCE_DIR
-// Then load shaders from "RESOURCE_DIR/shaders/""
 
 struct Game : public ILowpolyInput {
 	using duration_s = std::chrono::duration<double, std::ratio<1, 1>>;

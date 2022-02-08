@@ -294,7 +294,7 @@ endif()
 # ---------------------------------------------------------------------------- #
 install(TARGETS ${PROJECT_NAME} RUNTIME)
 install(TARGETS glbinding RUNTIME)
-install(DIRECTORY include DESTINATION include)
+install(DIRECTORY include DESTINATION .)
 install(DIRECTORY shaders DESTINATION .)
 
 # Create zip on windows but TGZ on linux and apple

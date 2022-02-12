@@ -54,6 +54,7 @@ private:
 	DebugRenderer debugRenderer;
 
 	std::unique_ptr<GLFrame> worldAxes;
+	std::unique_ptr<GLFrame> originFrame;
 
 	bool showWireframes = false;
 

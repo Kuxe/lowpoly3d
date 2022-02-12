@@ -1,3 +1,4 @@
+#include "glm/ext/matrix_transform.hpp"
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
 #include <glbinding/gl/functions-patches.h>
@@ -115,6 +116,7 @@ bool Renderer::initialize(ILowpolyInput* li, const std::filesystem::path& shader
 	}
 
 	worldAxes = std::make_unique<GLFrame>();
+	originFrame = std::make_unique<GLFrame>();
 
 	initialized = true;
 	return true;
@@ -453,6 +455,8 @@ bool Renderer::run() {
 				frame[3] = glm::vec4(-1.0f + worldAxesSize, -1.0f + worldAxesSize, 0.0f, 1.0f);
 				return frame;
 			}(), shaderProgramBank["simple"_sph], mvpUBO, 1.0f);
+
+			originFrame->draw(vp * glm::identity<glm::mat4>(), shaderProgramBank["simple"_sph], mvpUBO, 3.0f);
 
 			return true;
 		}; //End of render2fbo

@@ -195,6 +195,7 @@ add_library(${PROJECT_NAME}
 	include/fps_camera.hpp src/fps_camera.cpp
 	include/framebuffer.hpp src/framebuffer.cpp
 	include/gamedata.hpp
+	include/glfw_callbacks.hpp src/glfw_callbacks.cpp
 	include/ilowpolyinput.hpp
 	include/keyaction.hpp src/keyaction.cpp
 	include/keymanager.hpp src/keymanager.cpp

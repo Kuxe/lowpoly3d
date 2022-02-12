@@ -32,6 +32,18 @@ option(${PROJECT_NAME}_BUILD_EXAMPLES "Build examples." ON)
 option(${PROJECT_NAME}_BUILD_TESTS "Build tests." ON)
 option(${PROJECT_NAME}_BUILD_INTERSECTION_VISUALIZATIONS "Build intersection-visualizations." ON)
 
+# RPATH
+set(EXECUTABLE_INSTALL_RPATH $ORIGIN/../lib)
+set(LIBRARY_INSTALL_RPATH $ORIGIN)
+
+# Install RPATH is defaulted to the library install rpath.
+# Executable targets are expected to set their own install rpath property.
+set(CMAKE_INSTALL_RPATH ${LIBRARY_INSTALL_RPATH})
+set(CMAKE_BUILD_WITH_INSTALL_RPATH False)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH False)
+set(CMAKE_SKIP_BUILD_RPATH False)
+set(CMAKE_BUILD_RPATH_USE_ORIGIN True)
+
 # [WIN32] All projects should output dlls to the binary directory.
 # This is because .exe-files look for .dlls in its own directory,
 # so if .exe-files should be runnable from the binary directory

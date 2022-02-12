@@ -1,6 +1,7 @@
 #include "shaderprogram.hpp"
 #include <sstream>
 #include <fstream>
+#include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 #include "uniformbuffer.hpp"
 
@@ -22,14 +23,14 @@ ShaderProgram::~ShaderProgram() {
 bool ShaderProgram::add(GLenum shaderType, const std::filesystem::path& path) {
 
 	if(!std::filesystem::exists(path)) {
-		printf("ERROR: Shader at \"%ls\" does not exist.\n", path.c_str());
+		std::cout << "ERROR: Shader at \"" << path.c_str() << "\" does not exist.\n";
 		return false;
 	}
 
 	//Load shader on path to sourcePtr
 	std::ifstream ifs(path);
 	if(!ifs.is_open()) {
-		printf("ERROR: Could open shader filestream for file \"%ls\"\n", path.c_str());
+		std::cout << "ERROR: Could open shader filestream for file \"" << path.c_str() << "\"\n";
 		return false;
 	}
 	std::stringstream buffer;
@@ -41,37 +42,35 @@ bool ShaderProgram::add(GLenum shaderType, const std::filesystem::path& path) {
 	//Create and compile shader
 	GLuint shaderHandle = glCreateShader(shaderType);
 	if(!shaderHandle) {
-		printf("ERROR: call to glCreateShader() returned 0 for \"%ls\"\n", path.c_str());
+		std::cout << "ERROR: call to glCreateShader() returned 0 for \"" << path.c_str() << "\"\n";
 		return false;
 	}
 
 	glShaderSource(shaderHandle, 1, &sourceStrPtr, NULL);
-    glCompileShader(shaderHandle);
+	glCompileShader(shaderHandle);
 
-    //Check if any errors occurred
-    GLboolean success;
-    glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, reinterpret_cast<GLint*>(&success));
-    if(success == GL_FALSE) {
-    	GLint length;
-	    glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &length);
-	    std::vector<GLchar> log(length);
+	//Check if any errors occurred
+	GLboolean success;
+	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, reinterpret_cast<GLint*>(&success));
+	if(success == GL_FALSE) {
+		GLint length;
+		glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &length);
+		std::vector<GLchar> log(length);
 		glGetShaderInfoLog(shaderHandle, length, 0, &log[0]);
-		printf("ERROR: Could not compile \"%ls\" (%s)\n", path.c_str(), &log[0]);
+		std::cout << "ERROR: Could not compile \"" << path.c_str() << "\" (" << &log[0] << ")\n";    //Save metadata of shader. This must be done if this shader program should support live-reloading.
 		return false;
-    }
-
-    //Save metadata of shader. This must be done if this shader program should support live-reloading.
-    shaders[shaderType] = {shaderHandle, path};
+	}
+	shaders[shaderType] = {shaderHandle, path};
 
 	//Finally attach shader to program
-    glAttachShader(programHandle, shaderHandle);
+	glAttachShader(programHandle, shaderHandle);
 
-    /** Don't worry about this call. It only flags shaderHandle for deletion,
-    	which is fine since the shaderHandle is attached to programHandle
-    	and therefore the shader is only deleted after deletion of programHandle
-    **/
-    glDeleteShader(shaderHandle);
-    return true;
+	/** Don't worry about this call. It only flags shaderHandle for deletion,
+	    which is fine since the shaderHandle is attached to programHandle
+	    and therefore the shader is only deleted after deletion of programHandle
+	**/
+	glDeleteShader(shaderHandle);
+	return true;
 }
 
 bool ShaderProgram::remove(gl::GLenum shaderType) {

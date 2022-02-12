@@ -50,45 +50,53 @@ namespace lowpoly3d {
 /** Statics **/
 /*************/
 
-ILowpolyInput* lowpolyInput;
-
-static void error_callback(int error, const char* description) {
-	lowpolyInput->onError();
-}
-
-static void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
-	glViewport(0, 0, w, h);
-	lowpolyInput->onFramebufferResize(w, h);
-	subber::publish<OnResize>({w, h});
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
-	lowpolyInput->onKey(key, scancode, action, mods);
-
-	/** GLFW_KEY_R might be used for something else in client-application, so
-		whenever user presses 'R' an (unintentional) live-reload of shaders
-		happen. This is not fine for release-build but its not to worrysome in a debug-build **/
-	#ifdef DEBUG
-	if(key == GLFW_KEY_R) {
-		subber::publish<rPress>({});
+struct GLFWCallbacks {
+	static ILowpolyInput* handler;
+	static void set_input_handler(ILowpolyInput* iHandler)
+	{
+		handler = iHandler;
 	}
-	#endif //DEBUG
-}
 
-static void cursor_enter_callback(GLFWwindow* window, int focused) {
-	double x, y;
-	glfwGetCursorPos(window, &x, &y);
-	if(focused) {
-		lowpolyInput->onMouseEnter(x, y);
-	} else {
-		lowpolyInput->onMouseExit(x, y);
+	static void error_callback(int error, const char* description) {
+		handler->onError();
 	}
-}
 
-static void mouse_callback(GLFWwindow* window, double x, double y) {
-	lowpolyInput->onMouse(x, y);
-}
+	static void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
+		glViewport(0, 0, w, h);
+		handler->onFramebufferResize(w, h);
+		subber::publish<OnResize>({w, h});
+	}
+
+	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
+		handler->onKey(key, scancode, action, mods);
+
+		/** GLFW_KEY_R might be used for something else in client-application, so
+			whenever user presses 'R' an (unintentional) live-reload of shaders
+			happen. This is not fine for release-build but its not to worrysome in a debug-build **/
+		#ifdef DEBUG
+		if(key == GLFW_KEY_R) {
+			subber::publish<rPress>({});
+		}
+		#endif //DEBUG
+	}
+
+	static void cursor_enter_callback(GLFWwindow* window, int focused) {
+		double x, y;
+		glfwGetCursorPos(window, &x, &y);
+		if(focused) {
+			handler->onMouseEnter(x, y);
+		} else {
+			handler->onMouseExit(x, y);
+		}
+	}
+
+	static void mouse_callback(GLFWwindow* window, double x, double y) {
+		handler->onMouse(x, y);
+	}
+};
+
+ILowpolyInput* GLFWCallbacks::handler = nullptr;
 
 /*********************/
 /** Private methods **/
@@ -110,9 +118,9 @@ Renderer::~Renderer() = default;
 bool Renderer::initialize(ILowpolyInput* li, const std::filesystem::path& shaderDirectory) {
 	assert(std::filesystem::exists(shaderDirectory));
 
-	lowpolyInput = li;
+	GLFWCallbacks::set_input_handler(li);
 	this->shaderDirectory = shaderDirectory;
-	glfwSetErrorCallback(error_callback);
+	glfwSetErrorCallback(GLFWCallbacks::error_callback);
 	if(glfwInit() == GLFW_FALSE) {
 		fprintf(stderr, "Could not load glfw (call to glfwInit returned GLFW_FALSE)\n");
 		return false;
@@ -130,13 +138,14 @@ bool Renderer::initialize(ILowpolyInput* li, const std::filesystem::path& shader
 		return false;
 	}
 
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetCursorEnterCallback(window, cursor_enter_callback);
+	glfwSetKeyCallback(window, GLFWCallbacks::key_callback);
+	glfwSetCursorPosCallback(window, GLFWCallbacks::mouse_callback);
+	glfwSetCursorEnterCallback(window, GLFWCallbacks::cursor_enter_callback);
+	glfwSetFramebufferSizeCallback(window, GLFWCallbacks::framebuffer_size_callback);
+	
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	glbinding::Binding::initialize([](const char * name) {
 		return glfwGetProcAddress(name);

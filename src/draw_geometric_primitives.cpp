@@ -18,8 +18,8 @@ void draw(Scene& iScene, Point const& iPoint)
 	rdb.setTransformationInWorld(scale(translate(iPoint), glm::vec3(getPointScalingFactor())));
 	// Assume that there is a model loaded in engine called "sphere"
 	rdb.setModel("sphere");
-	// Assume that there is a shader loaded in engine called "default"
-	rdb.setShader("default");
+	// Assume that there is a shader loaded in engine called "noshade"
+	rdb.setShader("color");
 
 	iScene.insert(rdb.build());
 }
@@ -29,7 +29,7 @@ void draw(Scene& iScene, LineSegment const& iLineSegment)
 	// Cylinder has base at (0, 0, 0) and tip (0, 1, 0)
 	RenderDataBuilder rdb;
 	rdb.setModel("cylinder");
-	rdb.setShader("default");
+	rdb.setShader("color");
 
 	// Now we want to "align" the cylinder in its model-space
 	// (which is just pointing upwards along +y) to the origLineSegment.
@@ -66,7 +66,7 @@ void draw(Scene& iScene, Sphere const& iSphere)
 	auto const rdb = RenderDataBuilder()
 		.setTransformationInWorld(scale(translate(iSphere.p), glm::vec3(iSphere.r)))
 		.setModel("sphere")
-		.setShader("default");
+		.setShader("color");
 
 	iScene.insert(rdb.build());
 }
@@ -79,7 +79,7 @@ void draw(Scene& iScene, Triangle const& iTriangle)
 	auto const rdb = RenderDataBuilder()
 		.setTransformationInWorld(translate(iTriangle.p1))
 		.setModel("triangle_xy")
-		.setShader("default");
+		.setShader("color");
 
 	iScene.insert(rdb.build());	
 }

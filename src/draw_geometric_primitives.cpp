@@ -71,4 +71,17 @@ void draw(Scene& iScene, Sphere const& iSphere)
 	iScene.insert(rdb.build());
 }
 
+// FIXME: This does NOT respect the shape of the input 'iTriangle',
+//        it will draw a triangle with unit-length catheti in the
+//        first quadrant of the XY-plane.
+void draw(Scene& iScene, Triangle const& iTriangle)
+{
+	auto const rdb = RenderDataBuilder()
+		.setTransformationInWorld(translate(iTriangle.p1))
+		.setModel("triangle_xy")
+		.setShader("default");
+
+	iScene.insert(rdb.build());	
+}
+
 } // End of namespace lowpoly3d

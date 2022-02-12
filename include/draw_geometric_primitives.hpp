@@ -4,6 +4,7 @@
 #include "geometric_primitives/linesegment.hpp"
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/sphere.hpp"
+#include "geometric_primitives/triangle.hpp"
 
 namespace lowpoly3d {
 
@@ -13,6 +14,7 @@ class Scene;
 void draw(Scene& iScene, Point const& iPoint);
 void draw(Scene& iScene, LineSegment const& iLineSegment);
 void draw(Scene& iScene, Sphere const& iSphere);
+void draw(Scene& iScene, Triangle const& iTriangle);
 
 } // End of namespace lowpoly3d
 

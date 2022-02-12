@@ -36,7 +36,8 @@ namespace lowpoly3d
 				"passthrough",
 				"simple",
 				"depth",
-				"debug"
+				"debug",
+				"color"
 			};
 
 			for(std::string const& iRawShaderProgramHandle : rawShaderProgramHandles) {
@@ -74,7 +75,11 @@ namespace lowpoly3d
 					GL_FRAGMENT_SHADER, mShaderDirectory / "depth.frag") &&
 				mShaderProgramMap.at("debug").link(
 					GL_VERTEX_SHADER, mShaderDirectory / "debug.vert",
-					GL_FRAGMENT_SHADER, mShaderDirectory / "debug.frag");
+					GL_FRAGMENT_SHADER, mShaderDirectory / "debug.frag") &&
+				mShaderProgramMap.at("color").link(
+					GL_VERTEX_SHADER, mShaderDirectory / "shader.vert",
+					GL_FRAGMENT_SHADER, mShaderDirectory / "color.frag",
+					GL_GEOMETRY_SHADER, mShaderDirectory / "shader.geom");
 		}
 
 		ShaderProgram& get(ShaderProgramHandle const& iShaderProgramHandle) {

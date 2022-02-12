@@ -195,6 +195,7 @@ add_library(${PROJECT_NAME}
 	include/renderer.hpp src/renderer.cpp
 	include/renderdata.hpp src/renderdata.cpp
 	include/scene.hpp src/scene.cpp
+	include/shaderprogrambank.hpp src/shaderprogrambank.cpp
 	include/shaderprogram.hpp src/shaderprogram.cpp
 	include/uniformbuffer.hpp src/uniformbuffer.cpp
 	include/glframe.hpp src/glframe.cpp

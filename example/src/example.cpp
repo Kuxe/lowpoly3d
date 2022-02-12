@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 		Proceed to load 3D-meshes into GPU-memory if initialization went well
 		Finally, run the lowpoly3d-renderer if everything went well. **/
 	auto const bindir = get_current_binary_absolute_path().parent_path();
-	lowpoly3d.initialize(&game, bindir.string() +  "/../shaders/") &&
+	lowpoly3d.initialize(&game, bindir / "../shaders") &&
 	lowpoly3d.loadModels("sphere", sphere, "terrain", terrain, "tree", tree) &&
 	lowpoly3d.run(); //Main-thread will remain in lowpoly3d.run() until lowpoly3d terminates
 	game.running = false; //terminate game and join game thread with main thread

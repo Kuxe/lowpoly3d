@@ -23,8 +23,11 @@
 #include "scene.hpp"
 #include "geometric_primitives/line.hpp"
 #include "glframe.hpp"
+#include "shaderprogrambank.hpp"
 
+#include <filesystem>
 #include <sstream>
+#include <unordered_map>
 
 using namespace gl;
 
@@ -104,7 +107,9 @@ Renderer::Renderer()
 // I don't know why though.
 Renderer::~Renderer() = default;
 
-bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory) {
+bool Renderer::initialize(ILowpolyInput* li, const std::filesystem::path& shaderDirectory) {
+	assert(std::filesystem::exists(shaderDirectory));
+
 	lowpolyInput = li;
 	this->shaderDirectory = shaderDirectory;
 	glfwSetErrorCallback(error_callback);
@@ -327,72 +332,17 @@ bool Renderer::run() {
 		return false;
 	}
 
-	/** Ideally a ShaderProgram defines what uniforms it needs.
-		It would be nice during initialization of a shader to simply
-		pass a list of datatypes which the shaders sets as uniforms.
-		No. This is not nice. I want uniforms to be defined in shader
-		NO not nice either, dont wanna subclass. **/
-	ShaderProgram program("default");
-	if(!program.link(
-		GL_VERTEX_SHADER, shaderDirectory + "shader.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "shader.frag",
-		GL_GEOMETRY_SHADER, shaderDirectory + "shader.geom")) {
+	ShaderProgramBank shaderProgramBank(shaderDirectory);
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Unknown error during shaderprogrambank creation.\n");
 		return false;
 	}
 
-	ShaderProgram sunProgram("sun");
-	if(!sunProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "sun.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "sun.frag")) {
-		return false;
-	 }
-
-	 ShaderProgram skyboxProgram("skybox");
-	 if(!skyboxProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "skybox.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "skybox.frag")) {
+	if(!shaderProgramBank.link()) {
 		return false;
 	}
-
-	ShaderProgram waterProgram("water");
-	if(!waterProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "water.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "water.frag")) {
-		return false;
-	}
-
-	ShaderProgram postprocessProgram("post-process");
-	if(!postprocessProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "postprocess.frag")) {
-		return false;
-	}
-
-	ShaderProgram passthroughProgram("passthrough");
-	if(!passthroughProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "passthrough.frag")) {
-		return false;
-	}
-
-	ShaderProgram simpleProgram("simple");
-	if(!simpleProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "simple.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "simple.frag")) {
-		return false;
-	}
-
-	ShaderProgram depthProgram("depth");
-	if(!depthProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "depth.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "depth.frag")) {
-		return false;
-	}
-
-	ShaderProgram debugProgram("debug");
-	if(!debugProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "debug.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "debug.frag")) {
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Unknown error during shaderprogrambank linking.\n");
 		return false;
 	}
 
@@ -418,22 +368,12 @@ bool Renderer::run() {
 	UniformBuffer worldUBO("World UBO", 1);
 	UniformBuffer modelUBO("Model UBO", 2);
 	UniformBuffer mvpUBO("MVP UBO", 3);
-	if(!program.setUBO("WorldUniformData", worldUBO)) return false;
-	if(!program.setUBO("ModelUniformData", modelUBO)) return false;
-	if(!skyboxProgram.setUBO("WorldUniformData", worldUBO)) return false;
-	if(!skyboxProgram.setUBO("ModelUniformData", modelUBO)) return false;
-	if(!depthProgram.setUBO("ModelUniformData", modelUBO)) return false;
-	if(!simpleProgram.setUBO("MVPUniformData", mvpUBO)) return false;
-
-	std::unordered_map<std::string, const ShaderProgram&> programs;
-	auto addProgram = [&](const ShaderProgram& p) { programs.insert({p.name, p}); };
-	addProgram(program);
-	addProgram(sunProgram);
-	addProgram(skyboxProgram);
-	addProgram(waterProgram);
-	addProgram(postprocessProgram);
-	addProgram(depthProgram);
-	addProgram(debugProgram);
+	if(!shaderProgramBank["default"_sph].setUBO("WorldUniformData", worldUBO)) return false;
+	if(!shaderProgramBank["default"_sph].setUBO("ModelUniformData", modelUBO)) return false;
+	if(!shaderProgramBank["skybox"_sph].setUBO("WorldUniformData", worldUBO)) return false;
+	if(!shaderProgramBank["skybox"_sph].setUBO("ModelUniformData", modelUBO)) return false;
+	if(!shaderProgramBank["depth"_sph].setUBO("ModelUniformData", modelUBO)) return false;
+	if(!shaderProgramBank["simple"_sph].setUBO("MVPUniformData", mvpUBO)) return false;
 
 	//Sun should rotate around the x-axis through origo
 	CelestialBody suncb({0.0, 0.0, 0.0}, {95.0, 0.0, 0.0}, 1.57079632679);
@@ -525,11 +465,11 @@ bool Renderer::run() {
 
 			worldUBO.use<WorldUniformData>(view, projection, glm::vec4(suncb.getPos(sunRadians), 1.0), glm::vec4(timeOfDayColor, 0.0), windowResolution);
 
-			if(!program.use()) {
+			if(!shaderProgramBank["default"_sph].use()) {
 				printf("ERROR: Could not use shader program\n");
 				return false;
 			}
-			if(!program.setTexture("shadowmap", depthFBO.getTexture())) {
+			if(!shaderProgramBank["default"_sph].setTexture("shadowmap", depthFBO.getTexture())) {
 				printf("ERROR: Could not set shadowmap\n");
 				return false;
 			}
@@ -541,9 +481,9 @@ bool Renderer::run() {
 			const glm::mat4 vp = projection * view;
 			for(const auto& rd : rds) {
 				try {
-					programs.at(rd.shader).use();
+					shaderProgramBank[rd.shader].use();
 				} catch (const std::out_of_range& e) {
-					printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%zu shaders)\n", rd.shader.c_str(), programs.size());
+					printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%zu shaders)\n", rd.shader.c_str(), shaderProgramBank.size());
 					return false;
 				} catch (const std::exception& e) {
 					printf("ERROR: Could not draw RenderData %s\n", e.what());
@@ -564,7 +504,7 @@ bool Renderer::run() {
 				glm::mat4 frame = glm::scale(view, glm::vec3(worldAxesSize));
 				frame[3] = glm::vec4(-1.0f + worldAxesSize, -1.0f + worldAxesSize, 0.0f, 1.0f);
 				return frame;
-			}(), simpleProgram, mvpUBO, 1.0f);
+			}(), shaderProgramBank["simple"_sph], mvpUBO, 1.0f);
 
 			return true;
 		}; //End of render2fbo
@@ -586,10 +526,10 @@ bool Renderer::run() {
 
 			/** Render quad filling the screen using postfx shaders, where postfx shader got multisampled texture from mainFBO **/
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			postprocessProgram.use();
-			if(!postprocessProgram.setUniform("resolution", windowResolution)) return false;
-			if(!postprocessProgram.setUniform("time", time32)) return false; 
-			if(!postprocessProgram.setTexture("renderedTexture", postfxFBO.getTexture())) return false;
+			shaderProgramBank["post-process"_sph].use();
+			if(!shaderProgramBank["post-process"_sph].setUniform("resolution", windowResolution)) return false;
+			if(!shaderProgramBank["post-process"_sph].setUniform("time", time32)) return false; 
+			if(!shaderProgramBank["post-process"_sph].setTexture("renderedTexture", postfxFBO.getTexture())) return false;
 			glBindVertexArray(quadVA);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -605,7 +545,7 @@ bool Renderer::run() {
 		auto render2depth = [&](const RenderDatas& rds, const glm::mat4& viewproj) {
 			//Render each renderdata (except sun?) to depthfbo using depth shaders
 			depthFBO.use();
-			depthProgram.use();
+			shaderProgramBank["depth"_sph].use();
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			glClear(GL_DEPTH_BUFFER_BIT);
 			for(const auto& rd : rds) {
@@ -629,7 +569,7 @@ bool Renderer::run() {
 			const glm::mat4 sunView = glm::lookAt(suncb.getPos(constants.getSunRadians()), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 			const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
 			const glm::mat4 sunvp = sunPerspective * sunView;
-			debugRenderer.render(constants.getView() * projection, debugFBO, debugProgram);
+			debugRenderer.render(constants.getView() * projection, debugFBO, shaderProgramBank["debug"_sph]);
 
 			showWireframes = constants.getShowWireframes();
 

@@ -7,6 +7,7 @@
 #include "queue.hpp" //For buffering scenes during setScene()
 #include "debugrenderer.hpp"
 #include <memory> //std::unique_ptr
+#include <filesystem> //std::filesystem::path
 
 #include "geometric_primitives/line.hpp"
 
@@ -30,7 +31,7 @@ class Renderer {
 private:
 	bool initialized = false, printFrameTime = false;
 	GLFWwindow* window;
-	std::string shaderDirectory;
+	std::filesystem::path shaderDirectory;
 
 	//Keep track of triangles count per model and what vertex array is associated with what name
 	std::unordered_map<std::string, int> triangles, models;
@@ -67,7 +68,7 @@ public:
 		shaderDirectory is a relative or absolute path to the directory containing
 		shaders used by lowpoly3d. These shaders are provided by lowpoly3d.
 		returns an error code if fail **/
-	bool initialize(ILowpolyInput* li, const std::string& shaderDirectory);
+	bool initialize(ILowpolyInput* li, const std::filesystem::path& shaderDirectory);
 
 	//Terminates renderer (destroy window, no longer ready for rendering)
 	void terminate();

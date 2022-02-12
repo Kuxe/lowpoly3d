@@ -1,5 +1,4 @@
 #include "draw_geometric_primitives.hpp"
-#include "geometric_primitives/point.hpp"
 #include "renderdata.hpp"
 #include "scene.hpp"
 #include <glm/ext/vector_relational.hpp>
@@ -58,6 +57,16 @@ void draw(Scene& iScene, LineSegment const& iLineSegment)
 			return glm::translate(glm::mat4x4(mat), iLineSegment.p1);
 		}
 	}());
+
+	iScene.insert(rdb.build());
+}
+
+void draw(Scene& iScene, Sphere const& iSphere)
+{
+	auto const rdb = RenderDataBuilder()
+		.setTransformationInWorld(scale(translate(iSphere.p), glm::vec3(iSphere.r)))
+		.setModel("sphere")
+		.setShader("default");
 
 	iScene.insert(rdb.build());
 }

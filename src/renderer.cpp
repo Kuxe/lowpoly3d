@@ -23,8 +23,11 @@
 #include "scene.hpp"
 #include "geometric_primitives/line.hpp"
 #include "glframe.hpp"
+#include "shaderprogrambank.hpp"
 
+#include <filesystem>
 #include <sstream>
+#include <unordered_map>
 
 using namespace gl;
 
@@ -47,45 +50,53 @@ namespace lowpoly3d {
 /** Statics **/
 /*************/
 
-ILowpolyInput* lowpolyInput;
-
-static void error_callback(int error, const char* description) {
-	lowpolyInput->onError();
-}
-
-static void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
-	glViewport(0, 0, w, h);
-	lowpolyInput->onFramebufferResize(w, h);
-	subber::publish<OnResize>({w, h});
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
-	lowpolyInput->onKey(key, scancode, action, mods);
-
-	/** GLFW_KEY_R might be used for something else in client-application, so
-		whenever user presses 'R' an (unintentional) live-reload of shaders
-		happen. This is not fine for release-build but its not to worrysome in a debug-build **/
-	#ifdef DEBUG
-	if(key == GLFW_KEY_R) {
-		subber::publish<rPress>({});
+struct GLFWCallbacks {
+	static ILowpolyInput* handler;
+	static void set_input_handler(ILowpolyInput* iHandler)
+	{
+		handler = iHandler;
 	}
-	#endif //DEBUG
-}
 
-static void cursor_enter_callback(GLFWwindow* window, int focused) {
-	double x, y;
-	glfwGetCursorPos(window, &x, &y);
-	if(focused) {
-		lowpolyInput->onMouseEnter(x, y);
-	} else {
-		lowpolyInput->onMouseExit(x, y);
+	static void error_callback(int error, const char* description) {
+		handler->onError();
 	}
-}
 
-static void mouse_callback(GLFWwindow* window, double x, double y) {
-	lowpolyInput->onMouse(x, y);
-}
+	static void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
+		glViewport(0, 0, w, h);
+		handler->onFramebufferResize(w, h);
+		subber::publish<OnResize>({w, h});
+	}
+
+	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		if(key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
+		handler->onKey(key, scancode, action, mods);
+
+		/** GLFW_KEY_R might be used for something else in client-application, so
+			whenever user presses 'R' an (unintentional) live-reload of shaders
+			happen. This is not fine for release-build but its not to worrysome in a debug-build **/
+		#ifdef DEBUG
+		if(key == GLFW_KEY_R) {
+			subber::publish<rPress>({});
+		}
+		#endif //DEBUG
+	}
+
+	static void cursor_enter_callback(GLFWwindow* window, int focused) {
+		double x, y;
+		glfwGetCursorPos(window, &x, &y);
+		if(focused) {
+			handler->onMouseEnter(x, y);
+		} else {
+			handler->onMouseExit(x, y);
+		}
+	}
+
+	static void mouse_callback(GLFWwindow* window, double x, double y) {
+		handler->onMouse(x, y);
+	}
+};
+
+ILowpolyInput* GLFWCallbacks::handler = nullptr;
 
 /*********************/
 /** Private methods **/
@@ -104,10 +115,12 @@ Renderer::Renderer()
 // I don't know why though.
 Renderer::~Renderer() = default;
 
-bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory) {
-	lowpolyInput = li;
+bool Renderer::initialize(ILowpolyInput* li, const std::filesystem::path& shaderDirectory) {
+	assert(std::filesystem::exists(shaderDirectory));
+
+	GLFWCallbacks::set_input_handler(li);
 	this->shaderDirectory = shaderDirectory;
-	glfwSetErrorCallback(error_callback);
+	glfwSetErrorCallback(GLFWCallbacks::error_callback);
 	if(glfwInit() == GLFW_FALSE) {
 		fprintf(stderr, "Could not load glfw (call to glfwInit returned GLFW_FALSE)\n");
 		return false;
@@ -125,13 +138,14 @@ bool Renderer::initialize(ILowpolyInput* li, const std::string& shaderDirectory)
 		return false;
 	}
 
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetCursorEnterCallback(window, cursor_enter_callback);
+	glfwSetKeyCallback(window, GLFWCallbacks::key_callback);
+	glfwSetCursorPosCallback(window, GLFWCallbacks::mouse_callback);
+	glfwSetCursorEnterCallback(window, GLFWCallbacks::cursor_enter_callback);
+	glfwSetFramebufferSizeCallback(window, GLFWCallbacks::framebuffer_size_callback);
+	
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	glbinding::Binding::initialize([](const char * name) {
 		return glfwGetProcAddress(name);
@@ -327,72 +341,17 @@ bool Renderer::run() {
 		return false;
 	}
 
-	/** Ideally a ShaderProgram defines what uniforms it needs.
-		It would be nice during initialization of a shader to simply
-		pass a list of datatypes which the shaders sets as uniforms.
-		No. This is not nice. I want uniforms to be defined in shader
-		NO not nice either, dont wanna subclass. **/
-	ShaderProgram program("default");
-	if(!program.link(
-		GL_VERTEX_SHADER, shaderDirectory + "shader.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "shader.frag",
-		GL_GEOMETRY_SHADER, shaderDirectory + "shader.geom")) {
+	ShaderProgramBank shaderProgramBank(shaderDirectory);
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Unknown error during shaderprogrambank creation.\n");
 		return false;
 	}
 
-	ShaderProgram sunProgram("sun");
-	if(!sunProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "sun.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "sun.frag")) {
-		return false;
-	 }
-
-	 ShaderProgram skyboxProgram("skybox");
-	 if(!skyboxProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "skybox.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "skybox.frag")) {
+	if(!shaderProgramBank.link()) {
 		return false;
 	}
-
-	ShaderProgram waterProgram("water");
-	if(!waterProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "water.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "water.frag")) {
-		return false;
-	}
-
-	ShaderProgram postprocessProgram("post-process");
-	if(!postprocessProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "postprocess.frag")) {
-		return false;
-	}
-
-	ShaderProgram passthroughProgram("passthrough");
-	if(!passthroughProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "passthrough.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "passthrough.frag")) {
-		return false;
-	}
-
-	ShaderProgram simpleProgram("simple");
-	if(!simpleProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "simple.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "simple.frag")) {
-		return false;
-	}
-
-	ShaderProgram depthProgram("depth");
-	if(!depthProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "depth.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "depth.frag")) {
-		return false;
-	}
-
-	ShaderProgram debugProgram("debug");
-	if(!debugProgram.link(
-		GL_VERTEX_SHADER, shaderDirectory + "debug.vert",
-		GL_FRAGMENT_SHADER, shaderDirectory + "debug.frag")) {
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Unknown error during shaderprogrambank linking.\n");
 		return false;
 	}
 
@@ -418,22 +377,12 @@ bool Renderer::run() {
 	UniformBuffer worldUBO("World UBO", 1);
 	UniformBuffer modelUBO("Model UBO", 2);
 	UniformBuffer mvpUBO("MVP UBO", 3);
-	if(!program.setUBO("WorldUniformData", worldUBO)) return false;
-	if(!program.setUBO("ModelUniformData", modelUBO)) return false;
-	if(!skyboxProgram.setUBO("WorldUniformData", worldUBO)) return false;
-	if(!skyboxProgram.setUBO("ModelUniformData", modelUBO)) return false;
-	if(!depthProgram.setUBO("ModelUniformData", modelUBO)) return false;
-	if(!simpleProgram.setUBO("MVPUniformData", mvpUBO)) return false;
-
-	std::unordered_map<std::string, const ShaderProgram&> programs;
-	auto addProgram = [&](const ShaderProgram& p) { programs.insert({p.name, p}); };
-	addProgram(program);
-	addProgram(sunProgram);
-	addProgram(skyboxProgram);
-	addProgram(waterProgram);
-	addProgram(postprocessProgram);
-	addProgram(depthProgram);
-	addProgram(debugProgram);
+	if(!shaderProgramBank["default"_sph].setUBO("WorldUniformData", worldUBO)) return false;
+	if(!shaderProgramBank["default"_sph].setUBO("ModelUniformData", modelUBO)) return false;
+	if(!shaderProgramBank["skybox"_sph].setUBO("WorldUniformData", worldUBO)) return false;
+	if(!shaderProgramBank["skybox"_sph].setUBO("ModelUniformData", modelUBO)) return false;
+	if(!shaderProgramBank["depth"_sph].setUBO("ModelUniformData", modelUBO)) return false;
+	if(!shaderProgramBank["simple"_sph].setUBO("MVPUniformData", mvpUBO)) return false;
 
 	//Sun should rotate around the x-axis through origo
 	CelestialBody suncb({0.0, 0.0, 0.0}, {95.0, 0.0, 0.0}, 1.57079632679);
@@ -441,83 +390,6 @@ bool Renderer::run() {
 	auto startTime = std::chrono::high_resolution_clock::now();
 
 	while(!glfwWindowShouldClose(window)) {
-
-		/** Explanation of threading in renderer (why and how):
-			First of all, the simulation part of game (logic, physics, AI etc)
-			should be decoupled from the rendering engine. This is because
-			the code would get messy otherwise. In the best of worlds, only a
-			minimal set of data flows from the "game" into the renderer.
-			This minimal set of data is, for most part, called "RenderData".
-			Other information that the renderer need from the game is position of sun,
-			view-matrix and some other things. So an interface which the game implements
-			should provide these data if the game should be compatible with the renderer.
-			Thus, the only thing the game needs to do is simply realize the interface.
-			The game need not know anything about the renderer. This is nice.
-
-			So we know what the game must do (again, simply realize the RenderQuerier interface).
-			What must the renderer do? The renderer must have access to the RenderQuerier,
-			so pass a RenderQuerier into the render-method
-				Renderer::render(const RenderQuerier& rq)
-			This is precisely what is done right now. Now the renderer can access
-			whatever it needs to render a nice world. Very good.
-			But who passes RenderQuerier into the render-method?
-			This can be done in main, like so:
-
-				DummySimulation sim;
-				Renderer renderer;
-				renderer.initialize();
-				renderer.render(sim); //Main-thread locked in here!
-				renderer.terminate();
-
-			Not very difficult. But notice that renderer.render(sim) will not return
-			until the renderer is close (crossing out the window, alt+f4 or whatever).
-			Question: When should the simulation update?
-			Try1: Let the renderer update the simulation
-
-				DummySimulation sim;
-				Renderer renderer;
-				renderer.initialize();
-				renderer.render(sim); ... {
-					sim.update();
-					//do whatever the renderer does
-				}
-				renderer.terminate();
-
-			Since the renderer knows the RenderQuerier, the RenderQuerier can provide
-			a "update"-method which the renderer calls. Thus the renderer is in
-			control of updating the simulation. This is not nice, because then
-			the renderer is highly coupled with the simulation
-			(the renderer is a puppet-master and the simulation is the puppet).
-
-			Try2: Update the simulation in another thread, like so:
-
-				DummySimulation sim;
-				Renderer renderer;
-				renderer.initialize();
-				updateInThread(sim);
-				renderer.render(sim);
-				renderer.terminate();
-
-			Very nice. But problem arises. Since the renderer may access sim at anytime, even when
-			sim is doing computation, a race condition is introduced. So we must make sure that
-			the renderer does not use anything from simulation when simulation is running.
-			So whenever the simulation wants to render anything, signal the renderer that it
-			should render. When the renderer is done, wake the simulation. That is all.
-
-			Disregard everything stated above. It is kept for historical reasons
-			(also kept incase I get confused, again). RenderQuerier-interface is
-			obsolete since a game copies a scene into memory owned by renderer.
-			The scene is copied from the game-thread into and only after
-			the copying took place the renderer is informed that there is a new
-			scene which should be rendered. This way, there is no shared data
-			so there is no need for any locking mechanisms. This change from
-			RenderQuerier to copying a scene was made since blocking the game-thread
-			whenever the renderer is not feasible since rendering might take 16ms,
-			or more if computer is slow. A 16ms block on the game thread is not ok.
-			A copy on the other hand is (or I think so, have not actually measured)
-			faster than 16ms so it is less of a penalty to copy than to block.
-		**/
-
 		glfwGetFramebufferSize(window, &width, &height);
 		glViewport(0, 0, width, height);
 		const glm::vec2 windowResolution(width, height);
@@ -602,11 +474,11 @@ bool Renderer::run() {
 
 			worldUBO.use<WorldUniformData>(view, projection, glm::vec4(suncb.getPos(sunRadians), 1.0), glm::vec4(timeOfDayColor, 0.0), windowResolution);
 
-			if(!program.use()) {
+			if(!shaderProgramBank["default"_sph].use()) {
 				printf("ERROR: Could not use shader program\n");
 				return false;
 			}
-			if(!program.setTexture("shadowmap", depthFBO.getTexture())) {
+			if(!shaderProgramBank["default"_sph].setTexture("shadowmap", depthFBO.getTexture())) {
 				printf("ERROR: Could not set shadowmap\n");
 				return false;
 			}
@@ -618,9 +490,9 @@ bool Renderer::run() {
 			const glm::mat4 vp = projection * view;
 			for(const auto& rd : rds) {
 				try {
-					programs.at(rd.shader).use();
+					shaderProgramBank[rd.shader].use();
 				} catch (const std::out_of_range& e) {
-					printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%zu shaders)\n", rd.shader.c_str(), programs.size());
+					printf("ERROR: Could not draw RenderData, there is no shader \"%s\" (there are 0...%zu shaders)\n", rd.shader.c_str(), shaderProgramBank.size());
 					return false;
 				} catch (const std::exception& e) {
 					printf("ERROR: Could not draw RenderData %s\n", e.what());
@@ -641,7 +513,7 @@ bool Renderer::run() {
 				glm::mat4 frame = glm::scale(view, glm::vec3(worldAxesSize));
 				frame[3] = glm::vec4(-1.0f + worldAxesSize, -1.0f + worldAxesSize, 0.0f, 1.0f);
 				return frame;
-			}(), simpleProgram, mvpUBO, 1.0f);
+			}(), shaderProgramBank["simple"_sph], mvpUBO, 1.0f);
 
 			return true;
 		}; //End of render2fbo
@@ -663,10 +535,10 @@ bool Renderer::run() {
 
 			/** Render quad filling the screen using postfx shaders, where postfx shader got multisampled texture from mainFBO **/
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			postprocessProgram.use();
-			if(!postprocessProgram.setUniform("resolution", windowResolution)) return false;
-			if(!postprocessProgram.setUniform("time", time32)) return false; 
-			if(!postprocessProgram.setTexture("renderedTexture", postfxFBO.getTexture())) return false;
+			shaderProgramBank["post-process"_sph].use();
+			if(!shaderProgramBank["post-process"_sph].setUniform("resolution", windowResolution)) return false;
+			if(!shaderProgramBank["post-process"_sph].setUniform("time", time32)) return false; 
+			if(!shaderProgramBank["post-process"_sph].setTexture("renderedTexture", postfxFBO.getTexture())) return false;
 			glBindVertexArray(quadVA);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -682,7 +554,7 @@ bool Renderer::run() {
 		auto render2depth = [&](const RenderDatas& rds, const glm::mat4& viewproj) {
 			//Render each renderdata (except sun?) to depthfbo using depth shaders
 			depthFBO.use();
-			depthProgram.use();
+			shaderProgramBank["depth"_sph].use();
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			glClear(GL_DEPTH_BUFFER_BIT);
 			for(const auto& rd : rds) {
@@ -706,7 +578,7 @@ bool Renderer::run() {
 			const glm::mat4 sunView = glm::lookAt(suncb.getPos(constants.getSunRadians()), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 			const glm::mat4 sunPerspective = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
 			const glm::mat4 sunvp = sunPerspective * sunView;
-			debugRenderer.render(constants.getView() * projection, debugFBO, debugProgram);
+			debugRenderer.render(constants.getView() * projection, debugFBO, shaderProgramBank["debug"_sph]);
 
 			showWireframes = constants.getShowWireframes();
 

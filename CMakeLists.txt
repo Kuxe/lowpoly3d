@@ -26,6 +26,10 @@ endif()
 configure_file(build.hpp.in build.hpp @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
+# Variables
+set(runtime_build_dir "${CMAKE_BINARY_DIR}/bin")
+set(shaders_dir "${CMAKE_SOURCE_DIR}/shaders")
+
 # Global options
 option(BUILD_SHARED_LIBS "Build shared libraries." ON)
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build examples." ON)
@@ -44,15 +48,17 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH False)
 set(CMAKE_SKIP_BUILD_RPATH False)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN True)
 
-# [WIN32] All projects should output dlls to the binary directory.
+# [WIN32] All projects should output dlls to the same directory.
 # This is because .exe-files look for .dlls in its own directory,
-# so if .exe-files should be runnable from the binary directory
-# then all its dependencies must exist in the binary directory.
+# so if .exe-files should be runnable then all its dependencies
+# must exist in its directory.
+# Let that directory be ${CMAKE_BINARY_DIR}/bin, so that shaders
+# live at "../shaders" as expected.
 if(WIN32)
 	# Windows does not have concept of RUNPATHs.
 	# So build all dlls in same directory.
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${runtime_build_dir})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${runtime_build_dir})
 endif()
 
 # ---------------------------------------------------------------------------- #
@@ -101,12 +107,12 @@ endif()
 
 if(WIN32)
 	set_target_properties(glbinding PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		RUNTIME_OUTPUT_DIRECTORY ${runtime_build_dir}
+		LIBRARY_OUTPUT_DIRECTORY ${runtime_build_dir}
 	)
 	set_target_properties(glbinding-aux PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		RUNTIME_OUTPUT_DIRECTORY ${runtime_build_dir}
+		LIBRARY_OUTPUT_DIRECTORY ${runtime_build_dir}
 	)
 endif()
 
@@ -178,6 +184,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #Create a compilation database for use wit
 add_library(${PROJECT_NAME}
 	include/args.hxx
 	include/bezier.hpp
+	include/binary_path.hpp src/binary_path.cpp
 	include/bounding_volume_hierarchy.hpp src/bounding_volume_hierarchy.cpp
 	include/celestialbody.hpp
 	include/camera.hpp src/camera.cpp
@@ -200,6 +207,7 @@ add_library(${PROJECT_NAME}
 	include/renderer.hpp src/renderer.cpp
 	include/renderdata.hpp src/renderdata.cpp
 	include/scene.hpp src/scene.cpp
+	include/shaderprogrambank.hpp src/shaderprogrambank.cpp
 	include/shaderprogram.hpp src/shaderprogram.cpp
 	include/uniformbuffer.hpp src/uniformbuffer.cpp
 	include/glframe.hpp src/glframe.cpp
@@ -257,7 +265,12 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 # for compile_commands.json, but build-directory is not necessarily a parent
 # directory of source files, whereas CMakeLists-directory is.
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json)
+	COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
+)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E create_symlink ${shaders_dir} ${CMAKE_BINARY_DIR}/shaders
+)
+
 
 # Setup headers
 set(${PROJECT_NAME}_INCLUDE_DIRS
@@ -307,7 +320,7 @@ endif()
 install(TARGETS ${PROJECT_NAME} RUNTIME)
 install(TARGETS glbinding RUNTIME)
 install(DIRECTORY include DESTINATION .)
-install(DIRECTORY shaders DESTINATION .)
+install(DIRECTORY ${shaders_dir} DESTINATION .)
 
 # Create zip on windows but TGZ on linux and apple
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})

@@ -22,7 +22,7 @@ Framebuffer::Framebuffer(const std::string& framebufferName, const gl::GLsizei w
 	}
 	glBindTexture(textureTarget, 0);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Unknown error in framebuffer %s constructor during texture initialization!\n", framebufferName.c_str());
+		printf("ERROR: Unknown error in framebuffer \"%s\" constructor during texture initialization!\n", framebufferName.c_str());
 	}
 
 
@@ -30,7 +30,7 @@ Framebuffer::Framebuffer(const std::string& framebufferName, const gl::GLsizei w
 	glGenRenderbuffers(1, &renderbuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 	if(samples > static_cast<GLsizei>(GL_MAX_SAMPLES)) {
-		printf("WARNING: Number of samples (=%i) for renderbuffer in framebuffer %s is larger than GL_MAX_SAMPLES, capping samples to GL_MAX_SAMPLES (=%i)\n", samples, framebufferName.c_str(), static_cast<GLint>(GL_MAX_SAMPLES));
+		printf("WARNING: Number of samples (=%i) for renderbuffer in framebuffer \"%s\" is larger than GL_MAX_SAMPLES, capping samples to GL_MAX_SAMPLES (=%i)\n", samples, framebufferName.c_str(), static_cast<GLint>(GL_MAX_SAMPLES));
 		samples = static_cast<GLsizei>(GL_MAX_SAMPLES);
 	}
 
@@ -41,7 +41,7 @@ Framebuffer::Framebuffer(const std::string& framebufferName, const gl::GLsizei w
 	}
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Unknown error in framebuffer %s constructor during renderbuffer initialization!\n", framebufferName.c_str());
+		printf("ERROR: Unknown error in framebuffer \"%s\" constructor during renderbuffer initialization!\n", framebufferName.c_str());
 	}
 
 	/** Create and bind framebuffer **/
@@ -52,7 +52,7 @@ Framebuffer::Framebuffer(const std::string& framebufferName, const gl::GLsizei w
 	ok();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Unknown error in framebuffer  %s constructor during texture initialization!\n", framebufferName.c_str());
+		printf("ERROR: Unknown error in framebuffer \"%s\" constructor during texture initialization!\n", framebufferName.c_str());
 	}
 }
 
@@ -65,7 +65,7 @@ Framebuffer::~Framebuffer() {
 bool Framebuffer::use(const gl::GLenum target) const {
 	glBindFramebuffer(target, fbo);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not use framebuffer %s!\n", framebufferName.c_str());
+		printf("ERROR: Could not use framebuffer \"%s\"!\n", framebufferName.c_str());
 		return false;
 	}
 	return true;
@@ -74,7 +74,7 @@ bool Framebuffer::use(const gl::GLenum target) const {
 bool Framebuffer::ok() const {
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status != GL_FRAMEBUFFER_COMPLETE) {
-		printf("ERROR: Couldn't create framebuffer %s, got ", framebufferName.c_str());
+		printf("ERROR: Couldn't create framebuffer \"%s\", got ", framebufferName.c_str());
 		switch(status) {
 			default: {
 				printf("Unknown reason\n");
@@ -115,7 +115,7 @@ void Framebuffer::notified(const OnResize& evt) {
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, evt.width, evt.height);
 	}
 	if(glGetError() != GL_NO_ERROR) {
-		printf("WARNING: Could not resize framebuffer %s!\n", framebufferName.c_str());
+		printf("WARNING: Could not resize framebuffer \"%s\"!\n", framebufferName.c_str());
 	}
 }
 

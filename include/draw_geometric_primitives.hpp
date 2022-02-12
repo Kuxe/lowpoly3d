@@ -3,6 +3,7 @@
 
 #include "geometric_primitives/linesegment.hpp"
 #include "geometric_primitives/point.hpp"
+#include "geometric_primitives/sphere.hpp"
 
 namespace lowpoly3d {
 
@@ -11,6 +12,7 @@ class Scene;
 // Draws a point in world-space onto the given scene
 void draw(Scene& iScene, Point const& iPoint);
 void draw(Scene& iScene, LineSegment const& iLineSegment);
+void draw(Scene& iScene, Sphere const& iSphere);
 
 } // End of namespace lowpoly3d
 

@@ -8,17 +8,28 @@ using namespace gl;
 
 namespace lowpoly3d {
 
-ShaderProgram::ShaderProgram(const std::string& name) : programHandle(glCreateProgram()), name(name) { }
+ShaderProgram::ShaderProgram(const std::string& name) : programHandle(glCreateProgram()), name(name) {
+	if(glGetError() != GL_NO_ERROR)
+	{
+		printf("ERROR: Unknown error after \"glCreateProgram()\".\n");
+		return;
+	}
+}
 ShaderProgram::~ShaderProgram() {
 	glDeleteProgram(programHandle);
 }
 
-bool ShaderProgram::add(GLenum shaderType, const std::string& path) {
+bool ShaderProgram::add(GLenum shaderType, const std::filesystem::path& path) {
+
+	if(!std::filesystem::exists(path)) {
+		printf("ERROR: Shader at \"%ls\" does not exist.\n", path.c_str());
+		return false;
+	}
 
 	//Load shader on path to sourcePtr
 	std::ifstream ifs(path);
 	if(!ifs.is_open()) {
-		printf("Could open shader filestream for file %s\n", path.c_str());
+		printf("ERROR: Could open shader filestream for file \"%ls\"\n", path.c_str());
 		return false;
 	}
 	std::stringstream buffer;
@@ -30,7 +41,7 @@ bool ShaderProgram::add(GLenum shaderType, const std::string& path) {
 	//Create and compile shader
 	GLuint shaderHandle = glCreateShader(shaderType);
 	if(!shaderHandle) {
-		printf("ERROR: call to glCreateShader() returned 0 for %s\n", path.c_str());
+		printf("ERROR: call to glCreateShader() returned 0 for \"%ls\"\n", path.c_str());
 		return false;
 	}
 
@@ -45,7 +56,7 @@ bool ShaderProgram::add(GLenum shaderType, const std::string& path) {
 	    glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &length);
 	    std::vector<GLchar> log(length);
 		glGetShaderInfoLog(shaderHandle, length, 0, &log[0]);
-		printf("ERROR: Could not compile %s (%s)\n", path.c_str(), &log[0]);
+		printf("ERROR: Could not compile \"%ls\" (%s)\n", path.c_str(), &log[0]);
 		return false;
     }
 
@@ -88,6 +99,12 @@ bool ShaderProgram::link() const {
 		printf("ERROR: Could not link the shader program \"%s\" (%s)\n", name.c_str(), &log[0]);
 		return false;
 	}
+
+	if(glGetError() != GL_NO_ERROR) {
+		printf("ERROR: Unknown error when linking shader program \"%s\".\n", name.c_str());
+		return false;
+	}
+
 	return true;
 
 }
@@ -104,13 +121,13 @@ bool ShaderProgram::use() const {
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::mat4& m) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
+		printf("ERROR: No uniform named \"%s\" in shader \"%s\"\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
 	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(m));
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set uniform %s\n", uniformName.c_str());
+		printf("ERROR: Could not set uniform \"%s\"\n", uniformName.c_str());
 		return false;
 	}
 
@@ -120,13 +137,13 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::mat4& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec3& v) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
+		printf("ERROR: No uniform named \"%s\" in shader \"%s\"\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
 	glUniform3fv(uniformLocation, 1, glm::value_ptr(v));
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set uniform %s\n", uniformName.c_str());
+		printf("ERROR: Could not set uniform \"%s\"\n", uniformName.c_str());
 		return false;
 	}
 
@@ -136,13 +153,13 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec3& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec2& v) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
+		printf("ERROR: No uniform named \"%s\" in shader \"%s\"\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
 	glUniform2fv(uniformLocation, 1, glm::value_ptr(v));
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set uniform %s\n", uniformName.c_str());
+		printf("ERROR: Could not set uniform \"%s\"\n", uniformName.c_str());
 		return false;
 	}
 
@@ -152,13 +169,13 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const glm::vec2& 
 bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLfloat& f) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
+		printf("ERROR: No uniform named \"%s\" in shader \"%s\"\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
 	glUniform1f(uniformLocation, f);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set uniform %s\n", uniformName.c_str());
+		printf("ERROR: Could not set uniform \"%s\"\n", uniformName.c_str());
 		return false;
 	}
 
@@ -168,13 +185,13 @@ bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLfloat
 bool ShaderProgram::setUniform(const std::string& uniformName, const gl::GLuint& n) const {
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No uniform named %s in %s\n", uniformName.c_str(), name.c_str());
+		printf("ERROR: No uniform named \"%s\" in shader \"%s\"\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
 	glUniform1ui(uniformLocation, n);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set uniform %s\n", uniformName.c_str());
+		printf("ERROR: Could not set uniform \"%s\"\n", uniformName.c_str());
 		return false;
 	}
 
@@ -189,14 +206,14 @@ bool ShaderProgram::setTexture(const std::string& uniformName, const GLuint& id,
 
 	const GLint uniformLocation = glGetUniformLocation(programHandle, uniformName.c_str());
 	if(uniformLocation == -1) {
-		printf("ERROR: No texture uniform named %s in %s\n", uniformName.c_str(), name.c_str());
+		printf("ERROR: No texture uniform named \"%s\" in shader \"%s\"\n", uniformName.c_str(), name.c_str());
 		return false;
 	}
 
 	glBindTexture(target, id);
 	glUniform1i(uniformLocation, 0);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set texture uniform %s\n", uniformName.c_str());
+		printf("ERROR: Could not set texture uniform \"%s\"\n", uniformName.c_str());
 		return false;
 	}
 	return true;
@@ -209,13 +226,13 @@ bool ShaderProgram::setTextureMultisample(const std::string& uniformName, const 
 bool ShaderProgram::setUBO(const std::string& blockName, const UniformBuffer& ubo) {
 	GLuint blockIndex =  glGetUniformBlockIndex(programHandle, blockName.c_str());
 	if(blockIndex == GL_INVALID_INDEX) {
-		printf("ERROR: No uniform block index named \"%s\" in %s\n", blockName.c_str(), name.c_str());
+		printf("ERROR: No uniform block index named \"%s\" in shader \"%s\"\n", blockName.c_str(), name.c_str());
 		return false;
 	}
 	glBindBufferBase(GL_UNIFORM_BUFFER, ubo.bindingPoint, ubo.ubo);
 	glUniformBlockBinding(programHandle, blockIndex, ubo.bindingPoint);
 	if(glGetError() != GL_NO_ERROR) {
-		printf("ERROR: Could not set uniform buffer object in %s\n", name.c_str());
+		printf("ERROR: Could not set uniform buffer object in shade \"%s\"\n", name.c_str());
 		return false;
 	}
 

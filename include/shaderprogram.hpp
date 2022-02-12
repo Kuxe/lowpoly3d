@@ -9,6 +9,7 @@
 #include <string>
 #include "subber.hpp"
 #include "events.hpp"
+#include <filesystem>
 
 namespace lowpoly3d {
 
@@ -21,7 +22,7 @@ private:
 		These metadata are needed when live-recompiling shaders **/
 	struct ShaderMetadata {
 		gl::GLuint handle;
-		std::string path;
+		std::filesystem::path path;
 	};
 
 	std::unordered_map<gl::GLenum, ShaderMetadata> shaders;
@@ -30,6 +31,7 @@ public:
 	const std::string name;
 
 	ShaderProgram(const std::string& shaderName);
+	ShaderProgram(ShaderProgram const&) = delete;
 	~ShaderProgram();
 
 	/** Add a shader (eg GL_VERTEX_SHADER) to a shader program,
@@ -38,7 +40,7 @@ public:
 		call add(shaderType, "source", shaderType, "source" ...)
 	**/
 
-	bool add(gl::GLenum shaderType, const std::string& source);
+	bool add(gl::GLenum shaderType, const std::filesystem::path& path);
 	bool add() const { return true; }
 	template<typename T, typename S, typename... Pack>
 	bool add(const T& t, const S& s, const Pack&... pack) {

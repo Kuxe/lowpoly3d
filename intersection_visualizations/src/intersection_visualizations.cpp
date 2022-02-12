@@ -39,10 +39,12 @@ public:
 
 			auto const p0 = lowpoly3d::Point(0.0f, 0.0f, 0.0f);
 			auto const p1 = lowpoly3d::Point(-1.0f, 1.0f, -1.0f);
+			auto const s0 = lowpoly3d::Sphere({2.0f, 0.0f, 0.0f}, 2.0f);
 
 			lowpoly3d::draw(scene, p0);
 			lowpoly3d::draw(scene, p1);
 			lowpoly3d::draw(scene, lowpoly3d::LineSegment(p0, p1));
+			lowpoly3d::draw(scene, s0);
 
 			iRenderer.offer(scene); //Render a scene
 			mDt = std::chrono::high_resolution_clock::now() - start;

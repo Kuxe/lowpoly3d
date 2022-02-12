@@ -3,11 +3,6 @@
 /** Example file illustrating how to use lowpoly3d **/
 using namespace lowpoly3d;
 
-// TODO: 
-// When running from build-tree, use CMAKE_SOURCE_DIR (available from build.hpp) as RESOURCE_DIR
-// When running from install-tree, use "../" relative to executable as RESOURCE_DIR
-// Then load shaders from "RESOURCE_DIR/shaders/""
-
 struct Game : public ILowpolyInput {
 	using duration_s = std::chrono::duration<double, std::ratio<1, 1>>;
 	KeyManager keymanager;
@@ -76,7 +71,8 @@ int main(int argc, char** argv) {
 	/** Tell the renderer to render the game, using shaders within the ../shaders/ directory.
 		Proceed to load 3D-meshes into GPU-memory if initialization went well
 		Finally, run the lowpoly3d-renderer if everything went well. **/
-	lowpoly3d.initialize(&game, "../shaders/") &&
+	auto const bindir = get_current_binary_absolute_path().parent_path();
+	lowpoly3d.initialize(&game, bindir / "../shaders") &&
 	lowpoly3d.loadModels("sphere", sphere, "terrain", terrain, "tree", tree) &&
 	lowpoly3d.run(); //Main-thread will remain in lowpoly3d.run() until lowpoly3d terminates
 	game.running = false; //terminate game and join game thread with main thread

@@ -192,6 +192,7 @@ add_library(${PROJECT_NAME}
 	include/events.hpp
 	include/debugrenderer.hpp src/debugrenderer.cpp
 	include/depthframebuffer.hpp src/depthframebuffer.cpp
+	include/drawfeature.hpp src/drawfeature.cpp
 	include/fps_camera.hpp src/fps_camera.cpp
 	include/framebuffer.hpp src/framebuffer.cpp
 	include/gamedata.hpp

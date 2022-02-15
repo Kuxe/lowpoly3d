@@ -1,3 +1,4 @@
+#include "drawfeature.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include <glbinding/gl/gl.h>
 #include <glbinding/Binding.h>
@@ -362,8 +363,14 @@ bool Renderer::run() {
 			so you need to specify what fbo or what shaders to use beforehand **/
 		const auto drawRenderData = [&](const RenderData& rd) {
 			try {
-				glBindVertexArray(models.at(rd.model)); 
-				glDrawElements(GL_TRIANGLES, triangles.at(rd.model)*3, GL_UNSIGNED_SHORT, nullptr);
+				
+				auto drawcall = prepareDrawCall([&](){
+					glBindVertexArray(models.at(rd.model)); 
+					glDrawElements(GL_TRIANGLES, triangles.at(rd.model)*3, GL_UNSIGNED_SHORT, nullptr);
+				});
+
+				rd.drawFeatureTarget.draw(*drawcall, *this);
+
 			} catch(const std::out_of_range& oor) {
 				std::stringstream ss;
 				ss << "ERROR: Could not lookup vertex array given by render data \"" << rd.model << "\"\n";

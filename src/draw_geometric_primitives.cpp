@@ -1,5 +1,6 @@
 #include "draw_geometric_primitives.hpp"
 #include "renderdata.hpp"
+#include "drawfeature.hpp"
 #include "scene.hpp"
 #include <glm/ext/vector_relational.hpp>
 #include <glm/geometric.hpp>
@@ -76,10 +77,14 @@ void draw(Scene& iScene, Sphere const& iSphere)
 //        first quadrant of the XY-plane.
 void draw(Scene& iScene, Triangle const& iTriangle)
 {
+	auto dft = DrawFeatureTarget()
+		.setNoFaceCull();
+
 	auto const rdb = RenderDataBuilder()
 		.setTransformationInWorld(translate(iTriangle.p1))
 		.setModel("triangle_xy")
-		.setShader("color");
+		.setShader("color")
+		.setDrawFeatureTarget(std::move(dft));
 
 	iScene.insert(rdb.build());	
 }

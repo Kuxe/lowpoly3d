@@ -327,6 +327,8 @@ bool Renderer::run() {
 	if(!shaderProgramBank["simple"_sph].setUBO("MVPUniformData", mvpUBO)) return false;
 	if(!shaderProgramBank["color"_sph].setUBO("WorldUniformData", worldUBO)) return false;
 	if(!shaderProgramBank["color"_sph].setUBO("ModelUniformData", modelUBO)) return false;
+	if(!shaderProgramBank["normal"_sph].setUBO("WorldUniformData", worldUBO)) return false;
+	if(!shaderProgramBank["normal"_sph].setUBO("ModelUniformData", modelUBO)) return false;
 
 	//Sun should rotate around the x-axis through origo
 	CelestialBody suncb({0.0, 0.0, 0.0}, {95.0, 0.0, 0.0}, 1.57079632679);

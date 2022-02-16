@@ -25,6 +25,19 @@ void draw(Scene& iScene, Point const& iPoint)
 	iScene.insert(rdb.build());
 }
 
+void draw(Scene& iScene, Line const& iLine)
+{
+	auto const p = iLine.parametrization();
+	// TODO: Implement proper "infinite" rendering of iLine.
+	// Idea:
+	// 1. Project 'iLine' into screenspace
+	// 2. Find the two points that coincide with the iLine and the screen "borders",
+	//    which is the "visible" portion of the infinite line.
+	// 3. Project these two points back into worldspace
+	// 4. Draw a LineSegment via the two points in worldspace
+	draw(iScene, LineSegment{p(-5.0f), p(5.0f)});
+}
+
 void draw(Scene& iScene, LineSegment const& iLineSegment)
 {
 	// Cylinder has base at (0, 0, 0) and tip (0, 1, 0)

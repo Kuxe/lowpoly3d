@@ -4,8 +4,11 @@
 #include "generators/cylindergenerator.hpp"
 #include "generators/spheregenerator.hpp"
 
+#include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
 #include "geometric_primitives/sphere.hpp"
+
+#include "minimum_bounding_sphere.hpp"
 
 #include "lowpoly3d.hpp"
 #include "model.hpp"
@@ -41,12 +44,21 @@ public:
 			auto const p1 = lowpoly3d::Point(-1.0f, 1.0f, -1.0f);
 			auto const s0 = lowpoly3d::Sphere({10.0f, 0.0f, 0.0f}, 2.0f);
 			auto const t0 = lowpoly3d::Triangle({0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+			auto const t0mbs = lowpoly3d::mbs(t0);
+			auto const l0 = lowpoly3d::Line({-5.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
 
 			lowpoly3d::draw(scene, p0);
 			lowpoly3d::draw(scene, p1);
 			lowpoly3d::draw(scene, lowpoly3d::LineSegment(p0, p1));
 			lowpoly3d::draw(scene, s0);
 			lowpoly3d::draw(scene, t0);
+			lowpoly3d::draw(scene, t0.p1);
+			lowpoly3d::draw(scene, t0.p2);
+			lowpoly3d::draw(scene, t0.p3);
+			lowpoly3d::draw(scene, t0mbs);
+			lowpoly3d::draw(scene, l0);
+
+			
 
 			iRenderer.offer(scene); //Render a scene
 			mDt = std::chrono::high_resolution_clock::now() - start;

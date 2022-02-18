@@ -23,6 +23,10 @@ template<typename fpt, std::size_t dim>
 struct Intersections
 {
 	static TPoint<fpt, dim> intersection(TPlane<fpt, dim> const&, TLine<fpt, dim> const&);
+
+	// Returns the parameter 't' for the parametrization of line
+	// such that l(t) = point-of-intersection
+	static fpt intersection_line_param(TPlane<fpt, dim> const&, TLine<fpt, dim> const&);
 };
 
 } // End of namespace detail

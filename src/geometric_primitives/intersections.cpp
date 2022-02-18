@@ -19,7 +19,13 @@ namespace detail {
 
 template<typename fpt, std::size_t dim>
 TPoint<fpt, dim> Intersections<fpt, dim>::intersection(TPlane<fpt, dim> const& plane, TLine<fpt, dim> const& line) {
+	auto const t = intersection_line_param(plane, line);
+	return t == NAN ? TPoint<fpt, dim>(NAN) : line.parametrization(t);
+}
 
+template<typename fpt, std::size_t dim>
+fpt Intersections<fpt, dim>::intersection_line_param(TPlane<fpt, dim> const& plane, TLine<fpt, dim> const& line)
+{
 	/* P+t*d1 = v gives a point v on a line at time t
 	 * n dot v = d2 is satisfied for all points v on the plane (n, d2)
 	 * 
@@ -29,18 +35,16 @@ TPoint<fpt, dim> Intersections<fpt, dim>::intersection(TPlane<fpt, dim> const& p
 	 * d2 	= n dot (P+t*d1)
 	 * 		= n dot P + n dot t*d1
 	 * 		= n dot P + t(n dot d1) 
-	 * 		=> t = (d2 - n dot P) / n dot d1
-	 * 
-	 * Then plug t back into line equation to get the point. Done. */
+	 * 		=> t = (d2 - n dot P) / n dot d1 */
 
 	const auto dot = glm::dot(plane.getNormal(), line.getDirection());
 	if(std::abs(dot) <= std::numeric_limits<fpt>::epsilon()) {
-		return TPoint<fpt, dim>(NAN);
+		return NAN;
 	}
 
 	// t can be interpreted as time until intersection assuming unit speed in some unit (such as m/s)
 	const auto t = (-plane.getD() - glm::dot(plane.getNormal(), line.getPoint())) / dot;
-	return line.parametrization(t);
+	return t;
 }
 
 template<typename fpt>

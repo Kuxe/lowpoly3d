@@ -11,7 +11,7 @@
 namespace lowpoly3d {
 
 constexpr float getPointScalingFactor() { return 0.1f; }
-constexpr float getLineSegmentScalingFactor() { return 0.05f; }
+constexpr float getLineSegmentScalingFactor() { return 0.01f; }
 
 void draw(Scene& iScene, Point const& iPoint)
 {

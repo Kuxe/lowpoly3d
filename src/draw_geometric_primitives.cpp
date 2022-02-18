@@ -68,7 +68,7 @@ void draw(Scene& iScene, LineSegment const& iLineSegment)
 				y * iLineSegment.length(),
 				z * getLineSegmentScalingFactor()
 			);
-			return glm::translate(glm::mat4x4(mat), iLineSegment.p1);
+			return glm::translate(glm::identity<glm::mat4>(), iLineSegment.p1) * glm::mat4x4(mat);
 		}
 	}());
 

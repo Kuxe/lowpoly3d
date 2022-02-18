@@ -74,7 +74,19 @@ struct TTriangle {
 
 // Returns the normal of triangle, with vertices winding CCW about the normal
 template<typename fpt>
-TDirection<fpt> normal(TTriangle<fpt, 3> const& triangle);
+glm::vec<3, fpt> normal(TTriangle<fpt, 3> const& triangle);
+
+// Returns the edge-normal pointing away from the triangle for edge p0-p1
+template<typename fpt>
+glm::vec<3, fpt> edge_normal_12(TTriangle<fpt, 3> const& triangle);
+
+// Returns the edge-normal pointing away from the triangle for edge p1-p2
+template<typename fpt>
+glm::vec<3, fpt> edge_normal_23(TTriangle<fpt, 3> const& triangle);
+
+// Returns the edge-normal pointing away from the triangle for edge p2-p0
+template<typename fpt>
+glm::vec<3, fpt> edge_normal_31(TTriangle<fpt, 3> const& triangle);
 
 // Returns a plane that is paralell to triangle
 template<typename fpt>

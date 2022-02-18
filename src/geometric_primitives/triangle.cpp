@@ -112,7 +112,7 @@ struct Circumcenter<fpt, 3> {
 		 * perpendicular to v instead of -bisector(AB). Note that this point is exactly the
 		 * intersection of bisector(AB) and bisector(CA) i.e the circumcenter. Done. */
 		auto const t1t0 = triangle[1] - triangle[0];
-		auto t1t0InwardBisector = glm::cross(normal(triangle).getVec(), t1t0);
+		auto t1t0InwardBisector = glm::cross(normal(triangle), t1t0);
 		auto const t0t2midpoint = fpt(0.5)*(triangle[0] + triangle[2]);
 		return projectOnto2(t0t2midpoint - projectOnto(t0t2midpoint, t1t0InwardBisector), -t1t0InwardBisector);
 	}
@@ -197,12 +197,37 @@ template class TTriangle<double, 2>;
 template class TTriangle<double, 3>;
 
 template<typename fpt>
-TDirection<fpt> normal(TTriangle<fpt, 3> const& t) {
-	return {glm::cross(t.p2 - t.p1, t.p3 - t.p1)};
+glm::vec<3, fpt> normal(TTriangle<fpt, 3> const& t) {
+	return glm::normalize(glm::cross(t.p2 - t.p1, t.p3 - t.p1));
 }
 
-template TDirection<float> normal(TTriangle< float, 3> const&);
-template TDirection<double> normal(TTriangle<double, 3> const&);
+template glm::vec<3, float> normal(TTriangle< float, 3> const&);
+template glm::vec<3, double> normal(TTriangle<double, 3> const&);
+
+template<typename fpt>
+glm::vec<3, fpt> edge_normal_12(TTriangle<fpt, 3> const& triangle)
+{
+	return glm::normalize(glm::cross(triangle.p2 - triangle.p1, normal(triangle)));
+}
+
+template<typename fpt>
+glm::vec<3, fpt>edge_normal_23(TTriangle<fpt, 3> const& triangle)
+{
+	return glm::normalize(glm::cross(triangle.p3 - triangle.p2, normal(triangle)));
+}
+
+template<typename fpt>
+glm::vec<3, fpt> edge_normal_31(TTriangle<fpt, 3> const& triangle)
+{
+	return glm::normalize(glm::cross(triangle.p1 - triangle.p3, normal(triangle)));
+}
+
+template glm::vec<3, float> edge_normal_12(TTriangle< float, 3> const&);
+template glm::vec<3, double> edge_normal_12(TTriangle<double, 3> const&);
+template glm::vec<3, float> edge_normal_23(TTriangle< float, 3> const&);
+template glm::vec<3, double> edge_normal_23(TTriangle<double, 3> const&);
+template glm::vec<3, float> edge_normal_31(TTriangle< float, 3> const&);
+template glm::vec<3, double> edge_normal_31(TTriangle<double, 3> const&);
 
 template<typename fpt>
 TPlane<fpt, 3> parallel(TTriangle<fpt, 3> const& t) {

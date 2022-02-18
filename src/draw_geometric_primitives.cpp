@@ -30,9 +30,14 @@ void draw(Scene& iScene, Line const& iLine)
 	auto const p = iLine.parametrization();
 	// TODO: Implement proper "infinite" rendering of iLine.
 	// Idea:
-	// 1. Project 'iLine' into screenspace
-	// 2. Find the two points that coincide with the iLine and the screen "borders",
-	//    which is the "visible" portion of the infinite line.
+	// 1. Project 3D 'iLine' into a 2D line in NDC-space (-1, +1)x(-1, +1)
+	// 2. Find the two points that coincide with the iLine and the NDC "borders"
+	//    by intersection projected 3D line with these lines:
+	//      * bottom_left_to_bottom_right (p=(-1, -1), d=(+1, +0))
+	//      * bottom_right_to_top_right   (p=(+1, -1), d=(+0, +1))
+	//      * top_right_to_top_left       (p=(+1, +1), d=(-1, +0))
+	//      * top_left_to_bottom_left     (p=(-1, +1), d=(+0, -1))
+	//    if the intersection-result is anything but two points, don't draw anything.
 	// 3. Project these two points back into worldspace
 	// 4. Draw a LineSegment via the two points in worldspace
 	draw(iScene, LineSegment{p(-5.0f), p(5.0f)});

@@ -4,6 +4,7 @@
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/point.hpp"
+#include "geometric_primitives/triangle.hpp"
 
 namespace lowpoly3d {
 
@@ -67,6 +68,11 @@ TPoint<fpt, dim> intersection(TLine<fpt, dim> const& line, TPlane<fpt, dim> cons
  * If no such point exists, returns a NaN point */
 template<typename fpt, std::size_t dim>
 TPoint<fpt, dim> intersection(TPlane<fpt, dim> const& p1, TPlane<fpt, dim> const& p2, TPlane<fpt, dim> const& p3) { return intersection(intersection(p1, p2), p3); }
+
+/* Triangle-line intersection that returns the point of intersection
+ * Returns a point with two quiet NaN components if no intersection exists */
+TPoint<float, 3> intersection(TTriangle<float, 3> const&, TLine<float, 3> const&);
+TPoint<double, 3> intersection(TLine<double, 3> const&, TTriangle<double, 3> const&);
 
 /* Solves a system of three linear equations by (naively) using Cramer's rule. */
 glm::vec<3,  float, glm::qualifier::defaultp> cramer(glm::mat<3, 3,  float, glm::qualifier::defaultp> const& A, glm::vec<3,  float, glm::qualifier::defaultp> const& b);

@@ -47,6 +47,17 @@ fpt Intersections<fpt, dim>::intersection_line_param(TPlane<fpt, dim> const& pla
 	return t;
 }
 
+template<typename fpt, std::size_t dim>
+TPoint<fpt, dim> intersection(TTriangle<fpt, dim> const& triangle, TLine<fpt, dim> const& line)
+{
+	auto const p = intersection(parallel(triangle), line);
+	auto const edge12Plane = Plane(triangle.p1, edge_normal_12(triangle));
+	auto const edge23Plane = Plane(triangle.p2, edge_normal_23(triangle));
+	auto const edge31Plane = Plane(triangle.p3, edge_normal_31(triangle));
+
+	return edge12Plane.below(p) && edge23Plane.below(p) && edge31Plane.below(p)	? p : TPoint<fpt, dim>{NAN};
+}
+
 template<typename fpt>
 TPoint<fpt, 2> intersection(TLineSegment<fpt, 2> const& l1, TLineSegment<fpt, 2> const& l2)
 {
@@ -228,6 +239,10 @@ TLine< float, 3> intersection(TPlane< float, 3> const& p1, TPlane< float, 3> con
 TLine<double, 3> intersection(TPlane<double, 3> const& p1, TPlane<double, 3> const& p2) { return detail::intersection(p1, p2); }
 TPoint< float, 2> intersection(TLine< float, 2> const& l1, TLine< float, 2> const& l2) { return detail::intersection(l1, l2); }
 TPoint<double, 2> intersection(TLine<double, 2> const& l1, TLine<double, 2> const& l2) { return detail::intersection(l1, l2); }
+TPoint<float, 3> intersection(TTriangle<float, 3> const& t, TLine<float, 3> const& l) { return detail::intersection(t, l); }
+TPoint<double, 3> intersection(TTriangle<double, 3> const& t, TLine<double, 3> const& l) { return detail::intersection(t, l); }
+TPoint<float, 3> intersection(TLine<float, 3> const& l, TTriangle<float, 3> const& t) { return detail::intersection(t, l); }
+TPoint<double, 3> intersection(TLine<double, 3> const& l, TTriangle<double, 3> const& t) { return detail::intersection(t, l); }
 
 glm::vec<3,  float, glm::qualifier::defaultp> cramer(glm::mat<3, 3,  float, glm::qualifier::defaultp> const& A, glm::vec<3,  float, glm::qualifier::defaultp> const& b) { return detail::cramer(A, b); }
 glm::vec<3, double, glm::qualifier::defaultp> cramer(glm::mat<3, 3, double, glm::qualifier::defaultp> const& A, glm::vec<3, double, glm::qualifier::defaultp> const& b) { return detail::cramer(A, b); }

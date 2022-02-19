@@ -90,16 +90,18 @@ void draw(Scene& iScene, Sphere const& iSphere)
 	iScene.insert(rdb.build());
 }
 
-// FIXME: This does NOT respect the shape of the input 'iTriangle',
-//        it will draw a triangle with unit-length catheti in the
-//        first quadrant of the XY-plane.
 void draw(Scene& iScene, Triangle const& iTriangle)
 {
 	auto dft = DrawFeatureTarget()
 		.setNoFaceCull();
 
+	auto const x = iTriangle.p2 - iTriangle.p1;
+	auto const y = iTriangle.p3 - iTriangle.p1;
+	auto const z = glm::cross(x, y);
+	auto const mat = glm::mat3(x, y, z);
+
 	auto const rdb = RenderDataBuilder()
-		.setTransformationInWorld(translate(iTriangle.p1))
+		.setTransformationInWorld(glm::translate(glm::identity<glm::mat4>(), iTriangle.p1) * glm::mat4x4(mat))
 		.setModel("triangle_xy")
 		.setShader("color")
 		.setDrawFeatureTarget(std::move(dft));

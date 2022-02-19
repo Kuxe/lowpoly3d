@@ -13,18 +13,6 @@ namespace lowpoly3d {
 constexpr float getPointScalingFactor() { return 0.1f; }
 constexpr float getLineSegmentScalingFactor() { return 0.01f; }
 
-void draw(Scene& iScene, Point const& iPoint)
-{
-	RenderDataBuilder rdb;
-	rdb.setTransformationInWorld(scale(translate(iPoint), glm::vec3(getPointScalingFactor())));
-	// Assume that there is a model loaded in engine called "sphere"
-	rdb.setModel("sphere");
-	// Assume that there is a shader loaded in engine called "noshade"
-	rdb.setShader("color");
-
-	iScene.insert(rdb.build());
-}
-
 void draw(Scene& iScene, Line const& iLine)
 {
 	auto const p = iLine.parametrization();
@@ -76,6 +64,18 @@ void draw(Scene& iScene, LineSegment const& iLineSegment)
 			return glm::translate(glm::identity<glm::mat4>(), iLineSegment.p1) * glm::mat4x4(mat);
 		}
 	}());
+
+	iScene.insert(rdb.build());
+}
+
+void draw(Scene& iScene, Point const& iPoint)
+{
+	RenderDataBuilder rdb;
+	rdb.setTransformationInWorld(scale(translate(iPoint), glm::vec3(getPointScalingFactor())));
+	// Assume that there is a model loaded in engine called "sphere"
+	rdb.setModel("sphere");
+	// Assume that there is a shader loaded in engine called "noshade"
+	rdb.setShader("color");
 
 	iScene.insert(rdb.build());
 }

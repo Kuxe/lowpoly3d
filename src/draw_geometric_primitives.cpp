@@ -68,6 +68,12 @@ void draw(Scene& iScene, LineSegment const& iLineSegment)
 	iScene.insert(rdb.build());
 }
 
+void draw(Scene& iScene, Parallelogram const& iParallelogram)
+{
+	draw(iScene, iParallelogram.getFirstTriangle());
+	draw(iScene, iParallelogram.getSecondTriangle());
+}
+
 void draw(Scene& iScene, Point const& iPoint)
 {
 	RenderDataBuilder rdb;
@@ -78,6 +84,11 @@ void draw(Scene& iScene, Point const& iPoint)
 	rdb.setShader("color");
 
 	iScene.insert(rdb.build());
+}
+
+void draw(Scene& iScene, Rectangle const& iRectangle)
+{
+	draw(iScene, static_cast<Parallelogram const&>(iRectangle));
 }
 
 void draw(Scene& iScene, Sphere const& iSphere)

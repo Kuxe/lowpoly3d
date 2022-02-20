@@ -231,6 +231,7 @@ add_library(${PROJECT_NAME}
 	include/geometric_primitives/intersects.hpp src/geometric_primitives/intersects.cpp
 	include/geometric_primitives/line.hpp
 	include/geometric_primitives/linesegment.hpp
+	include/geometric_primitives/parallelogram.hpp
 	include/geometric_primitives/plane.hpp
 	include/geometric_primitives/point.hpp
 	include/geometric_primitives/rectangle.hpp

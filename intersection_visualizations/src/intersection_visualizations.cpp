@@ -8,6 +8,7 @@
 #include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
+#include "geometric_primitives/rectangle.hpp"
 #include "geometric_primitives/sphere.hpp"
 
 #include "minimum_bounding_sphere.hpp"
@@ -96,7 +97,8 @@ public:
 			auto const t2  = lowpoly3d::Triangle({10.0f, 10.0f, 10.0f}, {0.0f, 20.0f, 10.0f}, {-10.0f, 10.0f, 10.0f});
 			lowpoly3d::draw(scene, t2);
 
-			
+			auto const r1 = lowpoly3d::Rectangle({15.0f, 0.0f, 0.0f}, {24.0f, 0.0f, 0.0f}, {15.0f, 5.0f, 0.0f});
+			lowpoly3d::draw(scene, r1);
 
 			iRenderer.offer(scene); //Render a scene
 			mDt = std::chrono::high_resolution_clock::now() - start;

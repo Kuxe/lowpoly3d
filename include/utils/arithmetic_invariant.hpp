@@ -140,65 +140,65 @@ struct arithmetic_invariant : invariant_unary_checker {
 
 // Addition
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator+(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
+auto operator+(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
 	return number.number + other.number;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator+(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
+auto operator+(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
     return number.number + other;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-other_arithmetic_type operator+(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
+auto operator+(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
     return number.number + other;
 }
 
 // Subtraction
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator-(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
+auto operator-(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
 	return number.number - other.number;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator-(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
+auto operator-(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
     return number.number - other;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-other_arithmetic_type operator-(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
+auto operator-(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
     return other - number.number;
 }
 
 // Multiplication
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator*(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
+auto operator*(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
 	return number.number * other.number;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator*(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
+auto operator*(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
     return number.number * other;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-other_arithmetic_type operator*(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
+auto operator*(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
     return number.number * other;
 }
 
 // Division
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator/(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
+auto operator/(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const arithmetic_invariant<other_arithmetic_type, invariant_unary_checker> other) {
 	return arithmetic_type(1) / number.number * other;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-arithmetic_type operator/(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
+auto operator/(const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number, const other_arithmetic_type other) {
     return number.number / other;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
-other_arithmetic_type operator/(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
+auto operator/(const other_arithmetic_type other, const arithmetic_invariant<arithmetic_type, invariant_unary_checker> number) {
     return number.number / other;
 }
 

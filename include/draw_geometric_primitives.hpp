@@ -1,6 +1,7 @@
 #ifndef DRAW_GEOMETRIC_PRIMITIVES_HPP
 #define DRAW_GEOMETRIC_PRIMITIVES_HPP
 
+#include "geometric_primitives/cylinder.hpp"
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
 #include "geometric_primitives/parallelogram.hpp"
@@ -14,6 +15,7 @@ namespace lowpoly3d {
 class Scene;
 
 // Draws a point in world-space onto the given scene
+void draw(Scene& iScene, Cylinder const& iCylinder);
 void draw(Scene& iScene, Line const& iLine);
 void draw(Scene& iScene, LineSegment const& iLineSegment);
 void draw(Scene& iScene, Parallelogram const& iParallelogram);

@@ -13,6 +13,39 @@ namespace lowpoly3d {
 constexpr float getPointScalingFactor() { return 0.1f; }
 constexpr float getLineSegmentScalingFactor() { return 0.01f; }
 
+void draw(Scene& iScene, Cylinder const& iCylinder)
+{
+	// Cylinder has base at (0, 0, 0) and tip (0, 1, 0)
+	RenderDataBuilder rdb;
+	rdb.setModel("cylinder");
+	rdb.setShader("color");
+
+	auto const parametrization_centerline = iCylinder.parametrization_centerline();
+	auto const p1 = parametrization_centerline(0.0f);
+	auto const p2 = parametrization_centerline(1.0f);
+
+	// See docs on drawing a LineSegment for more info (very much resembles the code below)
+	rdb.setTransformationInWorld([&]() {
+		auto const y = glm::normalize(p2 - p1);
+		if(almostEqual(y, glm::vec3(0.0f, 1.0f, 0.0f))) {
+			return glm::translate(p1);
+		} else {
+			auto const x = glm::cross({0.0f, 1.0f, 0.0f}, y);
+			auto const z = glm::cross(x, y);
+			// We don't want uniform scaling.
+			// We want to stretch along y so that we "reach" iLineSegment.p2.
+			auto const mat = glm::mat3(
+				x * iCylinder.getRadius(),
+				y * iCylinder.getHeight(),
+				z * iCylinder.getRadius()
+			);
+			return glm::translate(glm::identity<glm::mat4>(), p1) * glm::mat4x4(mat);
+		}
+	}());
+
+	iScene.insert(rdb.build());
+}
+
 void draw(Scene& iScene, Line const& iLine)
 {
 	auto const p = iLine.parametrization();

@@ -135,6 +135,16 @@ TPoint<fpt, 2> intersection(TLine<fpt, 2> const& l1, TLine<fpt, 2> const& l2)
 	return l1.parametrization(timepoints.x);
 }
 
+template<typename fpt>
+TLineSegment<fpt, 3> intersection(TTriangle<fpt, 3> const& t1, TTriangle<fpt, 3> const& t2) {
+	// 1. Take the two planes of t1 and t2 and find their line-intersection.
+	// 2. Then take that line-intersection and what segment of it is contained by t1, if any.
+	//    It is sufficient to just pick one triangle out of t1 and t2.
+	// TODO: Implement
+	//auto const line = intersection(parallel(t1), parallel(t2));
+	return TLineSegment<fpt, 3>({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f});
+}
+
 /* Solves a system of three linear equations by (naively) using Cramer's rule. */
 template<typename fpt>
 glm::vec<3, fpt, glm::qualifier::defaultp> cramer(
@@ -243,6 +253,8 @@ TPoint<float, 3> intersection(TTriangle<float, 3> const& t, TLine<float, 3> cons
 TPoint<double, 3> intersection(TTriangle<double, 3> const& t, TLine<double, 3> const& l) { return detail::intersection(t, l); }
 TPoint<float, 3> intersection(TLine<float, 3> const& l, TTriangle<float, 3> const& t) { return detail::intersection(t, l); }
 TPoint<double, 3> intersection(TLine<double, 3> const& l, TTriangle<double, 3> const& t) { return detail::intersection(t, l); }
+TLineSegment<float, 3> intersection(TTriangle<float, 3> const& t1, TTriangle<float, 3> const& t2) { return detail::intersection(t1, t2); }
+TLineSegment<double, 3> intersection(TTriangle<double, 3> const& t1, TTriangle<double, 3> const& t2) { return detail::intersection(t1, t2); }
 
 glm::vec<3,  float, glm::qualifier::defaultp> cramer(glm::mat<3, 3,  float, glm::qualifier::defaultp> const& A, glm::vec<3,  float, glm::qualifier::defaultp> const& b) { return detail::cramer(A, b); }
 glm::vec<3, double, glm::qualifier::defaultp> cramer(glm::mat<3, 3, double, glm::qualifier::defaultp> const& A, glm::vec<3, double, glm::qualifier::defaultp> const& b) { return detail::cramer(A, b); }

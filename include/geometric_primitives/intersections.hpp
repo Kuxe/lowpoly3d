@@ -76,6 +76,11 @@ TPoint<double, 3> intersection(TTriangle<double, 3> const&, TLine<double, 3> con
 TPoint<float, 3> intersection(TLine<float, 3> const&, TTriangle<float, 3> const&);
 TPoint<double, 3> intersection(TLine<double, 3> const&, TTriangle<double, 3> const&);
 
+/* Triangle-triangle intersection that returns the linesegment of intersection
+ * Returns a linesegment with two NaN points if no intersection exists */
+TLineSegment<float, 3> intersection(TTriangle<float, 3> const&, TTriangle<float, 3> const&);
+TLineSegment<double, 3> intersection(TTriangle<double, 3> const&, TTriangle<double, 3> const&);
+
 /* Solves a system of three linear equations by (naively) using Cramer's rule. */
 glm::vec<3,  float, glm::qualifier::defaultp> cramer(glm::mat<3, 3,  float, glm::qualifier::defaultp> const& A, glm::vec<3,  float, glm::qualifier::defaultp> const& b);
 glm::vec<3, double, glm::qualifier::defaultp> cramer(glm::mat<3, 3, double, glm::qualifier::defaultp> const& A, glm::vec<3, double, glm::qualifier::defaultp> const& b);

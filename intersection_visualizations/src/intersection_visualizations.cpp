@@ -4,6 +4,7 @@
 #include "generators/cylindergenerator.hpp"
 #include "generators/spheregenerator.hpp"
 
+#include "geometric_primitives/cylinder.hpp"
 #include "geometric_primitives/intersections.hpp"
 #include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/line.hpp"
@@ -99,6 +100,12 @@ public:
 
 			auto const r1 = lowpoly3d::Rectangle({15.0f, 0.0f, 0.0f}, {24.0f, 0.0f, 0.0f}, {15.0f, 5.0f, 0.0f});
 			lowpoly3d::draw(scene, r1);
+
+			auto const c1 = lowpoly3d::Cylinder(lowpoly3d::LineSegment({15.0f, 7.0f, 0.0f}, {24.0f, 7.0f, 0.0f}), 1.0f);
+			lowpoly3d::draw(scene, c1);
+
+			auto const c2 = lowpoly3d::Cylinder(lowpoly3d::LineSegment({15.0f, 7.0f, 0.0f}, {10.0f, 10.0f, 10.0f}), 0.5f);
+			lowpoly3d::draw(scene, c2);
 
 			iRenderer.offer(scene); //Render a scene
 			mDt = std::chrono::high_resolution_clock::now() - start;

@@ -31,10 +31,10 @@ struct TLineSegment {
 		return 0.5*(end + start);
 	}
 
-	std::function<point_type(double)> parametrization() {
-        return [this](double t) {
-            assert(t >= 0.0 && t <= 1.0);
-            lerp(start, end, t);
+	std::function<point_type(floating_point_type)> parametrization() const {
+        return [start = start, end = end](floating_point_type t) -> point_type {
+            assert(t >= floating_point_type(0) && t <= floating_point_type(1));
+            return lerp(start, end, t);
         };
     }
 

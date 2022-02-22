@@ -1,4 +1,5 @@
 #include "draw_geometric_primitives.hpp"
+#include "glm/gtx/vector_query.hpp"
 #include "renderdata.hpp"
 #include "drawfeature.hpp"
 #include "scene.hpp"
@@ -55,20 +56,16 @@ void draw(Scene& iScene, Cylinder const& iCylinder)
 	// See docs on drawing a LineSegment for more info (very much resembles the code below)
 	rdb.setTransformationInWorld([&]() {
 		auto const y = glm::normalize(p2 - p1);
-		if(almostEqual(y, glm::vec3(0.0f, 1.0f, 0.0f))) {
-			return glm::translate(p1);
-		} else {
-			auto const x = glm::cross({0.0f, 1.0f, 0.0f}, y);
-			auto const z = glm::cross(x, y);
-			// We don't want uniform scaling.
-			// We want to stretch along y so that we "reach" iLineSegment.p2.
-			auto const mat = glm::mat3(
-				x * iCylinder.getRadius(),
-				y * iCylinder.getHeight(),
-				z * iCylinder.getRadius()
-			);
-			return glm::translate(glm::identity<glm::mat4>(), p1) * glm::mat4x4(mat);
-		}
+		auto const x = !glm::areCollinear(y, glm::vec3(0.0f, 1.0f, 0.0f), 1E-4f) ? glm::cross({0.0f, 1.0f, 0.0f}, y) : glm::cross(y, {0.0f, 0.0f, 1.0f});
+		auto const z = glm::cross(x, y);
+		// We don't want uniform scaling.
+		// We want to stretch along y so that we "reach" iLineSegment.p2.
+		auto const mat = glm::mat3(
+			x * iCylinder.getRadius(),
+			y * iCylinder.getHeight(),
+			z * iCylinder.getRadius()
+		);
+		return glm::translate(glm::identity<glm::mat4>(), p1) * glm::mat4x4(mat);
 	}());
 
 	iScene.insert(rdb.build());
@@ -110,20 +107,16 @@ void draw(Scene& iScene, LineSegment const& iLineSegment)
 	// (we dont need to do this if iLineSegment x (0,1,0) == 0)
 	rdb.setTransformationInWorld([&]() {
 		auto const y = glm::normalize(iLineSegment.p2 - iLineSegment.p1);
-		if(almostEqual(y, glm::vec3(0.0f, 1.0f, 0.0f))) {
-			return glm::translate(iLineSegment.p1);
-		} else {
-			auto const x = glm::cross({0.0f, 1.0f, 0.0f}, y);
-			auto const z = glm::cross(x, y);
-			// We don't want uniform scaling.
-			// We want to stretch along y so that we "reach" iLineSegment.p2.
-			auto const mat = glm::mat3(
-				x * getLineSegmentScalingFactor(),
-				y * iLineSegment.length(),
-				z * getLineSegmentScalingFactor()
-			);
-			return glm::translate(glm::identity<glm::mat4>(), iLineSegment.p1) * glm::mat4x4(mat);
-		}
+		auto const x = !glm::areCollinear(y, glm::vec3(0.0f, 1.0f, 0.0f), 1E-4f) ? glm::cross({0.0f, 1.0f, 0.0f}, y) : glm::cross(y, {0.0f, 0.0f, 1.0f});
+		auto const z = glm::cross(x, y);
+		// We don't want uniform scaling.
+		// We want to stretch along y so that we "reach" iLineSegment.p2.
+		auto const mat = glm::mat3(
+			x * getLineSegmentScalingFactor(),
+			y * iLineSegment.length(),
+			z * getLineSegmentScalingFactor()
+		);
+		return glm::translate(glm::identity<glm::mat4>(), iLineSegment.p1) * glm::mat4x4(mat);
 	}());
 
 	iScene.insert(rdb.build());

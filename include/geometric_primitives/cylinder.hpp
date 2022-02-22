@@ -44,6 +44,8 @@ public:
 	fpt getRadius() const { return radius; }
 	fpt getHeight() const { return centerline.length(); }
 
+	linesegment_type const& getCenterline() const { return centerline; }
+
 private:
 	/* Returns a parametrization(rad, t) of this cylinder in ,
 	 * with rad in [0, 2pi) and t in [0, 1) */
@@ -54,13 +56,19 @@ private:
 		};
 	}
 
-	TLineSegment<fpt, 3> centerline;
+	linesegment_type centerline;
 	fpt radius;
 };
 
 using Cylinderd = TCylinder<double, 3>;
 using Cylinderf = TCylinder<float, 3>;
 using Cylinder = Cylinderf;
+
+template<typename floating_point_type, std::size_t dim>
+std::ostream& operator<<(std::ostream& os, TCylinder<floating_point_type, dim> const& cylinder) {
+	os << "(centerline=" << cylinder.getCenterline() << ",radius=" << cylinder.getRadius() << ")";
+	return os;
+}
 
 } // End of namespace lowpoly3d
 

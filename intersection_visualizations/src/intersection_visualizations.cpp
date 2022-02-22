@@ -5,6 +5,7 @@
 #include "generators/cylindergenerator.hpp"
 #include "generators/spheregenerator.hpp"
 
+#include "geometric_primitives/arrow.hpp"
 #include "geometric_primitives/cylinder.hpp"
 #include "geometric_primitives/intersections.hpp"
 #include "geometric_primitives/intersects.hpp"
@@ -113,6 +114,15 @@ public:
 			lowpoly3d::draw(scene, cone1);
 			lowpoly3d::draw(scene, cone2);
 
+			auto const arrow1 = lowpoly3d::Arrow(lowpoly3d::Cylinder(lowpoly3d::LineSegment({0.0f, 0.0f, -7.0f}, {0.0f, 1.0f, -7.0f}), 0.5f)); // Bulky
+			auto const arrow2 = lowpoly3d::Arrow(lowpoly3d::Cylinder(lowpoly3d::LineSegment({2.0f, 0.0f, -7.0f}, {4.0f, 1.0f, -7.0f}), 1.0f)); // Bulky & tilted //FIXME: Does not actually extend all the way to arrowtarget, which is expected since x=4.0f?
+			auto const arrow3 = lowpoly3d::Arrow(lowpoly3d::Cylinder(lowpoly3d::LineSegment({4.0f, 3.5f, -7.0f}, {4.0f, 2.0f, -7.0f}), 0.25f)); // Pretty & upside-down
+			auto const arrowtarget = lowpoly3d::Sphere({4.0f, 1.0f, -7.0f}, 0.05f); // TODO: Create this as intersection of lines extended from line-segments of arrows
+			lowpoly3d::draw(scene, arrow1);
+			lowpoly3d::draw(scene, arrow2);
+			lowpoly3d::draw(scene, arrow3);
+			lowpoly3d::draw(scene, arrowtarget);
+
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());
 
 			iRenderer.offer(scene); //Render a scene
@@ -146,7 +156,7 @@ int main()
 
 	lowpoly3d::Model sphere = lowpoly3d::SphereGenerator({200, 0, 200}, 3).generate();
 	lowpoly3d::Model cylinder = lowpoly3d::CylinderGenerator({255, 50, 255}, 16).generate();
-	lowpoly3d::Model cone = lowpoly3d::ConeGenerator(lowpoly3d::Cone(lowpoly3d::LineSegment({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}), 1.0f), 4).generate();
+	lowpoly3d::Model cone = lowpoly3d::ConeGenerator(lowpoly3d::Cone(lowpoly3d::LineSegment({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}), 1.0f), 24).generate();
 	lowpoly3d::Model const triangle_xy(
 		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
 		{{255, 255, 255}, {255, 255, 255}, {255, 255, 255}},

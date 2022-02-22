@@ -14,6 +14,12 @@ namespace lowpoly3d {
 constexpr float getPointScalingFactor() { return 0.1f; }
 constexpr float getLineSegmentScalingFactor() { return 0.01f; }
 
+void draw(Scene& iScene, Arrow const& iArrow)
+{
+	draw(iScene, iArrow.getCone());
+	draw(iScene, iArrow.getCylinder());
+}
+
 void draw(Scene& iScene, Cone const& iCone)
 {
 	// Cone has base at (0, 0, 0) and tip (0, 1, 0)

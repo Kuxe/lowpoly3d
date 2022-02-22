@@ -13,6 +13,34 @@ namespace lowpoly3d {
 constexpr float getPointScalingFactor() { return 0.1f; }
 constexpr float getLineSegmentScalingFactor() { return 0.01f; }
 
+void draw(Scene& iScene, Cone const& iCone)
+{
+	// Cone has base at (0, 0, 0) and tip (0, 1, 0)
+	RenderDataBuilder rdb;
+	rdb.setModel("cone");
+	rdb.setShader("normal");
+
+	auto const parametrization_centerline = iCone.getCenterline().parametrization();
+	auto const p1 = parametrization_centerline(0.0f);
+	auto const p2 = parametrization_centerline(1.0f);
+
+	// See docs on drawing a LineSegment for more info (very much resembles the code below)
+
+	rdb.setTransformationInWorld([&]() {
+		auto const y = glm::normalize(p2 - p1);
+		auto const x = !glm::areCollinear(y, glm::vec3(0.0f, 1.0f, 0.0f), 1E-4f) ? glm::cross({0.0f, 1.0f, 0.0f}, y) : glm::cross(y, {0.0f, 0.0f, 1.0f});
+		auto const z = glm::cross(x, y);
+		auto const mat = glm::mat3(
+			x * iCone.getRadius(),
+			y * iCone.getHeight(),
+			z * iCone.getRadius()
+		);
+		return glm::translate(glm::identity<glm::mat4>(), p1) * glm::mat4x4(mat);
+	}());
+
+	iScene.insert(rdb.build());
+}
+
 void draw(Scene& iScene, Cylinder const& iCylinder)
 {
 	// Cylinder has base at (0, 0, 0) and tip (0, 1, 0)

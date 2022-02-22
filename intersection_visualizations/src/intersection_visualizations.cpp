@@ -1,6 +1,7 @@
 
 #include "draw_geometric_primitives.hpp"
 
+#include "generators/conegenerator.hpp"
 #include "generators/cylindergenerator.hpp"
 #include "generators/spheregenerator.hpp"
 
@@ -107,6 +108,13 @@ public:
 			auto const c2 = lowpoly3d::Cylinder(lowpoly3d::LineSegment({15.0f, 7.0f, 0.0f}, {10.0f, 10.0f, 10.0f}), 0.5f);
 			lowpoly3d::draw(scene, c2);
 
+			auto const cone1 = lowpoly3d::Cone(lowpoly3d::Cone(lowpoly3d::LineSegment({0.0f, 0.0f, -5.0f}, {0.0f, 1.0f, -5.0f}), 0.5f));
+			auto const cone2 = lowpoly3d::Cone(lowpoly3d::Cone(lowpoly3d::LineSegment({0.0f, 3.0f, -5.0f}, {0.0f, 1.0f, -5.0f}), 1.0f));
+			lowpoly3d::draw(scene, cone1);
+			lowpoly3d::draw(scene, cone2);
+
+			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());
+
 			iRenderer.offer(scene); //Render a scene
 			mDt = std::chrono::high_resolution_clock::now() - start;
 			mElapsed = std::chrono::high_resolution_clock::now() - runstart;
@@ -138,6 +146,7 @@ int main()
 
 	lowpoly3d::Model sphere = lowpoly3d::SphereGenerator({200, 0, 200}, 3).generate();
 	lowpoly3d::Model cylinder = lowpoly3d::CylinderGenerator({255, 50, 255}, 16).generate();
+	lowpoly3d::Model cone = lowpoly3d::ConeGenerator(lowpoly3d::Cone(lowpoly3d::LineSegment({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}), 1.0f), 4).generate();
 	lowpoly3d::Model const triangle_xy(
 		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
 		{{255, 255, 255}, {255, 255, 255}, {255, 255, 255}},
@@ -147,7 +156,7 @@ int main()
 	std::thread visualizerThread([&] { iv.run(renderer); });
 
 	renderer.initialize(&iv, "../shaders/") &&
-	renderer.loadModels("sphere", sphere, "cylinder", cylinder, "triangle_xy", triangle_xy) &&
+	renderer.loadModels("sphere", sphere, "cylinder", cylinder, "triangle_xy", triangle_xy, "cone", cone) &&
 	renderer.run();
 	iv.stop();
 	visualizerThread.join();

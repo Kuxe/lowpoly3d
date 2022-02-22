@@ -216,6 +216,7 @@ add_library(${PROJECT_NAME}
 	include/worlduniformdata.hpp
 	include/minimum_bounding_sphere.hpp src/minimum_bounding_sphere.cpp
 
+	include/generators/conegenerator.hpp src/generators/conegenerator.cpp
 	include/generators/circlegenerator.hpp src/generators/circlegenerator.cpp
 	include/generators/cubegenerator.hpp src/generators/cubegenerator.cpp
 	include/generators/cylindergenerator.hpp src/generators/cylindergenerator.cpp
@@ -225,6 +226,7 @@ add_library(${PROJECT_NAME}
 	include/generators/terraingenerator.hpp src/generators/terraingenerator.cpp
 	include/generators/treegenerator.hpp
 
+	include/geometric_primitives/cone.hpp
 	include/geometric_primitives/cylinder.hpp
 	include/geometric_primitives/direction.hpp
 	include/geometric_primitives/intersections.hpp src/geometric_primitives/intersections.cpp

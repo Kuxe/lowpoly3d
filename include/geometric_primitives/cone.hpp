@@ -56,6 +56,12 @@ using Conef = TCone<float, 3>;
 using Coned = TCone<double, 3>;
 using Cone  = Conef;
 
+template<typename floating_point_type, std::size_t dim>
+std::ostream& operator<<(std::ostream& os, TCone<floating_point_type, dim> const& cone) {
+	os << "(centerline=" << cone.getCenterline() << ",radius=" << cone.getRadius() << ")";
+	return os;
+}
+
 } // End of namespace lowpoly3d
 
 #endif // CONE_HPP

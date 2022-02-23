@@ -151,7 +151,7 @@ void draw(Scene& iScene, Plane const& iPlane)
 	auto const p3 = planeParametrization(+uvsidehalf, -uvsidehalf);
 	auto const rectangle = Rectangle(p1, p2, p3);
 	
-	APT_ASSERT_EQ(iPlane.getPoint(), rectangle.midpoint());
+	assert(almostEqual(iPlane.getPoint(), rectangle.midpoint()));
 
 	draw(iScene, rectangle);
 

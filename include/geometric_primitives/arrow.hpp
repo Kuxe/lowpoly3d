@@ -40,7 +40,7 @@ private:
 	{
 		auto const& centerline = bound.getCenterline();
 		auto const p1 = centerline.p1;
-		auto const p2 = p1 + (3.0f / 5.0f) * glm::normalize(centerline.p2 - centerline.p1);
+		auto const p2 = p1 + (3.0f / 5.0f) * (centerline.p2 - centerline.p1);
 		auto const radius = 1.0f/3.0f * bound.getRadius();
 		return cylinder_type{{p1, p2}, radius};
 	}
@@ -48,8 +48,8 @@ private:
 	static cone_type createCone(cylinder_type const& bound)
 	{
 		auto const& centerline = bound.getCenterline();
-		auto const p1 = centerline.p1 + (3.0f / 5.0f) * glm::normalize(centerline.p2 - centerline.p1);
-		auto const p2 = p1 + (2.0f / 5.0f) * glm::normalize(centerline.p2 - centerline.p1);
+		auto const p1 = centerline.p1 + (3.0f / 5.0f) * (centerline.p2 - centerline.p1);
+		auto const p2 = centerline.p2;
 		auto const radius = bound.getRadius();
 		return cone_type{{p1, p2}, radius};
 	}

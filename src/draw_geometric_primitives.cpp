@@ -1,17 +1,18 @@
 #include "draw_geometric_primitives.hpp"
-#include "geometric_primitives/plane.hpp"
-#include "glm/gtx/vector_query.hpp"
-#include "renderdata.hpp"
+
 #include "drawfeature.hpp"
+#include "geometric_primitives/plane.hpp"
+#include "renderdata.hpp"
 #include "scene.hpp"
 #include "utils/apt_assert.hpp"
-#include <glm/ext/vector_relational.hpp>
-#include <glm/geometric.hpp>
-#include <glm/trigonometric.hpp>
 #include "utils/glm/glmprint.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL
+#define GLM_ENABLE_EXPERIMENTAL¨
+#include <glm/ext/vector_relational.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtx/transform.hpp> //glm::translate
+#include <glm/gtx/vector_query.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace lowpoly3d {
 

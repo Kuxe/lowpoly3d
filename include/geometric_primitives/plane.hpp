@@ -3,9 +3,12 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/gtx/string_cast.hpp> // glm::to_string
 #include <glm/gtx/vector_query.hpp> // glm::areCollinear
+#include <glm/gtx/polar_coordinates.hpp> // glm::polar, glm::euclidean
 
+#include <functional>
 #include <ostream>
 
 #include "geometric_primitives/point.hpp"
@@ -149,6 +152,39 @@ public:
 		};
 
 		return world2plane * point;
+	}
+
+	// Returns a parametrization of the plane. The parameters are unbounded.
+	std::function<point_type(floating_point_type, floating_point_type)> parametrization() const
+	{
+		// Is there a bijective function from unit vectors in R3 to unit vectors in R3, that is not identiy or negation?
+		//
+		// Lets figure this out.
+		//
+		// Represent unit vector v=(x, y, z) in spherical coordinates spherical(v)=(theta, phi)
+		// f(spherical(v)) = (theta+pi/2, phi+pi/2) will always yield another unit vector
+		// Now convert back to (x, y, z): v'=cartesian(f(spherical(v))).
+		// Question: Is v' orthogonal to v? I don't know. Because of this insecurity,
+		// I can just cross(v, v') to get a second base-axis, and then cross again to get the third.
+		//
+		// I doubt this function is bijective though. It does produce vectors
+		// that are NOT parallel to original vector (for all unit vectors), which is sufficient.
+		// I haven't proved this, but I'll trust my gut on this one.
+
+		auto const polar = glm::polar(n);
+		auto const lat = polar[1];
+		auto const lon = polar[2];
+		auto const v = glm::euclidean(glm::vec<2, floating_point_type>(
+			lat + glm::half_pi<floating_point_type>(),
+			lon + glm::half_pi<floating_point_type>()
+		));
+
+		auto const x = glm::cross(n, v);
+		auto const z = glm::cross(x, n);
+
+		return [=](floating_point_type u, floating_point_type v) -> point_type {
+			return p + u*x + v*z;
+		};
 	}
 
 private:

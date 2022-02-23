@@ -7,6 +7,7 @@
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
 #include "geometric_primitives/parallelogram.hpp"
+#include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/rectangle.hpp"
 #include "geometric_primitives/sphere.hpp"
@@ -23,6 +24,7 @@ void draw(Scene& iScene, Cylinder const& iCylinder);
 void draw(Scene& iScene, Line const& iLine);
 void draw(Scene& iScene, LineSegment const& iLineSegment);
 void draw(Scene& iScene, Parallelogram const& iParallelogram);
+void draw(Scene& iScene, Plane const& iPlane);
 void draw(Scene& iScene, Point const& iPoint);
 void draw(Scene& iScene, Rectangle const& iRectangle);
 void draw(Scene& iScene, Sphere const& iSphere);

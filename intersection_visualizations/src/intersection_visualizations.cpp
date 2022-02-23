@@ -11,6 +11,8 @@
 #include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
+#include "geometric_primitives/plane.hpp"
+#include "geometric_primitives/point.hpp"
 #include "geometric_primitives/rectangle.hpp"
 #include "geometric_primitives/sphere.hpp"
 
@@ -122,6 +124,15 @@ public:
 			lowpoly3d::draw(scene, arrow2);
 			lowpoly3d::draw(scene, arrow3);
 			lowpoly3d::draw(scene, arrowtarget);
+			
+			auto const planePoint = lowpoly3d::Point(-5.0f, 0.0f, +5.0f);
+			auto const yzplane = lowpoly3d::Plane(planePoint, {1.0f, 0.0f, 0.0f});
+			auto const xzplane = lowpoly3d::Plane(planePoint, {0.0f, 1.0f, 0.0f});
+			auto const xyplane = lowpoly3d::Plane(planePoint, {0.0f, 0.0f, 1.0f});
+
+			lowpoly3d::draw(scene, yzplane);
+			lowpoly3d::draw(scene, xzplane); // FIXME: This is not visible?
+			lowpoly3d::draw(scene, xyplane);
 
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());
 

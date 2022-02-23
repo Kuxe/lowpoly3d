@@ -1,10 +1,13 @@
 #include "draw_geometric_primitives.hpp"
+#include "geometric_primitives/plane.hpp"
 #include "glm/gtx/vector_query.hpp"
 #include "renderdata.hpp"
 #include "drawfeature.hpp"
 #include "scene.hpp"
+#include "utils/apt_assert.hpp"
 #include <glm/ext/vector_relational.hpp>
 #include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp> //glm::translate
@@ -134,6 +137,26 @@ void draw(Scene& iScene, Parallelogram const& iParallelogram)
 	draw(iScene, iParallelogram.getSecondTriangle());
 }
 
+void draw(Scene& iScene, Plane const& iPlane)
+{
+	auto const planeParametrization = iPlane.parametrization();
+	
+	constexpr float uvside = 0.3f;
+	constexpr float uvsidehalf = uvside/2.0f;
+
+	auto const p1 = planeParametrization(-uvsidehalf, -uvsidehalf);
+	auto const p2 = planeParametrization(-uvsidehalf, +uvsidehalf);
+	auto const p3 = planeParametrization(+uvsidehalf, -uvsidehalf);
+	auto const rectangle = Rectangle(p1, p2, p3);
+	
+	APT_ASSERT_EQ(iPlane.getPoint(), rectangle.midpoint());
+
+	draw(iScene, rectangle);
+
+	auto const arrow = Arrow(Cylinder({iPlane.getPoint(), iPlane.getPoint() + iPlane.getNormal()}, 0.01f));
+	draw(iScene, arrow);
+}
+
 void draw(Scene& iScene, Point const& iPoint)
 {
 	RenderDataBuilder rdb;
@@ -174,7 +197,7 @@ void draw(Scene& iScene, Triangle const& iTriangle)
 	auto const rdb = RenderDataBuilder()
 		.setTransformationInWorld(glm::translate(glm::identity<glm::mat4>(), iTriangle.p1) * glm::mat4x4(mat))
 		.setModel("triangle_xy")
-		.setShader("color")
+		.setShader("normal")
 		.setDrawFeatureTarget(std::move(dft));
 
 	iScene.insert(rdb.build());	

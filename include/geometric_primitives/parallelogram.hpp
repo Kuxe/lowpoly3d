@@ -73,6 +73,11 @@ public:
 		);
 	}
 	
+	point_type midpoint() const
+	{
+		return floating_point_type(0.5) * (getBottomRightCorner() + getTopLeftCorner());
+	}
+	
 private:
 	triangle_type triangle;
 	point_type p3;

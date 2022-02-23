@@ -117,7 +117,7 @@ public:
 			lowpoly3d::draw(scene, cone2);
 
 			auto const arrow1 = lowpoly3d::Arrow(lowpoly3d::Cylinder(lowpoly3d::LineSegment({0.0f, 0.0f, -7.0f}, {0.0f, 1.0f, -7.0f}), 0.5f)); // Bulky
-			auto const arrow2 = lowpoly3d::Arrow(lowpoly3d::Cylinder(lowpoly3d::LineSegment({2.0f, 0.0f, -7.0f}, {4.0f, 1.0f, -7.0f}), 1.0f)); // Bulky & tilted //FIXME: Does not actually extend all the way to arrowtarget, which is expected since x=4.0f?
+			auto const arrow2 = lowpoly3d::Arrow(lowpoly3d::Cylinder(lowpoly3d::LineSegment({2.0f, 0.0f, -7.0f}, {4.0f, 1.0f, -7.0f}), 1.0f)); // Bulky & tilted
 			auto const arrow3 = lowpoly3d::Arrow(lowpoly3d::Cylinder(lowpoly3d::LineSegment({4.0f, 3.5f, -7.0f}, {4.0f, 2.0f, -7.0f}), 0.25f)); // Pretty & upside-down
 			auto const arrowtarget = lowpoly3d::Sphere({4.0f, 1.0f, -7.0f}, 0.05f); // TODO: Create this as intersection of lines extended from line-segments of arrows
 			lowpoly3d::draw(scene, arrow1);

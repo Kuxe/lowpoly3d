@@ -124,15 +124,45 @@ public:
 			lowpoly3d::draw(scene, arrow2);
 			lowpoly3d::draw(scene, arrow3);
 			lowpoly3d::draw(scene, arrowtarget);
-			
+
 			auto const planePoint = lowpoly3d::Point(-5.0f, 0.0f, +5.0f);
 			auto const yzplane = lowpoly3d::Plane(planePoint, {1.0f, 0.0f, 0.0f});
 			auto const xzplane = lowpoly3d::Plane(planePoint, {0.0f, 1.0f, 0.0f});
 			auto const xyplane = lowpoly3d::Plane(planePoint, {0.0f, 0.0f, 1.0f});
 
+			auto const animatedPlaneX = lowpoly3d::Plane(
+				planePoint + glm::vec3{-1.0f, 0.0f, 0.0f},
+				glm::vec3(
+					0.0f,
+					std::cos(0.5f*mElapsed.count()),
+					std::sin(0.5f*mElapsed.count())
+				)
+			);
+
+			auto const animatedPlaneY = lowpoly3d::Plane(
+				planePoint + glm::vec3{-2.0f, 1.0f, 0.0f},
+				glm::vec3(
+					std::sin(0.5f*mElapsed.count()),
+					0.0f,
+					std::cos(0.5f*mElapsed.count())
+				)
+			);
+
+			auto const animatedPlaneZ = lowpoly3d::Plane(
+				planePoint + glm::vec3{-2.0f, 0.0f, 1.0f},
+				glm::vec3(
+					std::cos(0.5f*mElapsed.count()),
+					std::sin(0.5f*mElapsed.count()),
+					0.0f
+				)
+			);
+
 			lowpoly3d::draw(scene, yzplane);
 			lowpoly3d::draw(scene, xzplane); // FIXME: This is not visible?
 			lowpoly3d::draw(scene, xyplane);
+			lowpoly3d::draw(scene, animatedPlaneX);
+			lowpoly3d::draw(scene, animatedPlaneY);
+			lowpoly3d::draw(scene, animatedPlaneZ);
 
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());
 

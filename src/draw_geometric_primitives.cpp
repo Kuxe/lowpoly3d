@@ -8,6 +8,7 @@
 #include <glm/ext/vector_relational.hpp>
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
+#include "utils/glm/glmprint.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp> //glm::translate

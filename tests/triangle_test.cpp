@@ -64,7 +64,10 @@ SCENARIO("Triangle circumcenter") {
 	// distance from {0,0,0} to {0,-4,0} is 4
 	// so distance from {0,1,0} to {0,-4,0} is 5
 	// Note that distance from {-3,0,0} to {0,-4,0} is also 5
-	// Hence {3,0,0},{-3,0,0},{0,1,0} has circumcenter in {0,-4,0}
+	// So distance from {0,-4,0} to all triangle vertices is 5,
+	// hence it is the circumcenter since a property of a circumcenter is that it
+	// is the point of the circle that intersect all vertices of a triangle
+	// Hence {3,0,0},{-3,0,0},{0,1,0} has circumcenter in {0,-4,0} (with radius 5)
 	test("The pythagorean triplet triangle", {{3,0,0},{0,1,0},{-3,0,0}}, {0,-4,0});
 }
 

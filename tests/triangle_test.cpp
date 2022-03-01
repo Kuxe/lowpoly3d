@@ -10,6 +10,7 @@
 #include <glm/gtc/random.hpp> // glm::sphericalRand
 
 #include <sstream>
+#include <string_view>
 
 namespace lowpoly3d {
 
@@ -38,9 +39,9 @@ SCENARIO("Triangle misc methods") {
 }
 
 SCENARIO("Triangle circumcenter") {
-	auto test = [](Triangle const& given, Point const& expected) {
+	auto test = [](std::string_view desc, Triangle const& given, Point const& expected) {
 		std::stringstream givenss;
-		givenss << "The triangle " << given;
+		givenss << desc << " " << given;
 		GIVEN(givenss.str()) {
 			WHEN("Computing its circumenter") {
 				Point actual = circumcenter(given);
@@ -54,9 +55,9 @@ SCENARIO("Triangle circumcenter") {
 		}
 	};
 
-	test({{0,0,0},{0,0,0},{0,0,0}}, {0,0,0});
-	test({{1,0,0},{0,1,0},{-1,0,0}}, {0,0,0});
-	test({{1,2,3},{2,3,1},{3,1,2}}, {2,2,2});
+	test("The point-degenerate triangle", {{0,0,0},{0,0,0},{0,0,0}}, {0,0,0});
+	test("The triangle", {{1,0,0},{0,1,0},{-1,0,0}}, {0,0,0});
+	test("The triangle", {{1,2,3},{2,3,1},{3,1,2}}, {2,2,2});
 
 	// Pythagorean triplet {{3,0,0},{0,0,0},{0,-4,0}}
 	// distance from {3,0,0} to {0,-4,0} is 5
@@ -64,7 +65,7 @@ SCENARIO("Triangle circumcenter") {
 	// so distance from {0,1,0} to {0,-4,0} is 5
 	// Note that distance from {-3,0,0} to {0,-4,0} is also 5
 	// Hence {3,0,0},{-3,0,0},{0,1,0} has circumcenter in {0,-4,0}
-	test({{3,0,0},{0,1,0},{-3,0,0}}, {0,-4,0});
+	test("The pythagorean triplet triangle", {{3,0,0},{0,1,0},{-3,0,0}}, {0,-4,0});
 }
 
 SCENARIO("Interior points of triangles (3D)") {

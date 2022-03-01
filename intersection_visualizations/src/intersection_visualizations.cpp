@@ -166,11 +166,26 @@ public:
 			lowpoly3d::draw(scene, animatedPlaneZ);
 
 			// Circumcenter visualizations
-			[&scene](){
-				glm::vec3 offset = {0.0f, -5.0f, 0.0f};
+			[this, &scene](){
+				glm::vec3 offset1 = {0.0f, -5.0f, 0.0f};
 				auto const t1 = lowpoly3d::Triangle({3.0f, 0.0f, 0.0f},{0.0f, 1.0f, 0.0f},{-3.0f, 0.0f, 0.0f});
-				lowpoly3d::draw(scene, lowpoly3d::Triangle(t1.p1 + offset, t1.p2 + offset, t1.p3 + offset));
-				lowpoly3d::draw(scene, lowpoly3d::circumcenter(t1) + offset);
+				lowpoly3d::draw(scene, lowpoly3d::Triangle(t1.p1 + offset1, t1.p2 + offset1, t1.p3 + offset1));
+				lowpoly3d::draw(scene, lowpoly3d::circumcenter(t1) + offset1);
+
+				auto const offset2 = glm::vec3{0.0f, -6.0f, 0.0f};
+				auto const t2p1 = lowpoly3d::Point{0.0f, 0.0f, 0.0f} + offset2;
+				auto const t2p2 = lowpoly3d::Point{4.0f, 0.0f, 0.0f} + offset2;
+				auto const t2p3 = lowpoly3d::Point{0.0f, 0.0f, -3.0f} + offset2;
+				auto const t2 = lowpoly3d::Triangle(
+					0.1f*std::sin(1.07f * mElapsed.count()) * t2p1 + t2p1,
+					0.1f*std::sin(1.13f * mElapsed.count()) * t2p2 + t2p2,
+					0.1f*std::sin(1.17f * mElapsed.count()) * t2p3 + t2p3
+				);
+				auto const t2circumcenter = lowpoly3d::circumcenter(t2);
+
+				lowpoly3d::draw(scene, lowpoly3d::Triangle(t2.p1, t2.p2, t2.p3));
+				lowpoly3d::draw(scene, lowpoly3d::Arrow({0.0f, -3.0f, 0.0f}, lowpoly3d::Point(t2circumcenter), 0.1f));
+				lowpoly3d::draw(scene, t2circumcenter);
 			}();
 
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());

@@ -3,6 +3,7 @@
 
 #include "geometric_primitives/cone.hpp"
 #include "geometric_primitives/cylinder.hpp"
+#include "geometric_primitives/linesegment.hpp"
 
 #include "glm/gtx/string_cast.hpp"
 
@@ -15,9 +16,10 @@ namespace lowpoly3d {
 template<typename floating_point_type, std::size_t dim>
 class TArrow final {
 public:
-
-	using cylinder_type = TCylinder<floating_point_type, dim>;
 	using cone_type = TCone<floating_point_type, dim>;
+	using cylinder_type = TCylinder<floating_point_type, dim>;
+	using linesegment_type = TLineSegment<floating_point_type, dim>;
+	using point_type = TPoint<floating_point_type, dim>;
 
 	// Create an arrow that is tightly bounded by a cylinder 'bound'
 	// This allows for intuitive constructor of arrows in terms of a cylinder,
@@ -26,6 +28,14 @@ public:
 	TArrow(cylinder_type&& bound)
 		: cylinder(createCylinder(bound))
 		, cone(createCone(bound))
+	{}
+
+	TArrow(linesegment_type&& linesegment, float radius)
+		: TArrow(cylinder_type(std::forward<linesegment_type>(linesegment), radius))
+	{}
+
+	TArrow(point_type&& from, point_type&& to, float radius)
+		: TArrow(linesegment_type(std::forward<point_type>(from), std::forward<point_type>(to)), radius)
 	{}
 
 	auto const& getCylinder() const { return cylinder; }

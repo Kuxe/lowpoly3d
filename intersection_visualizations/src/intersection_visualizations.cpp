@@ -15,6 +15,7 @@
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/rectangle.hpp"
 #include "geometric_primitives/sphere.hpp"
+#include "geometric_primitives/triangle.hpp"
 
 #include "minimum_bounding_sphere.hpp"
 
@@ -163,6 +164,14 @@ public:
 			lowpoly3d::draw(scene, animatedPlaneX);
 			lowpoly3d::draw(scene, animatedPlaneY);
 			lowpoly3d::draw(scene, animatedPlaneZ);
+
+			// Circumcenter visualizations
+			[&scene](){
+				glm::vec3 offset = {0.0f, -5.0f, 0.0f};
+				auto const t1 = lowpoly3d::Triangle({3.0f, 0.0f, 0.0f},{0.0f, 1.0f, 0.0f},{-3.0f, 0.0f, 0.0f});
+				lowpoly3d::draw(scene, lowpoly3d::Triangle(t1.p1 + offset, t1.p2 + offset, t1.p3 + offset));
+				lowpoly3d::draw(scene, lowpoly3d::circumcenter(t1) + offset);
+			}();
 
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());
 

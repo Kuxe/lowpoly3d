@@ -19,6 +19,8 @@
 
 #include "minimum_bounding_sphere.hpp"
 
+#include "utils/glm/vector_projection.hpp"
+
 #include "lowpoly3d.hpp"
 #include "model.hpp"
 
@@ -186,6 +188,18 @@ public:
 				lowpoly3d::draw(scene, lowpoly3d::Triangle(t2.p1, t2.p2, t2.p3));
 				lowpoly3d::draw(scene, lowpoly3d::Arrow({0.0f, -3.0f, 0.0f}, lowpoly3d::Point(t2circumcenter), 0.1f));
 				lowpoly3d::draw(scene, t2circumcenter);
+			}();
+
+			// Vector projections
+			[this, &scene](){
+				auto const offset = lowpoly3d::Point(2.0f, -5.0f, -3.0f);
+				auto const projectee1 = lowpoly3d::Point(std::cos(mElapsed.count()) * 4.0f, std::sin(mElapsed.count()) * 3.0f, 0.0f);
+				auto const v1 = lowpoly3d::Point(std::cos(mElapsed.count()), 0.0f, std::sin(mElapsed.count()));
+				auto const projection1 = projectOnto(projectee1, v1);
+
+				lowpoly3d::draw(scene, lowpoly3d::LineSegment(offset, projectee1+offset));
+				lowpoly3d::draw(scene, lowpoly3d::LineSegment(offset, v1+offset));
+				lowpoly3d::draw(scene, projection1+offset);
 			}();
 
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());

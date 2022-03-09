@@ -171,7 +171,7 @@ TTriangle<fpt, dim> TTriangle<fpt, dim>::transform(glm::mat<dim+1, dim+1, fpt> c
 
 template<typename fpt, std::size_t dim>
 std::function<typename TTriangle<fpt, dim>::point_type(fpt, fpt, fpt)> TTriangle<fpt, dim>::getBarycentricParametrization() const {
-	return [=](fpt t1, fpt t2, fpt t3) {
+	return [this](fpt t1, fpt t2, fpt t3) {
 		return t1*p1 + t2*p2 + t3*p3;
 	};
 }

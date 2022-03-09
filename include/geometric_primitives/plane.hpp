@@ -182,7 +182,7 @@ public:
 		auto const x = glm::cross(n, v);
 		auto const z = glm::cross(x, n);
 
-		return [=](floating_point_type u, floating_point_type v) -> point_type {
+		return [this, x=x, z=z](floating_point_type u, floating_point_type v) -> point_type {
 			return p + u*x + v*z;
 		};
 	}

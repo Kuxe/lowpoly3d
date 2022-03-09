@@ -13,7 +13,7 @@ add_executable(${PROJECT_NAME}_test
 enable_testing()
 target_include_directories(${PROJECT_NAME}_test PRIVATE ${${PROJECT_NAME}_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME} Catch2::Catch2WithMain glm::glm)
-target_compile_features(${PROJECT_NAME}_test PRIVATE cxx_std_17)
+target_compile_features(${PROJECT_NAME}_test PRIVATE cxx_std_20)
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)

@@ -9,6 +9,7 @@ project(lowpoly3d
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(buildcache)
+include(target_disable_warnings)
 include(CheckCXXCompilerFlag)
 include(FetchContent)
 include(GNUInstallDirs)
@@ -90,6 +91,7 @@ FetchContent_Declare(
 	GIT_TAG 0.9.9.8
 )
 FetchContent_MakeAvailable(glm)
+target_disable_warnings(glm)
 
 FetchContent_Declare(
 	glbinding
@@ -263,7 +265,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:GNU>:${gcc_co
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:DEBUG>>:${gcc_compile_options_debug}>)
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:RELEASE>>:${gcc_compile_options_release}>)
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 # Symlink compile_commands.json from build-directory to CMakelists-directory.
 # Reason: clangd recursively looks in parent directories

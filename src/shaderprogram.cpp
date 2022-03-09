@@ -23,14 +23,14 @@ ShaderProgram::~ShaderProgram() {
 bool ShaderProgram::add(GLenum shaderType, const std::filesystem::path& path) {
 
 	if(!std::filesystem::exists(path)) {
-		std::cout << "ERROR: Shader at \"" << path.c_str() << "\" does not exist.\n";
+		std::cout << "ERROR: Shader at \"" << path << "\" does not exist.\n";
 		return false;
 	}
 
 	//Load shader on path to sourcePtr
 	std::ifstream ifs(path);
 	if(!ifs.is_open()) {
-		std::cout << "ERROR: Could open shader filestream for file \"" << path.c_str() << "\"\n";
+		std::cout << "ERROR: Could open shader filestream for file \"" << path << "\"\n";
 		return false;
 	}
 	std::stringstream buffer;
@@ -42,7 +42,7 @@ bool ShaderProgram::add(GLenum shaderType, const std::filesystem::path& path) {
 	//Create and compile shader
 	GLuint shaderHandle = glCreateShader(shaderType);
 	if(!shaderHandle) {
-		std::cout << "ERROR: call to glCreateShader() returned 0 for \"" << path.c_str() << "\"\n";
+		std::cout << "ERROR: call to glCreateShader() returned 0 for \"" << path << "\"\n";
 		return false;
 	}
 
@@ -57,7 +57,7 @@ bool ShaderProgram::add(GLenum shaderType, const std::filesystem::path& path) {
 		glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &length);
 		std::vector<GLchar> log(length);
 		glGetShaderInfoLog(shaderHandle, length, 0, &log[0]);
-		std::cout << "ERROR: Could not compile \"" << path.c_str() << "\" (" << &log[0] << ")\n";    //Save metadata of shader. This must be done if this shader program should support live-reloading.
+		std::cout << "ERROR: Could not compile \"" << path << "\" (" << &log[0] << ")\n";    //Save metadata of shader. This must be done if this shader program should support live-reloading.
 		return false;
 	}
 	shaders[shaderType] = {shaderHandle, path};

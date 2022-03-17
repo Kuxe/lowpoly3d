@@ -7,6 +7,8 @@
 #include "glm/gtc/epsilon.hpp"
 #include "glm/gtx/vector_query.hpp"
 
+#include "range/v3/view/concat.hpp"
+
 namespace lowpoly3d {
 
 template<typename value_type, std::size_t dimension>
@@ -53,7 +55,7 @@ public:
 	}
 
 	// Returns the triangle (bottom-left, bottom-right and top-left vertices)
-	triangle_type getFirstTriangle() const
+	triangle_type const& getFirstTriangle() const
 	{
 		return triangle;
 	}
@@ -82,6 +84,16 @@ private:
 	triangle_type triangle;
 	point_type p3;
 };
+
+template<typename floating_point_type, std::size_t dim>
+auto vertices(TParallelogram<floating_point_type, dim> const& parallelogram)
+{
+	using point_type = typename TParallelogram<floating_point_type, dim>::point_type;
+	return ranges::views::concat(
+		vertices(parallelogram.getFirstTriangle()),
+		*reinterpret_cast<std::array<point_type, 1> const * const>(&parallelogram.getTopRightCorner())
+	);
+}
 
 using Parallelogramf = TParallelogram<float, 3>;
 using Parallelogramd = TParallelogram<double, 3>;

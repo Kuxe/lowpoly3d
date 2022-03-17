@@ -11,6 +11,7 @@
 #include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
+#include "geometric_primitives/parallelogram.hpp"
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/rectangle.hpp"
@@ -200,6 +201,35 @@ public:
 				lowpoly3d::draw(scene, lowpoly3d::LineSegment(offset, projectee1+offset));
 				lowpoly3d::draw(scene, lowpoly3d::LineSegment(offset, v1+offset));
 				lowpoly3d::draw(scene, projection1+offset);
+			}();
+
+			[&scene](){
+				auto const offset = lowpoly3d::Point(0.0f, -5.0f, -7.0f);
+				auto const ls1 = lowpoly3d::LineSegment(
+					offset + lowpoly3d::Point{0.0f, 0.0f, 0.0f},
+					offset + lowpoly3d::Point{1.0f, 1.0f, 1.0f}
+				);
+				
+				lowpoly3d::draw(scene, ls1);
+				for(auto const& vertex : vertices(ls1))
+				{
+					lowpoly3d::draw(scene, vertex);
+				}
+			}();
+
+			[&scene](){
+				auto const offset = lowpoly3d::Point(2.0f, -5.0f, -7.0f);
+				auto const parallelogram = lowpoly3d::Parallelogram(
+					offset + lowpoly3d::Point{0.0f, 0.0f, 0.0f},
+					offset + lowpoly3d::Point{0.0f, 0.0f, 1.0f},
+					offset + lowpoly3d::Point{0.0f, 1.0f, 2.0f}
+				);
+				
+				lowpoly3d::draw(scene, parallelogram);
+				for(auto const& vertex : vertices(parallelogram))
+				{
+					lowpoly3d::draw(scene, vertex);
+				}
 			}();
 
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());

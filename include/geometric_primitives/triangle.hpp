@@ -104,6 +104,12 @@ TTriangle<fpt, 2> projectIntoLocal(TTriangle<fpt, 3> const& triangle, TPlane<fpt
 template<typename fpt>
 TPoint<fpt, 3> circumcenter(TTriangle<fpt, 3> const& triangle);
 
+template<typename fpt>
+auto const& vertices(TTriangle<fpt, 3> const& triangle)
+{
+	return triangle.points;
+}
+
 template<typename fpt, std::size_t dim>
 std::ostream& operator<<(std::ostream& os, TTriangle<fpt, dim> const& triangle);
 

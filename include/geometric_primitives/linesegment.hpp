@@ -45,6 +45,13 @@ struct TLineSegment {
 };
 
 template<typename floating_point_type, std::size_t dimension>
+auto const& vertices(TLineSegment<floating_point_type, dimension> const& linesegment)
+{
+	using point_type = typename TLineSegment<floating_point_type, dimension>::point_type;
+	return *reinterpret_cast<std::array<point_type, 2> const * const>(&linesegment.p1);
+}
+
+template<typename floating_point_type, std::size_t dimension>
 std::ostream& operator<<(std::ostream& out, const TLineSegment<floating_point_type, dimension>& segment) {
 	out << "(p1=" << glm::to_string(segment.p1) << ", p2=" << glm::to_string(segment.p2) << ")";
 	return out;

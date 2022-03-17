@@ -136,6 +136,14 @@ FetchContent_Declare(
 set(lsys_BUILD_EXAMPLES OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(lsys)
 
+FetchContent_Declare(
+	range-v3
+	GIT_REPOSITORY https://github.com/ericniebler/range-v3
+	GIT_TAG 0.11.0
+)
+#set(RANGES_BUILD_CALENDAR_EXAMPLE OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(range-v3)
+
 file(
 	DOWNLOAD https://raw.githubusercontent.com/Kuxe/subber/f0565d1dea10633ed04b5a1df1164f5f5915a40b/subber.hpp
 	${CONTRIB_DIR}/subber.hpp
@@ -294,17 +302,17 @@ target_include_directories(${PROJECT_NAME}
 )
 
 if(WIN32)
-	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32 lsys glm::glm glfw glbinding::glbinding)
+	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32 lsys glm::glm glfw glbinding::glbinding range-v3)
 elseif(UNIX AND NOT APPLE)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
 	find_package(Threads)
-	target_link_libraries(${PROJECT_NAME} PRIVATE glfw dl GL X11 Xxf86vm Xrandr Threads::Threads Xi Xinerama Xcursor lsys glbinding::glbinding)
+	target_link_libraries(${PROJECT_NAME} PRIVATE glfw dl GL X11 Xxf86vm Xrandr Threads::Threads Xi Xinerama Xcursor lsys glbinding::glbinding range-v3)
 elseif(APPLE)
 	find_package(OpenGL REQUIRED)
 	find_library(COCOA_LIBRARY Cocoa)
 	find_library(IOKIT_LIBRARY IOKit)
 	find_library(COREVIDEO CoreVideo)
-	target_link_libraries(${PROJECT_NAME} PRIVATE lsys glfw dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO} glbinding::glbinding)
+	target_link_libraries(${PROJECT_NAME} PRIVATE lsys glfw dl ${OPENGL_LIBRARIES} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO} glbinding::glbinding range-v3)
 endif(WIN32)
 
 if(${PROJECT_NAME}_BUILD_EXAMPLES)

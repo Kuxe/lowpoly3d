@@ -3,6 +3,7 @@
 
 #include "geometric_primitives/cone.hpp"
 #include "geometric_primitives/cylinder.hpp"
+#include "geometric_primitives/direction.hpp"
 #include "geometric_primitives/linesegment.hpp"
 
 #include "glm/gtx/string_cast.hpp"
@@ -18,6 +19,7 @@ class TArrow final {
 public:
 	using cone_type = TCone<floating_point_type, dim>;
 	using cylinder_type = TCylinder<floating_point_type, dim>;
+	using direction_type = TDirection<floating_point_type>;
 	using linesegment_type = TLineSegment<floating_point_type, dim>;
 	using point_type = TPoint<floating_point_type, dim>;
 
@@ -36,6 +38,10 @@ public:
 
 	TArrow(point_type&& from, point_type&& to, float radius)
 		: TArrow(linesegment_type(std::forward<point_type>(from), std::forward<point_type>(to)), radius)
+	{}
+
+	TArrow(point_type&& from, direction_type&& dir, float radius)
+		: TArrow(std::forward<point_type>(from), point_type(from) + dir.getVec(), radius)
 	{}
 
 	auto const& getCylinder() const { return cylinder; }

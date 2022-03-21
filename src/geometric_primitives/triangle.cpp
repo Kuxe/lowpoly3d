@@ -2,6 +2,8 @@
 #include <cstddef> // std::size_t
 
 #include "geometric_primitives/direction.hpp"
+#include "geometric_primitives/intersections.hpp"
+#include "geometric_primitives/line.hpp"
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/triangle.hpp"
@@ -204,6 +206,36 @@ glm::vec<3, fpt> normal(TTriangle<fpt, 3> const& t) {
 template glm::vec<3, float> normal(TTriangle< float, 3> const&);
 template glm::vec<3, double> normal(TTriangle<double, 3> const&);
 
+template<typename fpt, typename point_type = typename TTriangle<fpt, 2>::point_type>
+TLine<fpt, 2> bisector2d_generic(
+	point_type const& p0,
+	point_type const& p1)
+{
+	auto const midpoint = (p0 + p1) / fpt(2);
+	auto const diff = p1 - p0;
+	auto const vector_orthogonal_to_edge = point_type(diff.y, -diff.x);
+	auto const point_along_bisector = midpoint + vector_orthogonal_to_edge;
+	return TLine<fpt, 2>(midpoint, point_along_bisector);
+}
+
+template<typename fpt>
+TLine<fpt, 2> bisector_01(TTriangle<fpt, 2> const& triangle)
+{
+	return bisector2d_generic<fpt>(triangle.p1, triangle.p2);
+}
+
+template<typename fpt>
+TLine<fpt, 2> bisector_12(TTriangle<fpt, 2> const& triangle)
+{
+	return bisector2d_generic<fpt>(triangle.p2, triangle.p3);
+}
+
+template<typename fpt>
+TLine<fpt, 2> bisector_20(TTriangle<fpt, 2> const& triangle)
+{
+	return bisector2d_generic<fpt>(triangle.p3, triangle.p1);
+}
+
 template<typename fpt>
 glm::vec<3, fpt> edge_normal_12(TTriangle<fpt, 3> const& triangle)
 {
@@ -222,6 +254,12 @@ glm::vec<3, fpt> edge_normal_31(TTriangle<fpt, 3> const& triangle)
 	return glm::normalize(glm::cross(triangle.p1 - triangle.p3, normal(triangle)));
 }
 
+template TLine<float, 2> bisector_01(TTriangle< float, 2> const&);
+template TLine<double, 2> bisector_01(TTriangle<double, 2> const&);
+template TLine<float, 2> bisector_12(TTriangle< float, 2> const&);
+template TLine<double, 2> bisector_12(TTriangle<double, 2> const&);
+template TLine<float, 2> bisector_20(TTriangle< float, 2> const&);
+template TLine<double, 2> bisector_20(TTriangle<double, 2> const&);
 template glm::vec<3, float> edge_normal_12(TTriangle< float, 3> const&);
 template glm::vec<3, double> edge_normal_12(TTriangle<double, 3> const&);
 template glm::vec<3, float> edge_normal_23(TTriangle< float, 3> const&);

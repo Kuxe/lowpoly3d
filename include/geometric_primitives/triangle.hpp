@@ -20,6 +20,9 @@ template<typename fpt>
 struct TDirection;
 
 template<typename fpt, std::size_t dim>
+struct TLine;
+
+template<typename fpt, std::size_t dim>
 struct TTriangle {
 	using point_type = TPoint<fpt, dim>;
 	using points_type = std::array<point_type, 3>;
@@ -75,6 +78,18 @@ struct TTriangle {
 // Returns the normal of triangle, with vertices winding CCW about the normal
 template<typename fpt>
 glm::vec<3, fpt> normal(TTriangle<fpt, 3> const& triangle);
+
+// Returns the bisector for edge p0-p1
+template<typename fpt>
+TLine<fpt, 2> bisector_01(TTriangle<fpt, 2> const& triangle);
+
+// Returns the bisector for edge p1-p2
+template<typename fpt>
+TLine<fpt, 2> bisector_12(TTriangle<fpt, 2> const& triangle);
+
+// Returns the bisector for edge p2-p0
+template<typename fpt>
+TLine<fpt, 2> bisector_20(TTriangle<fpt, 2> const& triangle);
 
 // Returns the edge-normal pointing away from the triangle for edge p0-p1
 template<typename fpt>

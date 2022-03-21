@@ -54,9 +54,9 @@ private:
 	floating_point_type t, p;
 };
 
-using Direction = TDirection<double>;
-using Direcitond = TDirection<double>;
+using Directiond = TDirection<double>;
 using Directionf = TDirection<float>;
+using Direction = Directionf;
 
 template<typename floating_point_type>
 std::ostream operator<<(std::ostream& os, TDirection<floating_point_type> const& direction) {

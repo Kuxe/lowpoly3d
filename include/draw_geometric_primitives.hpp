@@ -6,6 +6,7 @@
 #include "geometric_primitives/cylinder.hpp"
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
+#include "geometric_primitives/oriented_plane.hpp"
 #include "geometric_primitives/parallelogram.hpp"
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/point.hpp"
@@ -23,6 +24,7 @@ void draw(Scene& iScene, Cone const& iCone);
 void draw(Scene& iScene, Cylinder const& iCylinder);
 void draw(Scene& iScene, Line const& iLine);
 void draw(Scene& iScene, LineSegment const& iLineSegment);
+void draw(Scene& iScene, OrientedPlane const& iOrientedPlane);
 void draw(Scene& iScene, Parallelogram const& iParallelogram);
 void draw(Scene& iScene, Plane const& iPlane);
 void draw(Scene& iScene, Point const& iPoint);

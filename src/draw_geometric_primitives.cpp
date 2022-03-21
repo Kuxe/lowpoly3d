@@ -133,6 +133,18 @@ void draw(Scene& iScene, LineSegment const& iLineSegment)
 	iScene.insert(rdb.build());
 }
 
+void draw(Scene& iScene, OrientedPlane const& iOrientedPlane)
+{
+	draw(iScene, Arrow(Point(iOrientedPlane.getPoint()), Direction(iOrientedPlane.getX()), 0.03f));
+	draw(iScene, Arrow(Point(iOrientedPlane.getPoint()), Direction(iOrientedPlane.getY()), 0.03f));
+	draw(iScene, Arrow(Point(iOrientedPlane.getPoint()), Direction(iOrientedPlane.getZ()), 0.03f));
+	draw(iScene, Rectangle(
+		iOrientedPlane.getPoint(),
+		iOrientedPlane.getPoint() + iOrientedPlane.getX(),
+		iOrientedPlane.getPoint() + iOrientedPlane.getY()
+	));
+}
+
 void draw(Scene& iScene, Parallelogram const& iParallelogram)
 {
 	draw(iScene, iParallelogram.getFirstTriangle());

@@ -85,7 +85,7 @@ using point_type_2d = glm::vec<2, fpt>;
 	// Returns true if point lies on the plane, otherwise false
 	bool contains(const point_type_3d& point) const {
 		// It should really be + since we want to check the difference between negative d and dot-product.
-		return std::abs(glm::dot(getNormal(), point) + getD()) <= std::numeric_limits<floating_point_type>::epsilon();
+		return std::abs(glm::dot(getNormal(), point) + getD()) <= floating_point_type{1e-6};
 	}
 
 	// TODO: Create concept for anything that has a range of vertices
@@ -98,7 +98,7 @@ using point_type_2d = glm::vec<2, fpt>;
 	// Projects a point in plane's local space to world space
 	point_type_3d projectLocalInverse(point_type_2d const& point) const
 	{
-		return base() * point_type_3d(point.x, point.y, floating_point_type(0));
+		return base() * point_type_3d(point.x, point.y, floating_point_type(0)) + getPoint();
 	}
 
 	glm::vec<3, fpt> const& getX() const
@@ -143,8 +143,7 @@ struct ProjectLocal {
 template<typename fpt>
 struct ProjectLocal<fpt, glm::vec<3, fpt>> {
 	auto operator()(TOrientedPlane<fpt> const& plane, glm::vec<3, fpt> const& point) const {
-		auto const point2d = plane.inverse() * point;
-		return glm::vec<2, fpt>(point2d.x, point2d.y);
+		return glm::mat2x3(plane.inverse()) * (point-plane.getPoint());
 	}
 };
 

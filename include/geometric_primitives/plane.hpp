@@ -83,7 +83,7 @@ public:
 	// Returns true if point lies on the plane, otherwise false
 	bool contains(const point_type& point) const {
 		// It should really be + since we want to check the difference between negative d and dot-product.
-		return std::abs(glm::dot(n, point) + getD()) <= std::numeric_limits<floating_point_type>::epsilon();
+		return std::abs(glm::dot(n, point) + getD()) <= floating_point_type{1e-6};
 	}
 
 	// Returns the distance to origo
@@ -95,7 +95,7 @@ public:
 
 	// Returns true if "plane" is parallel to this plane
 	[[nodiscard]] bool isParallelTo(const TPlane<floating_point_type, dimension>& plane) const {
-		return std::abs(glm::dot(getNormal(), plane.getNormal())) - floating_point_type(1) <= std::numeric_limits<floating_point_type>::epsilon();
+		return std::abs(glm::dot(getNormal(), plane.getNormal())) - floating_point_type(1) <= floating_point_type{1e-6};
 	}
 
 	// Projects a given point onto this plane and returns that point

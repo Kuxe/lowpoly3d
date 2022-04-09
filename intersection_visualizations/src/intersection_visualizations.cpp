@@ -11,6 +11,7 @@
 #include "geometric_primitives/intersects.hpp"
 #include "geometric_primitives/line.hpp"
 #include "geometric_primitives/linesegment.hpp"
+#include "geometric_primitives/oriented_plane.hpp"
 #include "geometric_primitives/parallelogram.hpp"
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/point.hpp"
@@ -168,7 +169,7 @@ public:
 			lowpoly3d::draw(scene, animatedPlaneY);
 			lowpoly3d::draw(scene, animatedPlaneZ);
 
-			// Circumcenter visualizations
+			// 3D Circumcenter visualizations
 			[this, &scene](){
 				glm::vec3 offset1 = {0.0f, -5.0f, 0.0f};
 				auto const t1 = lowpoly3d::Triangle({3.0f, 0.0f, 0.0f},{0.0f, 1.0f, 0.0f},{-3.0f, 0.0f, 0.0f});
@@ -186,9 +187,80 @@ public:
 				);
 				auto const t2circumcenter = lowpoly3d::circumcenter(t2);
 
-				lowpoly3d::draw(scene, lowpoly3d::Triangle(t2.p1, t2.p2, t2.p3));
+				lowpoly3d::draw(scene, t2);
 				lowpoly3d::draw(scene, lowpoly3d::Arrow({0.0f, -3.0f, 0.0f}, lowpoly3d::Point(t2circumcenter), 0.1f));
 				lowpoly3d::draw(scene, t2circumcenter);
+
+				// Draw bisectors of animated triangle
+				[&scene](lowpoly3d::Triangle const& t){
+					lowpoly3d::draw(scene, lowpoly3d::Arrow(0.5f*(t.p1 + t.p2), lowpoly3d::Direction(lowpoly3d::edge_normal_12(t)), 0.03f));
+					lowpoly3d::draw(scene, lowpoly3d::Arrow(0.5f*(t.p2 + t.p3), lowpoly3d::Direction(lowpoly3d::edge_normal_23(t)), 0.03f));
+					lowpoly3d::draw(scene, lowpoly3d::Arrow(0.5f*(t.p3 + t.p1), lowpoly3d::Direction(lowpoly3d::edge_normal_31(t)), 0.03f));
+				}(t2);
+
+				// Draw oriented plane of animated triangle
+				[&scene](lowpoly3d::Triangle const& t){
+					lowpoly3d::draw(scene, lowpoly3d::orientedParallel(t));
+				}(t2);
+			}();
+
+			// 2D Circumcenter visualizations
+			[this, &scene]()
+			{
+				// Animate a triangle that never degenerates into a line or point.
+				// This ensures that circumcenter visualization never blows off into
+				// infinity, which may confuse me in the future.
+				auto const triangle2d = lowpoly3d::Triangle2(
+					{0.0f, 0.0f},
+					{1.5f + 0.25f*std::cos(0.13f*mElapsed.count()), 0.0f + 0.25f*std::sin(0.17f*mElapsed.count())},
+					{0.0f + 0.25f*std::sin(0.23f*mElapsed.count()), 1.5f + 0.25f*std::cos(0.29f*mElapsed.count())}
+				);
+				auto const circumcenter2d = lowpoly3d::circumcenter(triangle2d);
+
+				auto const visualizationOffset = lowpoly3d::Point({-2.0f, -4.0f, 0.0f});
+
+				// Lift point in 2d to point in 3d with supplementary z
+				auto const pointlift = [](lowpoly3d::Point2 const& p, float z)
+				{
+					return lowpoly3d::Point{p.x, p.y, z};
+				};
+
+				// Lift triangle in 2d to triangle in 3d with supplementary z
+				auto const trianglelift = [&pointlift](lowpoly3d::Triangle2 const& p, float z)
+				{
+					return lowpoly3d::Triangle(pointlift(p.p1, z), pointlift(p.p2, z), pointlift(p.p3, z));
+				};
+
+				auto const linelift = [&pointlift](lowpoly3d::Line2 const& l, float pz, float lz)
+				{
+					return lowpoly3d::Line(pointlift(l.getPoint(), pz), pointlift(l.getDirection(), lz));
+				};
+
+				auto const lineoffset = [](lowpoly3d::Line const& line, lowpoly3d::Point const& offset)
+				{
+					return lowpoly3d::Line(line.getPoint() + offset, line.getDirection());
+				};
+
+				auto const triangle3d = [&triangle2d, &visualizationOffset, &trianglelift](){
+					lowpoly3d::Triangle t = trianglelift(triangle2d, 0.0f);
+					t.p1 += visualizationOffset;
+					t.p2 += visualizationOffset;
+					t.p3 += visualizationOffset;
+					return t;
+				}();
+					
+				auto const circumcenter3d = lowpoly3d::Point({
+					circumcenter2d.x + visualizationOffset.x,
+					circumcenter2d.y + visualizationOffset.y,
+					0.0f + visualizationOffset.z}
+				);
+
+				// These visualizations show that circumcenter calculations in 2D are OK!
+				lowpoly3d::draw(scene, triangle3d);
+				lowpoly3d::draw(scene, circumcenter3d);
+				lowpoly3d::draw(scene, lineoffset(linelift(lowpoly3d::bisector_01(triangle2d), 0.0f, 0.0f), visualizationOffset));
+				lowpoly3d::draw(scene, lineoffset(linelift(lowpoly3d::bisector_12(triangle2d), 0.0f, 0.0f), visualizationOffset));
+				lowpoly3d::draw(scene, lineoffset(linelift(lowpoly3d::bisector_20(triangle2d), 0.0f, 0.0f), visualizationOffset));
 			}();
 
 			// Vector projections
@@ -230,6 +302,35 @@ public:
 				{
 					lowpoly3d::draw(scene, vertex);
 				}
+			}();
+
+			// Visualize line2d-line2d intersection
+			[&scene, this](){
+				auto const offset = lowpoly3d::Point(2.0f, -5.0f, -9.0f);
+
+				auto const l1 = lowpoly3d::Line2(
+					lowpoly3d::Point2f(std::cos(mElapsed.count()) + 1.0f, std::sin(mElapsed.count()) + 1.0f),
+					{1.13f * std::cos(mElapsed.count()), 1.17f * std::sin(mElapsed.count())}
+				);
+
+				auto const l2 = lowpoly3d::Line2(
+					lowpoly3d::Point2f(std::sin(mElapsed.count()) - 1.0f, std::cos(mElapsed.count()) - 1.0f),
+					{1.13f * std::sin(mElapsed.count()), 1.17f * std::cos(mElapsed.count())}
+				);
+
+				auto line2d_to_line3d = [](lowpoly3d::Line2 const& l)
+				{
+					return lowpoly3d::Line(lowpoly3d::Point{l.getPoint().x, l.getPoint().y, -9.0f}, lowpoly3d::Point{l.getDirection().x, l.getDirection().y, 0.0f});
+				};
+
+				auto const l1_3d = line2d_to_line3d(l1);
+				auto const l2_3d = line2d_to_line3d(l2);
+				auto const intersection2d = intersection(l1, l2);
+				auto const intersection3d = lowpoly3d::Point{intersection2d.x, intersection2d.y, -9.0f};
+
+				lowpoly3d::draw(scene, l1_3d);
+				lowpoly3d::draw(scene, l2_3d);
+				lowpoly3d::draw(scene, intersection3d);
 			}();
 
 			//auto const intersection_line = intersection(t1, r1.getFirstTriangle());

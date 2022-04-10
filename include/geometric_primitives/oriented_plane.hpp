@@ -143,7 +143,7 @@ struct ProjectLocal {
 template<typename fpt>
 struct ProjectLocal<fpt, glm::vec<3, fpt>> {
 	auto operator()(TOrientedPlane<fpt> const& plane, glm::vec<3, fpt> const& point) const {
-		return glm::mat2x3(plane.inverse()) * (point-plane.getPoint());
+		return glm::mat3x2(plane.inverse()) * (point-plane.getPoint());
 	}
 };
 

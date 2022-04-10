@@ -171,37 +171,33 @@ public:
 
 			// 3D Circumcenter visualizations
 			[this, &scene](){
-				glm::vec3 offset1 = {0.0f, -5.0f, 0.0f};
-				auto const t1 = lowpoly3d::Triangle({3.0f, 0.0f, 0.0f},{0.0f, 1.0f, 0.0f},{-3.0f, 0.0f, 0.0f});
-				lowpoly3d::draw(scene, lowpoly3d::Triangle(t1.p1 + offset1, t1.p2 + offset1, t1.p3 + offset1));
-				lowpoly3d::draw(scene, lowpoly3d::circumcenter(t1) + offset1);
 
-				auto const offset2 = glm::vec3{0.0f, -6.0f, 0.0f};
-				auto const t2p1 = lowpoly3d::Point{0.0f, 0.0f, 0.0f} + offset2;
-				auto const t2p2 = lowpoly3d::Point{4.0f, 0.0f, 0.0f} + offset2;
-				auto const t2p3 = lowpoly3d::Point{0.0f, 0.0f, -3.0f} + offset2;
-				auto const t2 = lowpoly3d::Triangle(
-					0.1f*std::sin(1.07f * mElapsed.count()) * t2p1 + t2p1,
-					0.1f*std::sin(1.13f * mElapsed.count()) * t2p2 + t2p2,
-					0.1f*std::sin(1.17f * mElapsed.count()) * t2p3 + t2p3
+				auto const offset = glm::vec3{0.0f, -6.0f, 0.0f};
+				auto const p1 = lowpoly3d::Point{0.0f, 0.0f, 0.0f} + offset;
+				auto const p2 = lowpoly3d::Point{4.0f, 0.0f, 0.0f} + offset;
+				auto const p3 = lowpoly3d::Point{0.0f, 0.0f, -3.0f} + offset;
+				auto const t = lowpoly3d::Triangle(
+					0.1f*std::sin(1.07f * mElapsed.count()) * p1 + p1,
+					0.1f*std::sin(1.13f * mElapsed.count()) * p2 + p2,
+					0.1f*std::sin(1.17f * mElapsed.count()) * p3 + p3
 				);
-				auto const t2circumcenter = lowpoly3d::circumcenter(t2);
+				auto const circumcenter = lowpoly3d::circumcenter(t);
 
-				lowpoly3d::draw(scene, t2);
-				lowpoly3d::draw(scene, lowpoly3d::Arrow({0.0f, -3.0f, 0.0f}, lowpoly3d::Point(t2circumcenter), 0.1f));
-				lowpoly3d::draw(scene, t2circumcenter);
+				lowpoly3d::draw(scene, t);
+				lowpoly3d::draw(scene, lowpoly3d::Arrow({0.0f, -3.0f, 0.0f}, lowpoly3d::Point(circumcenter), 0.1f));
+				lowpoly3d::draw(scene, circumcenter);
 
 				// Draw bisectors of animated triangle
 				[&scene](lowpoly3d::Triangle const& t){
 					lowpoly3d::draw(scene, lowpoly3d::Arrow(0.5f*(t.p1 + t.p2), lowpoly3d::Direction(lowpoly3d::edge_normal_12(t)), 0.03f));
 					lowpoly3d::draw(scene, lowpoly3d::Arrow(0.5f*(t.p2 + t.p3), lowpoly3d::Direction(lowpoly3d::edge_normal_23(t)), 0.03f));
 					lowpoly3d::draw(scene, lowpoly3d::Arrow(0.5f*(t.p3 + t.p1), lowpoly3d::Direction(lowpoly3d::edge_normal_31(t)), 0.03f));
-				}(t2);
+				}(t);
 
 				// Draw oriented plane of animated triangle
 				[&scene](lowpoly3d::Triangle const& t){
 					lowpoly3d::draw(scene, lowpoly3d::orientedParallel(t));
-				}(t2);
+				}(t);
 			}();
 
 			// 2D Circumcenter visualizations

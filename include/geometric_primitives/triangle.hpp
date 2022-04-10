@@ -10,6 +10,9 @@ namespace lowpoly3d {
 template<typename fpt, std::size_t dim>
 struct TPlane;
 
+template<typename fpt>
+struct TOrientedPlane;
+
 template<typename value_type, std::size_t dimension>
 using TPoint = glm::vec<dimension, value_type>;
 
@@ -103,9 +106,13 @@ glm::vec<3, fpt> edge_normal_23(TTriangle<fpt, 3> const& triangle);
 template<typename fpt>
 glm::vec<3, fpt> edge_normal_31(TTriangle<fpt, 3> const& triangle);
 
-// Returns a plane that is paralell to triangle
+// Returns a plane that is parallel to triangle
 template<typename fpt>
 TPlane<fpt, 3> parallel(TTriangle<fpt, 3> const& triangle);
+
+// Returns an oriented plane that is parallel to triangle
+template<typename fpt>
+TOrientedPlane<fpt> orientedParallel(TTriangle<fpt, 3> const& triangle);
 
 // Projects triangle onto given plane
 template<typename fpt>
@@ -114,6 +121,14 @@ TTriangle<fpt, 2> project(TTriangle<fpt, 3> const& triangle, TPlane<fpt, 3> cons
 // Projects triangle onto given plane and returns a point expressed in a local coordinate system of the plane
 template<typename fpt>
 TTriangle<fpt, 2> projectIntoLocal(TTriangle<fpt, 3> const& triangle, TPlane<fpt, 3> const& plane);
+
+// Projects triangle onto given oriented plane and returns a point
+// expressed in a local coordinate system of the oriented plane
+template<typename fpt>
+TTriangle<fpt, 2> projectLocal(TTriangle<fpt, 3> const& triangle, TOrientedPlane<fpt> const& plane);
+
+template<typename fpt>
+TPoint<fpt, 2> circumcenter(TTriangle<fpt, 2> const& triangle);
 
 // Returns the circumcenter of triangle. TODO: Should be implemented for arbitrary dimension (not only 3)
 template<typename fpt>

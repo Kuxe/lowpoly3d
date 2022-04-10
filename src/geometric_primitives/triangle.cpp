@@ -4,6 +4,7 @@
 #include "geometric_primitives/direction.hpp"
 #include "geometric_primitives/intersections.hpp"
 #include "geometric_primitives/line.hpp"
+#include "geometric_primitives/oriented_plane.hpp"
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/plane.hpp"
 #include "geometric_primitives/triangle.hpp"
@@ -12,6 +13,7 @@
 
 #include <sstream> // std::ostream
 
+#include "utils/glm/glmprint.hpp"
 #include "utils/glm/vector_projection.hpp"
 #include "utils/solve.hpp"
 
@@ -99,24 +101,26 @@ template<typename fpt, std::size_t dim>
 struct Circumcenter { }; // Not implemented for arbitrary dimension
 
 template<typename fpt>
+struct Circumcenter<fpt, 2> {
+	using point_type = TPoint<fpt, 2>;
+
+	point_type operator()(TTriangle<fpt, 2> const& triangle) const {
+		return intersection(bisector_01(triangle), bisector_12(triangle));
+	}
+};
+
+template<typename fpt>
 struct Circumcenter<fpt, 3> {
 	using point_type = TPoint<fpt, 3>;
 
 	point_type operator()(TTriangle<fpt, 3> const& triangle) const {
-		/* To figure out whats going on here:
-		 * Let A, B, C be a triangle.
-		 * By convention, let all bisectors point inward.
-		 * Draw two bisectors bisector(AB), bisector(CA) in the triangle
-		 * The intersection of bisector(AB) with bisector(CA) is the circumcenter
-		 * Project AC/2 onto bisector(AB). Denote this projection point as 'P'.
-		 * Form AC/2 - P. Denote this vector as v.
-		 * Project v onto -bisector(AB) but do a funny projection where the rejection vector is
-		 * perpendicular to v instead of -bisector(AB). Note that this point is exactly the
-		 * intersection of bisector(AB) and bisector(CA) i.e the circumcenter. Done. */
-		auto const t1t0 = triangle[1] - triangle[0];
-		auto t1t0InwardBisector = glm::cross(normal(triangle), t1t0);
-		auto const t0t2midpoint = fpt(0.5)*(triangle[0] + triangle[2]);
-		return projectOnto2(t0t2midpoint - projectOnto(t0t2midpoint, t1t0InwardBisector), -t1t0InwardBisector);
+		// 1. Project 3D-triangle into it's own plane
+		// 2. Use circumcenter routine for 2D
+		// 3. "Lift" 2D-result back to 3D
+		auto const plane = orientedParallel(triangle);
+		auto const triangle2d = projectLocal(triangle, plane);
+		auto const circumcenter2d = circumcenter(triangle2d);
+		return plane.projectLocalInverse({circumcenter2d.x, circumcenter2d.y});
 	}
 };
 
@@ -214,8 +218,7 @@ TLine<fpt, 2> bisector2d_generic(
 	auto const midpoint = (p0 + p1) / fpt(2);
 	auto const diff = p1 - p0;
 	auto const vector_orthogonal_to_edge = point_type(diff.y, -diff.x);
-	auto const point_along_bisector = midpoint + vector_orthogonal_to_edge;
-	return TLine<fpt, 2>(midpoint, point_along_bisector);
+	return TLine<fpt, 2>(midpoint, vector_orthogonal_to_edge);
 }
 
 template<typename fpt>
@@ -260,6 +263,7 @@ template TLine<float, 2> bisector_12(TTriangle< float, 2> const&);
 template TLine<double, 2> bisector_12(TTriangle<double, 2> const&);
 template TLine<float, 2> bisector_20(TTriangle< float, 2> const&);
 template TLine<double, 2> bisector_20(TTriangle<double, 2> const&);
+
 template glm::vec<3, float> edge_normal_12(TTriangle< float, 3> const&);
 template glm::vec<3, double> edge_normal_12(TTriangle<double, 3> const&);
 template glm::vec<3, float> edge_normal_23(TTriangle< float, 3> const&);
@@ -274,6 +278,17 @@ TPlane<fpt, 3> parallel(TTriangle<fpt, 3> const& t) {
 
 template TPlane< float, 3> parallel(TTriangle< float, 3> const&);
 template TPlane<double, 3> parallel(TTriangle<double, 3> const&);
+
+template<typename fpt>
+TOrientedPlane<fpt> orientedParallel(TTriangle<fpt, 3> const& t) {
+	auto const x = glm::normalize(t.p2 - t.p1);
+	auto const z = glm::cross(x, glm::normalize(t.p3 - t.p1));
+	auto const y = glm::cross(z, x);
+	return { t.p1, x, y };
+}
+
+template TOrientedPlane< float> orientedParallel(TTriangle< float, 3> const&);
+template TOrientedPlane<double> orientedParallel(TTriangle<double, 3> const&);
 
 template<typename fpt>
 TTriangle<fpt, 2> project(TTriangle<fpt, 3> const& t, TPlane<fpt, 3> const& plane) {
@@ -292,10 +307,25 @@ template TTriangle< float, 2> projectIntoLocal(TTriangle< float, 3> const&, TPla
 template TTriangle<double, 2> projectIntoLocal(TTriangle<double, 3> const&, TPlane<double, 3> const& plane);
 
 template<typename fpt>
+TTriangle<fpt, 2> projectLocal(TTriangle<fpt, 3> const& triangle, TOrientedPlane<fpt> const& plane) {
+	return {plane.projectLocal(triangle.p1), plane.projectLocal(triangle.p2), plane.projectLocal(triangle.p3)};
+}
+
+template TTriangle< float, 2> projectLocal(TTriangle< float, 3> const&, TOrientedPlane< float> const& plane);
+template TTriangle<double, 2> projectLocal(TTriangle<double, 3> const&, TOrientedPlane<double> const& plane);
+
+template<typename fpt>
+TPoint<fpt, 2> circumcenter(TTriangle<fpt, 2> const& triangle) {
+	return detail::Circumcenter<fpt, 2>()(triangle);
+}
+
+template<typename fpt>
 TPoint<fpt, 3> circumcenter(TTriangle<fpt, 3> const& triangle) {
 	return detail::Circumcenter<fpt, 3>()(triangle);
 }
 
+template TPoint<float, 2> circumcenter(TTriangle<float, 2> const&);
+template TPoint<double, 2> circumcenter(TTriangle<double, 2> const&);
 template TPoint< float, 3> circumcenter(TTriangle< float, 3> const&);
 template TPoint<double, 3> circumcenter(TTriangle<double, 3> const&);
 

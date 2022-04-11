@@ -45,19 +45,19 @@ bool TSphere<floating_point_type, dimension>::enclosed(
 template<typename floating_point_type, std::size_t dimension>
 bool TSphere<floating_point_type, dimension>::contains(
 	const point_type& point,
-	floating_point_type eps) const {
-	return glm::distance(point, p) <= r + eps;
+	floating_point_type tolerance) const {
+	return glm::distance(point, p) <= r + tolerance;
 }
 
 template<typename floating_point_type, std::size_t dimension>
 bool TSphere<floating_point_type, dimension>::contains(
 	const triangle_type& triangle,
-	floating_point_type eps) const {
+	floating_point_type tolerance) const {
 	return std::all_of(
 		triangle.cbegin(),
 		triangle.cend(),
-	[this, eps](auto const& point) {
-		return contains(point, eps);
+	[this, tolerance](auto const& point) {
+		return contains(point, tolerance);
 	});
 }
 

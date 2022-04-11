@@ -50,11 +50,11 @@ struct TSphere {
 	// Returns true if point is within this (closed) sphere
 	bool contains(
 		const point_type& point,
-		floating_point_type eps = std::numeric_limits<floating_point_type>::epsilon()) const;
+		floating_point_type tolerance = floating_point_type(1e-4)) const;
 	// Returns true if triangle is within this (closed) sphere
 	bool contains(
 		const triangle_type& triangle,
-		floating_point_type eps = std::numeric_limits<floating_point_type>::epsilon()) const;
+		floating_point_type tolerance = floating_point_type(1e-4)) const;
 
 	// Returns true if this sphere is the MBS over the provided set of points
 	bool isMBSof(const TTriangle<floating_point_type, dimension>& points) const;

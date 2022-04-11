@@ -68,9 +68,9 @@ TSphere<fpt, dim> mbs(TTriangle<fpt, dim> const& t) {
 		auto const radius = fpt(0.5)*std::sqrt(longestSide);
 		TSphere<fpt, dim> ret(midpoint, radius);
 		if(ret.contains(otherPoint)) {
-			APT_ASSERT_LEQ(glm::distance(ret.p, a), ret.r + 1e-6);
-			APT_ASSERT_LEQ(glm::distance(ret.p, b), ret.r + 1e-6);
-			APT_ASSERT_LEQ(glm::distance(ret.p, c), ret.r + 1e-6);
+			APT_ASSERT_LEQ(glm::distance(ret.p, a), ret.r + fpt(1e-4));
+			APT_ASSERT_LEQ(glm::distance(ret.p, b), ret.r + fpt(1e-4));
+			APT_ASSERT_LEQ(glm::distance(ret.p, c), ret.r + fpt(1e-4));
 			return ret;
 		}
 	}
@@ -94,9 +94,9 @@ TSphere<fpt, dim> mbs(TTriangle<fpt, dim> const& t) {
 		auto const r = glm::length(a - cc);
 
 		// Check that (1), (2) and (3) hold
-		APT_ASSERT_ALMOST_EQ(glm::length(a - cc), r, fpt(1e-5));
-		APT_ASSERT_ALMOST_EQ(glm::length(b - cc), r, fpt(1e-5));
-		APT_ASSERT_ALMOST_EQ(glm::length(c - cc), r, fpt(1e-5));
+		APT_ASSERT_ALMOST_EQ(glm::length(a - cc), r, fpt(1e-4));
+		APT_ASSERT_ALMOST_EQ(glm::length(b - cc), r, fpt(1e-4));
+		APT_ASSERT_ALMOST_EQ(glm::length(c - cc), r, fpt(1e-4));
 
 		// Check that circumcenter has no NaN components and that radius is not NaN
 		APT_ASSERT_EQ(cc.x, cc.x);

@@ -94,9 +94,9 @@ TSphere<fpt, dim> mbs(TTriangle<fpt, dim> const& t) {
 		auto const r = glm::length(a - cc);
 
 		// Check that (1), (2) and (3) hold
-		APT_ASSERT_EQ(glm::length(a - cc), r);
-		APT_ASSERT_EQ(glm::length(b - cc), r);
-		APT_ASSERT_EQ(glm::length(c - cc), r);
+		APT_ASSERT_ALMOST_EQ(glm::length(a - cc), r, fpt(1e-5));
+		APT_ASSERT_ALMOST_EQ(glm::length(b - cc), r, fpt(1e-5));
+		APT_ASSERT_ALMOST_EQ(glm::length(c - cc), r, fpt(1e-5));
 
 		// Check that circumcenter has no NaN components and that radius is not NaN
 		APT_ASSERT_EQ(cc.x, cc.x);

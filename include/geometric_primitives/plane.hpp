@@ -129,16 +129,13 @@ public:
 		// If my normal is collinear with 0, 0, 1, then
 		// do not choose [0, 0, 1] as a initial vector to cross with,
 		// instead choose [0, 1, 0] 
-		auto const yaxis = glm::cross(getNormal(),
+		auto const yaxis = glm::normalize(glm::cross(getNormal(),
 			! glm::areCollinear(getNormal(), point_type(0, 0, 1), floating_point_type(1e-6))
 			? point_type(0, 0, 1)
 			: point_type(0, 1, 0)	
-		);
+		));
 
-		auto const xaxis = glm::cross(yaxis, getNormal());
-
-		assert(glm::isNormalized(xaxis, std::numeric_limits<floating_point_type>::epsilon()));
-		assert(glm::isNormalized(yaxis, std::numeric_limits<floating_point_type>::epsilon()));
+		auto const xaxis = glm::normalize(glm::cross(yaxis, getNormal()));
 
 		/* This is essentially T = [xaxis, yaxis, point], inversed (by transposing, thanks ON),
 		 * followed by multiplying with point --- a mapping from world to plane space ---

@@ -105,9 +105,7 @@ TSphere<fpt, dim> mbs(TTriangle<fpt, dim> const& t) {
 		APT_ASSERT_EQ(r, r);
 
 		TSphere<fpt, dim> ret {cc, r};
-		assert(ret.contains(a));
-		assert(ret.contains(b));
-		assert(ret.contains(c));
+		assert(ret.contains(t));
 		return ret;
 	}
 }

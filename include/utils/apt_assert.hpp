@@ -1,6 +1,8 @@
 #ifndef APT_ASSERT_HPP
 #define APT_ASSERT_HPP
 
+#include "utils/almost_eq.hpp"
+
 #include <iostream>
 #include <experimental/source_location>
 
@@ -66,9 +68,7 @@ template<typename T, typename Out = apt_assert_default_out_type>
 void apt_assert_almost_eq(char const* nt, T const& t, char const* nu, T const& u, T const& tolerance, std::experimental::source_location const& sl, Out& out = apt_assert_default_out)
 {
 	apt_assert(nt, t, nu, u, "almost_eq", [&tolerance](T const& x, T const& y) {
-		auto const smallest = std::min(std::abs(x), std::abs(y));
-		return (smallest == T(0) && std::abs(x-y) < tolerance)
-			|| std::abs(x-y) / std::max(std::numeric_limits<T>::min(), smallest) < tolerance;
+		return almost_eq(x, y, tolerance);
 		}, sl, out);
 }
 

@@ -5,6 +5,7 @@
 #include <numeric>
 #include <glm/glm.hpp>
 
+#include "utils/almost_eq.hpp"
 #include "utils/strong_type.hpp"
 
 namespace lowpoly3d {
@@ -27,17 +28,10 @@ bool almostEqual(
 	const TPoint<value_type, dimension>& p1,
 	const TPoint<value_type, dimension>& p2,
 	value_type tolerance) {
-
-	// Source: https://www.reidatcheson.com/floating%20point/comparison/2019/03/20/floating-point-comparison.html
-	auto almostEqual = [](value_type x, value_type y, value_type tolerance) {
-		auto const smallest = std::min(std::abs(x), std::abs(y));
-		return (smallest == value_type(0) && std::abs(x-y) < tolerance)
-			|| std::abs(x-y) / std::max(std::numeric_limits<value_type>::min(), smallest) < tolerance;
-	};
 	return
-		almostEqual(p1.x, p2.x, tolerance) &&
-		almostEqual(p1.y, p2.y, tolerance) &&
-		almostEqual(p1.z, p2.z, tolerance);
+		almost_eq(p1.x, p2.x, tolerance) &&
+		almost_eq(p1.y, p2.y, tolerance) &&
+		almost_eq(p1.z, p2.z, tolerance);
 }
 
 using Pointf = TPoint<float, 3>;

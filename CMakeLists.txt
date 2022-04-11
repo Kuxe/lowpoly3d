@@ -251,6 +251,7 @@ add_library(${PROJECT_NAME}
 	include/geometric_primitives/sphere.hpp src/geometric_primitives/sphere.cpp
 	include/geometric_primitives/triangle.hpp src/geometric_primitives/triangle.cpp
 
+	include/utils/almost_eq.hpp
 	include/utils/apt_assert.hpp
 	include/utils/arithmetic_invariant.hpp
 	include/utils/glm/are_parallel.hpp

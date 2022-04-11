@@ -13,6 +13,7 @@
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/string_cast.hpp> //glm::vec3 into std::cout
 
+#include "utils/almost_eq.hpp"
 #include "utils/glm/glmprint.hpp"
 
 namespace Catch {
@@ -24,10 +25,8 @@ namespace Catch {
     };
 }
 
-/* TODO: Understand the, to my knowledge, "correct" way of doing this
- * (using ulp, see example of https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon) */
 bool almostEqual(float a, float b) {
-	return std::abs(a-b) <= std::numeric_limits<float>::epsilon();
+	return almost_eq(a, b, 1e-5f);
 };
 
 SCENARIO("Intersection tests") {
@@ -72,7 +71,7 @@ SCENARIO("Intersection tests") {
 
 	auto intersectionCommutativeTest = [getCommutativeTester](auto const& arg1, auto const& arg2) {
 		getCommutativeTester([](auto const& a, auto const& b) { return intersection(a, b); })
-			(arg1, arg2, [](auto const& a, auto const&b) { return almostEqual<float, 3>(a, b); }
+			(arg1, arg2, [](auto const& a, auto const&b) { return almostEqual(a, b, 1e-5f); }
 		);
 	};
 
@@ -325,7 +324,7 @@ SCENARIO("Intersection tests") {
 				std::ostringstream solutionStr;
 				solutionStr << "The solution should be (x,y,z)=" << glm::to_string(expectedSolution);
 				THEN(solutionStr.str()) {
-					REQUIRE(almostEqual<float, 3>(solution, expectedSolution));
+					REQUIRE(almostEqual<float, 3>(solution, expectedSolution, 1e-5f));
 				}
 			}
 		}

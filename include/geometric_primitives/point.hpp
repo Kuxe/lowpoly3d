@@ -27,7 +27,7 @@ template<typename value_type, auto dimension>
 bool almostEqual(
 	const TPoint<value_type, dimension>& p1,
 	const TPoint<value_type, dimension>& p2,
-	value_type tolerance) {
+	value_type tolerance = 1e-5) {
 	return
 		almost_eq(p1.x, p2.x, tolerance) &&
 		almost_eq(p1.y, p2.y, tolerance) &&

@@ -73,9 +73,9 @@ struct TLine {
 	[[nodiscard]] const point_type& getPoint() const { return p; }
 
 	// Return true if "point" lies on this line
-	[[nodiscard]] bool contains(const point_type& point) const {
+	[[nodiscard]] bool contains(const point_type& point, floating_point_type tolerance = 1e-5) const {
 		const auto crossed = glm::cross(point - p, d);
-		return glm::dot(crossed, crossed) <= std::numeric_limits<floating_point_type>::epsilon();
+		return glm::dot(crossed, crossed) <= tolerance;
 	}
 
 	// Returns true if "direction" is parallel to this line
@@ -119,8 +119,9 @@ private:
 template<typename floating_point_type, std::size_t dimension>
 bool almostEqual(
 	TLine<floating_point_type, dimension> l1,
-	TLine<floating_point_type, dimension> l2) {
-	return l1.isParallelTo(l2) && l1.contains(l2.getPoint());
+	TLine<floating_point_type, dimension> l2,
+	floating_point_type tolerance = 1e-5) {
+	return l1.isParallelTo(l2) && l1.contains(l2.getPoint(), tolerance);
 }
 
 using Line   = TLine<float , 3>;

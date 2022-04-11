@@ -282,7 +282,7 @@ template TPlane<double, 3> parallel(TTriangle<double, 3> const&);
 template<typename fpt>
 TOrientedPlane<fpt> orientedParallel(TTriangle<fpt, 3> const& t) {
 	auto const x = glm::normalize(t.p2 - t.p1);
-	auto const z = glm::cross(x, glm::normalize(t.p3 - t.p1));
+	auto const z = glm::normalize(glm::cross(x, t.p3 - t.p1));
 	auto const y = glm::cross(z, x);
 	return { t.p1, x, y };
 }

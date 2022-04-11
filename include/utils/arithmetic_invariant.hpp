@@ -264,7 +264,7 @@ bool operator==(
 	other_arithmetic_type other,
 	arithmetic_invariant<arithmetic_type, invariant_unary_checker> number)
 {
-	return number == other;
+	return other == number.number;
 }
 
 template<typename arithmetic_type, typename other_arithmetic_type, typename invariant_unary_checker>
@@ -272,7 +272,7 @@ bool operator!=(
 	other_arithmetic_type other,
 	arithmetic_invariant<arithmetic_type, invariant_unary_checker> number)
 {
-	return number != other;
+	return !(other == number);
 }
 
 template<typename arithmetic_type>

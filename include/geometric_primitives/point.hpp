@@ -26,14 +26,18 @@ template<typename value_type, auto dimension>
 bool almostEqual(
 	const TPoint<value_type, dimension>& p1,
 	const TPoint<value_type, dimension>& p2,
-	int ulp = 2) {
+	value_type tolerance) {
 
-	// Source: https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
-	auto almostEqual = [&ulp](value_type x, value_type y) {
-		return std::abs(x-y) <= std::numeric_limits<value_type>::epsilon() * std::abs(x+y) * ulp
-			|| std::abs(x-y) < std::numeric_limits<value_type>::min();
+	// Source: https://www.reidatcheson.com/floating%20point/comparison/2019/03/20/floating-point-comparison.html
+	auto almostEqual = [](value_type x, value_type y, value_type tolerance) {
+		auto const smallest = std::min(std::abs(x), std::abs(y));
+		return (smallest == value_type(0) && std::abs(x-y) < tolerance)
+			|| std::abs(x-y) / std::max(std::numeric_limits<value_type>::min(), smallest) < tolerance;
 	};
-	return almostEqual(p1.x, p2.x) && almostEqual(p1.y, p2.y) && almostEqual(p1.z, p2.z);
+	return
+		almostEqual(p1.x, p2.x, tolerance) &&
+		almostEqual(p1.y, p2.y, tolerance) &&
+		almostEqual(p1.z, p2.z, tolerance);
 }
 
 using Pointf = TPoint<float, 3>;

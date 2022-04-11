@@ -49,7 +49,7 @@ SCENARIO("Triangle circumcenter") {
 				ss << "The circumcenter lies in " << glm::to_string(expected);
 				THEN(ss.str()) {
 					INFO("expected=" << glm::to_string(expected) << ", actual=" << glm::to_string(actual));
-					REQUIRE(almostEqual(actual, expected));
+					REQUIRE(almostEqual(actual, expected, 1e-6f));
 				}
 			}
 		}

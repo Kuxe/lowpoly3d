@@ -8,8 +8,8 @@
 
 #include "minimum_bounding_sphere.hpp"
 
-#include "utils/apt_assert.hpp"
 #include "utils/glm/glmprint.hpp"
+#include "utils/apt_assert.hpp"
 
 #include <glm/detail/qualifier.hpp>
 

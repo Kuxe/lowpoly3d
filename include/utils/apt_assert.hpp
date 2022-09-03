@@ -4,7 +4,7 @@
 #include "utils/almost_eq.hpp"
 
 #include <iostream>
-#include <experimental/source_location>
+#include <source_location>
 
 #ifdef NDEBUG
 #define apt_assert(condition)                 ((void)0)
@@ -36,7 +36,7 @@ void apt_assert(
     Name const& nu, U const& u,
     BinaryOpName op_name,
     BinaryOp op,
-    std::experimental::source_location const& sl,
+    std::source_location const& sl,
     Out& out = apt_assert_default_out)
 {
     if(!op(t, u))
@@ -51,7 +51,7 @@ void apt_assert(
 
 #define CREATE_APT_ASSERT(function_name, op)\
 template<typename T, typename U, typename Out = apt_assert_default_out_type>\
-void function_name (char const* nt, T const& t, char const* nu, U const& u, std::experimental::source_location const& sl, Out& out = apt_assert_default_out)\
+void function_name (char const* nt, T const& t, char const* nu, U const& u, std::source_location const& sl, Out& out = apt_assert_default_out)\
 {\
     apt_assert(nt, t, nu, u, #op, [](T const& rhs, U const& lhs)\
     {\
@@ -65,7 +65,7 @@ CREATE_APT_ASSERT(apt_assert_leq, <=)
 CREATE_APT_ASSERT(apt_assert_eq, ==)
 
 template<typename T, typename Out = apt_assert_default_out_type>
-void apt_assert_almost_eq(char const* nt, T const& t, char const* nu, T const& u, T const& tolerance, std::experimental::source_location const& sl, Out& out = apt_assert_default_out)
+void apt_assert_almost_eq(char const* nt, T const& t, char const* nu, T const& u, T const& tolerance, std::source_location const& sl, Out& out = apt_assert_default_out)
 {
 	apt_assert(nt, t, nu, u, "almost_eq", [&tolerance](T const& x, T const& y) {
 		return almost_eq(x, y, tolerance);
@@ -78,13 +78,13 @@ CREATE_APT_ASSERT(apt_assert_neq, !=)
 
 } // End of namespace apt_assert_internal
 
-#define APT_ASSERT_LESS(a, b)                 apt_assert_internal::apt_assert_less(#a, a, #b, b, std::experimental::source_location::current())
-#define APT_ASSERT_LEQ(a, b)                  apt_assert_internal::apt_assert_leq(#a, a, #b, b, std::experimental::source_location::current())
-#define APT_ASSERT_EQ(a, b)                   apt_assert_internal::apt_assert_eq(#a, a, #b, b, std::experimental::source_location::current())
-#define APT_ASSERT_ALMOST_EQ(a, b, tolerance) apt_assert_internal::apt_assert_almost_eq(#a, a, #b, b, tolerance, std::experimental::source_location::current())
-#define APT_ASSERT_GREATER(a, b)              apt_assert_internal::apt_assert_greater(#a, a, #b, std::experimental::source_location::current())
-#define APT_ASSERT_GEQ(a, b)                  apt_assert_internal::apt_assert_geq(#a, a, #b, b, std::experimental::source_location::current())
-#define APT_ASSERT_NEQ(a, b)                  apt_assert_internal::apt_assert_neq(#a, a, #b, b, std::experimental::source_location::current())
+#define APT_ASSERT_LESS(a, b)                 apt_assert_internal::apt_assert_less(#a, a, #b, b, std::source_location::current())
+#define APT_ASSERT_LEQ(a, b)                  apt_assert_internal::apt_assert_leq(#a, a, #b, b, std::source_location::current())
+#define APT_ASSERT_EQ(a, b)                   apt_assert_internal::apt_assert_eq(#a, a, #b, b, std::source_location::current())
+#define APT_ASSERT_ALMOST_EQ(a, b, tolerance) apt_assert_internal::apt_assert_almost_eq(#a, a, #b, b, tolerance, std::source_location::current())
+#define APT_ASSERT_GREATER(a, b)              apt_assert_internal::apt_assert_greater(#a, a, #b, std::source_location::current())
+#define APT_ASSERT_GEQ(a, b)                  apt_assert_internal::apt_assert_geq(#a, a, #b, b, std::source_location::current())
+#define APT_ASSERT_NEQ(a, b)                  apt_assert_internal::apt_assert_neq(#a, a, #b, b, std::source_location::current())
 
 #endif // NDEBUG
 #endif // APT_ASSERT_HPP

@@ -12,11 +12,6 @@
 // TResource is the type of the object that is retrieved and TResourceDefinition is the type
 // that contains all data needed for loading the resource, e.g a path to a file on disk.
 
-struct ResourceHandle
-{
-	std::uint16_t handle = 0;
-};
-
 template<typename TResourceTypes>
 class ResourceManager
 {
@@ -24,48 +19,53 @@ public:
 
 	// This is the resource itself that is to be used by the program.
 	// It needs to be assignable via operator=(Resource const&).
-	using Resource = typename TResourceTypes::Resource;
+	using Data = typename TResourceTypes::Data;
 	// This type contains data needed for loading the resource, e.g a path to a file.
-	using ResourceDefinition = typename TResourceTypes::ResourceDefiniton;
+	using Definition = typename TResourceTypes::Definition;
 	// This type should have one static method ResourceLoader::load(ResourceDefinition const& def),
 	// which loads the resource (whatever that entails)
-	using ResourceLoader = typename TResourceTypes::ResourceLoader;
+	using Loader = typename TResourceTypes::Loader;
 	// This type should have one static method ResourceLoader::unload(Resource const& res),
 	// which unloads the resource (whatever that entails)
-	using ResourceUnloader = typename TResourceTypes::ResourceUnloader;
+	using Unloader = typename TResourceTypes::Unloader;
 	// A lightweight handle to the resource. Needs to be integer type.
-	using ResourceHandle = typename TResourceTypes::ResourceHandle;
+	using Handle = typename TResourceTypes::Handle;
 
 	// Loads a resource.
-	ResourceHandle load(ResourceDefinition iResourceDefinition)
+	Handle load(Definition iResourceDefinition)
 	{
 		// Check if there are any recycled handles, if so, reuse
 		if(!mFreedHandles.empty())
 		{
-			ResourceHandle recycledHandle = mFreedHandles.back();
+			Handle recycledHandle = mFreedHandles.back();
 			mFreedHandles.pop_back();
-			mResources[recycledHandle.handle] = ResourceLoader::load(iResourceDefinition);
+			mDatas[recycledHandle.handle] = Loader::load(iResourceDefinition);
 			return recycledHandle;
 		}
 
-		mResources.emplace_back(ResourceLoader::load(iResourceDefinition));
-		return ResourceHandle{nextHandle++};
+		mDatas.emplace_back(Loader::load(iResourceDefinition));
+		return Handle{nextHandle++};
 	};
 
-	Resource& get(ResourceHandle iHandle)
+	Data& get(Handle iHandle)
 	{
-		return mResources[iHandle.handle];
+		return mDatas[iHandle.handle-INITIAL_HANDLE];
 	}
 
 	// Unloads a resource.
-	void unload(ResourceHandle iHandle)
+	void unload(Handle iHandle)
 	{
-		ResourceUnloader::unload(get(iHandle));
+		Unloader::unload(get(iHandle));
 		mFreedHandles.emplace_back(iHandle);
 	}
 
 private:
-	std::vector<Resource> mResources;
-	std::vector<ResourceHandle> mFreedHandles;
-	std::uint16_t nextHandle = 1;
+	std::vector<Data> mDatas;
+	std::vector<Handle> mFreedHandles;
+
+	// Handle starts at 1, because 0 is reserved for "bad" handle.
+	// Vector of datas is 0-indexed, so INITIAL_HANDLE is subtracted
+	// whenever a handle is used as index into data-vector.
+	static constexpr Handle INITIAL_HANDLE = 1;
+	Handle nextHandle = INITIAL_HANDLE;
 };

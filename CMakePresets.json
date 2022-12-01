@@ -1,5 +1,10 @@
 {
-	"version": 3,
+	"version": 6,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 25,
+		"patch": 1
+	},
 	"configurePresets": [
 		{
 			"name": "linux-debug",
@@ -200,6 +205,80 @@
 				"outputOnFailure": false,
 				"verbosity": "verbose"
 			}
+		}
+	],
+	"workflowPresets": [
+		{
+			"name": "linux-debug",
+			"displayName": "Linux Debug",
+			"steps": [
+				{
+					"type": "configure",
+					"name": "linux-debug"
+				},
+				{
+					"type": "build",
+					"name": "linux-debug"
+				},
+				{
+					"type": "test",
+					"name": "linux-debug-tests"
+				}
+			]
+		},
+		{
+			"name": "linux-release",
+			"displayName": "Linux Release",
+			"steps": [
+				{
+					"type": "configure",
+					"name": "linux-release"
+				},
+				{
+					"type": "build",
+					"name": "linux-release"
+				},
+				{
+					"type": "test",
+					"name": "linux-release-tests"
+				}
+			]
+		},
+		{
+			"name": "windows-debug",
+			"displayName": "Windows Debug",
+			"steps": [
+				{
+					"type": "configure",
+					"name": "windows-debug"
+				},
+				{
+					"type": "build",
+					"name": "windows-debug"
+				},
+				{
+					"type": "test",
+					"name": "windows-debug-tests"
+				}
+			]
+		},
+		{
+			"name": "windows-release",
+			"displayName": "Windows Release",
+			"steps": [
+				{
+					"type": "configure",
+					"name": "windows-release"
+				},
+				{
+					"type": "build",
+					"name": "windows-release"
+				},
+				{
+					"type": "test",
+					"name": "windows-release-tests"
+				}
+			]
 		}
 	]
 }

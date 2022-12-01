@@ -1,10 +1,12 @@
-cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25.1 FATAL_ERROR)
 
 project(lowpoly3d
 	VERSION 0.0.2
 	LANGUAGES CXX
 	HOMEPAGE_URL https://github.com/Kuxe/lowpoly3d
 )
+
+message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 

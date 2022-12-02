@@ -1,0 +1,44 @@
+name: CMake Build Matrix
+on:
+  push:
+    branches:
+      - 'main'
+      - 'github_actions'
+    jobs:
+      build:
+        strategy:
+          fail-fast: false
+          matrix:
+            config:
+              - {
+                  name: "Ubuntu 22.04 GCC Debug",
+                  os: ubuntu-22.04,WIn
+                  cmakeWorkflow: "linux-debug"
+                }
+              - {
+                  name: "Ubuntu 22.04 GCC Release",
+                  os: ubuntu-22.04,
+                  cmakeWorkflow: "linux-release"
+                }
+              - {
+                  name: "Windows Server 2022 Debug",
+                  os: ubuntu-22.04,
+                  cmakeWorkflow: "windows-debug"
+                }
+              - {
+                  name: "Windows Server 2022 Release",
+                  os: windows-2022,
+                  cmakeWorkflow: "windows-release"
+                }
+        runs-on: ${{ matrix.config.os }}
+        steps:
+          - name: Checkout Repo
+            uses: actions/checkout@v3
+          - name: Get CMake and Ninja
+            uses: lukka/get-cmake@v3.24.3 
+            with:
+              cmakeVersion: 3.25.1
+              ninja: 1.11.0
+          - name: Run CMake Workflow Preset
+            working-directory: ${{ GITHUB_WORKSPACE }}
+            run: cmake --workflow --preset ${{ matrix.config.cmakeWorkflow }}

@@ -40,5 +40,5 @@ jobs:
           cmakeVersion: 3.25.1
           ninja: 1.11.0
       - name: Run CMake Workflow Preset
-        working-directory: ${{ GITHUB_WORKSPACE }}
+        working-directory: $GITHUB_WORKSPACE
         run: cmake --workflow --preset ${{ matrix.config.cmakeWorkflow }}

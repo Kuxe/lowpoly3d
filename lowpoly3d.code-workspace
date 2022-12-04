@@ -4,11 +4,38 @@
 			"path": "."
 		}
 	],
+	"extensions": {
+		"recommendations": [
+			"gruntfuggly.todo-tree",
+			"josetr.cmake-language-support-vscode",
+			"llvm-vs-code-extensions.vscode-clangd",
+			"matepek.vscode-catch2-test-adapter",
+			"ms-vscode.cmake-tools",
+			"ms-vscode.cpptools"
+		]
+	},
+
 	"settings": {
-		"editor.insertSpaces": false,
-		"editor.tabSize": 2,
+		"C_Cpp.intelliSenseEngine": "Disabled",
+		"clangd.checkUpdates": true,
+		"clangd.restartAfterCrash": false,
 		"cmake.allowCommentsInPresetsFile": true,
 		"cmake.configureOnEdit": false,
-		"cmake.exportCompileCommandsFile": false
+		"cmake.configureOnOpen": false,
+		"cmake.exportCompileCommandsFile": false,
+		"editor.insertSpaces": false,
+		"editor.renderWhitespace": "all",
+		"editor.rulers": [
+			80,
+			120
+		],
+		"editor.tabSize": 2,
+
+		"todo-tree.highlights.enabled": true,
+		"todo-tree.highlights.useColourScheme": true,
+		"todo-tree.tree.buttons.groupByTag": true,
+		"todo-tree.tree.groupedByTag": true,
+		"todo-tree.tree.showBadges": true,
+		"todo-tree.tree.showCountsInTree": true
 	}
 }

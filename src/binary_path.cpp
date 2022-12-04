@@ -26,8 +26,20 @@ namespace {
 	std::filesystem::path get_current_binary_absolute_path_platform()
 	{
 		char path[PATH_MAX];
-		readlink("/proc/self/exe", path, PATH_MAX);
-		return std::filesystem::path(path);
+		int const numberOfReadBytes = readlink("/proc/self/exe", path, PATH_MAX);
+		switch(numberOfReadBytes)
+		{
+			case -1: {
+				throw std::runtime_error("Could readlink /proc/self/exe");
+			} break;
+			case PATH_MAX: {
+				assert(false && "readlink truncation ocurred");
+				return std::filesystem::path(path);
+			}
+			default: {
+				return std::filesystem::path(path);
+			}
+		}
 	}
 }
 

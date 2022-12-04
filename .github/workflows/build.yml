@@ -40,7 +40,7 @@ jobs:
           cmakeVersion: 3.25.1
           ninjaVersion: 1.11.0
       - name: Install dependencies
-        if: matrix.os == "ubuntu-22\.04'
+        if: runner.os == 'Linux'
         run: sudo apt-get install libxrandr
       - name: Run CMake Workflow Preset
         run: cmake --workflow --preset ${{ matrix.config.cmakeWorkflow }}

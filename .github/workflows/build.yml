@@ -38,7 +38,7 @@ jobs:
         uses: lukka/get-cmake@v3.24.3 
         with:
           cmakeVersion: 3.25.1
-          ninja: 1.11.0
+          ninjaVersion: 1.11.0
       - name: Run CMake Workflow Preset
         working-directory: $GITHUB_WORKSPACE
         run: cmake --workflow --preset ${{ matrix.config.cmakeWorkflow }}

@@ -41,6 +41,6 @@ jobs:
           ninjaVersion: 1.11.0
       - name: Install dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get install libxrandr-dev=2:1.5.2-1build1 libxinerama-dev=2:1.1.4-3 libxcursor-dev=1:1.2.0-2build4 libxi-dev=2:1.8-1build1 libgl-dev=1.4.0-1
+        run: sudo apt-get install libxrandr-dev=2:1.5.2-1build1 libxinerama-dev=2:1.1.4-3 libxcursor-dev=1:1.2.0-2build4 libxi-dev=2:1.8-1build1 libgl-dev=1.4.0-1 xorg-dev=1:7.7+23ubuntu2
       - name: Run CMake Workflow Preset
         run: cmake --workflow --preset ${{ matrix.config.cmakeWorkflow }}

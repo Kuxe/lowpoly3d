@@ -8,6 +8,8 @@ project(lowpoly3d
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
+set(ENV{NINJA_STATUS} "[%f/%t %oe/s %es]:")
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(buildcache)

@@ -4,6 +4,7 @@
 #include "geometric_primitives/point.hpp"
 #include "geometric_primitives/triangle.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include "utils/glm/glmprint.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>

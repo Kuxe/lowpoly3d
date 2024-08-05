@@ -15,7 +15,7 @@ if(WIN32)
 	set(buildcache_archive "${CMAKE_SOURCE_DIR}/download/buildcache-windows.zip")
 	set(buildcache_bindir "${CMAKE_SOURCE_DIR}/buildcache/bin")
 	set(buildcache_expected_binfile "${CMAKE_SOURCE_DIR}/buildcache/bin/buildcache.exe")
-	set(buildcache_download_url "https://github.com/mbitsnbites/buildcache/releases/download/v0.27.6/buildcache-windows.zip")
+	set(buildcache_download_url "https://gitlab.com/bits-n-bites/buildcache/-/releases/v0.30.2/downloads/buildcache-windows.zip")
 
 	if(NOT EXISTS ${buildcache_expected_binfile})
 		message(STATUS "buildcache.cmake: buildcache not found, downloading and extracting...")

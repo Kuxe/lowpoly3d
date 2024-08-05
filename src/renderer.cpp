@@ -380,17 +380,18 @@ bool Renderer::run() {
 				std::vector<std::string> names;
 				names.reserve(models.size());
 
-				ss << "Available models are: {";
+				ss << "Available models are: ";
 
-				if(models.empty()) ss << "}\n";
+				if(models.empty())
+				{
+					ss << "<NO MODELS>\n";
+				}
 				else
 				{
-					auto lastIt = prev(end(models));
-					for(auto it = begin(models); it != lastIt; ++it)
+					for(auto const& [key, value] : models)
 					{
-						ss << it->first << ", ";
+						ss << "\"" << key << "\" ";
 					}
-					ss << lastIt->first << "}\n";
 				}
 				printf("%s!", ss.str().c_str());
 

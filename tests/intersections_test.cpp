@@ -543,7 +543,7 @@ SCENARIO("Line-Line (2D) intersection tests") {
 				std::stringstream ssexpected;
 				ssexpected << "The result is reportedly " << glm::to_string(expected);
 				THEN(ssexpected.str()) {
-					INFO("result=" << result);
+					INFO("result=" << glm::to_string(result));
 					REQUIRE(glm::all(glm::epsilonEqual(result, expected, 1e-6f)));
 				}
 			}

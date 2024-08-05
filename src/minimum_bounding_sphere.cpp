@@ -4,6 +4,7 @@
 #include "geometric_primitives/sphere.hpp"
 #include "geometric_primitives/triangle.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/norm.hpp" // glm::distance2
 
 #include "minimum_bounding_sphere.hpp"

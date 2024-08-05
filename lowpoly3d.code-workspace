@@ -16,7 +16,7 @@
 	},
 
 	"settings": {
-		"C_Cpp.intelliSenseEngine": "Disabled",
+		"C_Cpp.intelliSenseEngine": "disabled",
 		"clangd.checkUpdates": true,
 		"clangd.restartAfterCrash": false,
 		"cmake.allowCommentsInPresetsFile": true,

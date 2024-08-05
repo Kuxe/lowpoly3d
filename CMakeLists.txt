@@ -81,14 +81,14 @@ set(CONTRIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/contrib")
 FetchContent_Declare(
 	Catch2
 	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-	GIT_TAG v3.0.0-preview4
+	GIT_TAG v3.6.0
 )
 FetchContent_MakeAvailable(Catch2)
 
 FetchContent_Declare(
 	glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG 0.9.9.8
+	GIT_TAG 1.0.1
 )
 FetchContent_MakeAvailable(glm)
 target_disable_warnings(glm)
